@@ -1,0 +1,6 @@
+*.out
+/__MACOSX
+*.hh
+*.cc
+lex.yy.c
+*.zip
