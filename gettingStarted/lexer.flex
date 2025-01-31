@@ -24,8 +24,8 @@
 ">="                     {if(USE_LEX_ONLY) {printf("GREATER EQUAL ");} else {return yy::parser::make_LESS_EQUAL(yytext);}}
 "=="                     {if(USE_LEX_ONLY) {printf("Equality Operator ");} else {return yy::parser::make_EQUAL(yytext);}}
 
-"["                   {if(USE_LEX_ONLY) {printf("Left SQR Brac ");} else {return yy::parser::make_RSQB(yytext);}}
-"]"                   {if(USE_LEX_ONLY) {printf("Right SQR Brac ");} else {return yy::parser::make_LSQB(yytext);}}
+"["                   {if(USE_LEX_ONLY) {printf("Left SQR Brac ");} else {return yy::parser::make_LB(yytext);}}
+"]"                   {if(USE_LEX_ONLY) {printf("Right SQR Brac ");} else {return yy::parser::make_RB(yytext);}}
 ";"                   {if(USE_LEX_ONLY) {printf("SemiColon ");} else {return yy::parser::make_SEMICOLON(yytext);}}
 ","                   {if(USE_LEX_ONLY) {printf("COMMA ");} else {return yy::parser::make_COMMA(yytext);}}
 "_"                   {if(USE_LEX_ONLY) {printf("UnderScore ");} else {return yy::parser::make_UNDERSCORE(yytext);}}

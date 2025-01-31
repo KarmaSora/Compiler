@@ -26,7 +26,10 @@
 %token <std::string> PLUSOP MINUSOP MULTOP LP RP DIVOP ASSIGN INT
 %token <std::string> AND OR EXCLAMATION_MARK EQUAL LESS_EQUAL LESS_THAN GREATER_EQUAL GREATER_THAN
 %token <std::string> SEMICOLON COMMA UNDERSCORE DOT COLON LB RB
-%token <std::string> LSQB  RSQB 
+%token <std::string> LSQB  RSQB LENGTH
+
+
+
 %token END 0 "end of file"
 
 /* Operator precedence and associativity rules */
@@ -57,12 +60,20 @@
 
 /* Specify types for non-terminals in the grammar */
 /* The type specifies the data type of the values associated with these non-terminals */
-%type <Node *> root expression factor
+%type <Node *> root expression factor identifier statement reqStatement
 
 /* Grammar rules section */
 /* This section defines the production rules for the language being parsed */
 %%
 root:       expression {root = $1;};
+reqStatement: %empty | reqStatement statement;
+
+statement: LB reqStatement RB {
+                $$ = new Node("Statement", $2,  yylineno);
+                $$->children.push_back();
+};
+
+
 
 expression: expression PLUSOP expression {      /*
             Create a subtree that corresponds to the AddExpression
@@ -143,18 +154,35 @@ expression: expression PLUSOP expression {      /*
             expression EXCLAMATION_MARK  {
                 $$ = new Node("NotExpression", "", yylineno);
                 $$->children.push_back($1);
-            }
+            } 
 
-          |
-            expression LSQB  {
-                $$ = new Node("NotExpression", "", yylineno);
+          | 
+          expression LB expression RB{
+                $$ = new Node("Exp left exp right brackets", "", yylineno);
+                $$->children.push_back($1); /*expression 1*/
+                $$->children.push_back($3); /*expression 2*/
+
+          }
+          | 
+          expression DOT LENGTH{
+                $$ = new Node("left right brackets", "", yylineno);
                 $$->children.push_back($1);
-            }
-
-
+          }
+          |
+            expression DOT identifier expression COMMA expression {
+                $$ = new Node("left right brackets", "", yylineno);
+                $$->children.push_back($1);
+          }
 
           | factor      {$$ = $1; /* printf("r4 ");*/}
             ;
+
+identifier: identifier{
+                $$ = new Node("Identifier", $1, yylineno);
+
+  };
+
+
 
 
 factor:     INT           {  $$ = new Node("Int", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
