@@ -9,7 +9,7 @@
 %code requires{
   #include <string>
   #include "Node.h"
-  #define USE_LEX_ONLY true //change this macro to true if you want to isolate the lexer from the parser.
+  #define USE_LEX_ONLY false //change this macro to true if you want to isolate the lexer from the parser.
 }
 
 /* Code included in the parser implementation file */
@@ -23,13 +23,37 @@
 
 /* Token definitions for the grammar */
 /* Tokens represent the smallest units of the language, like operators and parentheses */
-%token <std::string> PLUSOP MINUSOP MULTOP INT LP RP 
+%token <std::string> PLUSOP MINUSOP MULTOP LP RP DIVOP ASSIGN INT
+%token <std::string> AND OR EXCLAMATION_MARK EQUAL LESS_EQUAL LESS_THAN GREATER_EQUAL GREATER_THAN
+%token <std::string> SEMICOLON COMMA UNDERSCORE DOT COLON LB RB
+%token <std::string> LSQB  RSQB 
 %token END 0 "end of file"
 
 /* Operator precedence and associativity rules */
 /* Used to resolve ambiguities in parsing expressions See https://www.gnu.org/software/bison/manual/bison.html#Precedence-Decl */ 
-%left PLUSOP MINUSOP
-%left MULTOP
+
+
+
+
+/*assignment*/
+%right ASSIGN
+
+/*Logical */
+%left OR    
+%left AND 
+
+/*Comparison Operators */
+%left EQUAL 
+%left LESS_EQUAL LESS_THAN GREATER_EQUAL GREATER_THAN   
+
+/*additive*/
+%right PLUSOP MINUSOP EXCLAMATION_MARK
+
+/*multiplicative*/
+%left MULTOP DIVOP
+
+/*paranteces*/
+%left LP RP
 
 /* Specify types for non-terminals in the grammar */
 /* The type specifies the data type of the values associated with these non-terminals */
@@ -41,29 +65,97 @@
 root:       expression {root = $1;};
 
 expression: expression PLUSOP expression {      /*
-                                                  Create a subtree that corresponds to the AddExpression
-                                                  The root of the subtree is AddExpression
-                                                  The childdren of the AddExpression subtree are the left hand side (expression accessed through $1) and right hand side of the expression (expression accessed through $3)
-                                                */
-                            $$ = new Node("AddExpression", "", yylineno);
-                            $$->children.push_back($1);
-                            $$->children.push_back($3);
-                            /* printf("r1 "); */
-                          }
+            Create a subtree that corresponds to the AddExpression
+            The root of the subtree is AddExpression
+            The childdren of the AddExpression subtree are the left hand side (expression accessed through $1) and right hand side of the expression (expression accessed through $3)
+          */
+                $$ = new Node("AddExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+                /* printf("r1 "); */
+              }
             | expression MINUSOP expression {
-                            $$ = new Node("SubExpression", "", yylineno);
-                            $$->children.push_back($1);
-                            $$->children.push_back($3);
-                            /* printf("r2 "); */
-                          }
+                $$ = new Node("SubExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+                /* printf("r2 "); */
+              }
             | expression MULTOP expression {
-                            $$ = new Node("MultExpression", "", yylineno);
-                            $$->children.push_back($1);
-                            $$->children.push_back($3);
-                            /* printf("r3 "); */
-                          }
-            | factor      {$$ = $1; /* printf("r4 ");*/}
+                $$ = new Node("MultExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+                /* printf("r3 "); */
+              }
+            | expression DIVOP expression {
+                $$ = new Node("DivExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+                /* printf("r3 "); */
+              }
+            | expression ASSIGN expression{
+                $$ = new Node("ASSIGN","", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+              }
+            | 
+
+            /*Comparesion Operators*/
+          expression LESS_THAN expression {
+                $$ = new Node("LessThanExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          | expression GREATER_THAN expression {
+                $$ = new Node("GreaterThanExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          | expression EQUAL expression {
+                $$ = new Node("EqualExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          | expression LESS_EQUAL expression {
+                $$ = new Node("LessEqualExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          | expression GREATER_EQUAL expression {
+                $$ = new Node("GreaterEqualExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          |
+
+            /* Logical section */ 
+            expression AND expression {
+                $$ = new Node("AndExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+          | expression OR expression {
+                $$ = new Node("OrExpression", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($3);
+            }
+
+          |
+            expression EXCLAMATION_MARK  {
+                $$ = new Node("NotExpression", "", yylineno);
+                $$->children.push_back($1);
+            }
+
+          |
+            expression LSQB  {
+                $$ = new Node("NotExpression", "", yylineno);
+                $$->children.push_back($1);
+            }
+
+
+
+          | factor      {$$ = $1; /* printf("r4 ");*/}
             ;
+
 
 factor:     INT           {  $$ = new Node("Int", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
             | LP expression RP { $$ = $2; /* printf("r6 ");  simply return the expression */}
