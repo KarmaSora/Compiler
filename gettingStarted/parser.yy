@@ -23,12 +23,17 @@
 
 /* Token definitions for the grammar */
 /* Tokens represent the smallest units of the language, like operators and parentheses */
-%token <std::string> PLUSOP MINUSOP MULTOP LP RP DIVOP ASSIGN 
+%token <std::string> PLUSOP MINUSOP MULTOP DIVOP ASSIGN 
 %token <std::string> AND OR EXCLAMATION_MARK EQUAL LESS_EQUAL LESS_THAN GREATER_EQUAL GREATER_THAN
-%token <std::string> SEMICOLON COMMA UNDERSCORE DOT COLON LB RB
-%token <std::string> LSQB  RSQB LENGTH 
+%token <std::string> SEMICOLON COMMA UNDERSCORE DOT COLON LENGTH 
+%token <std::string> LB RB                /*Square Bracets   [  ]   */
+%token <std::string> LP RP                /*Parantheses   (  )   */
+%token <std::string> CurlyLB CurlyRB      /*Curly Bracets   {   }   */
+
+
+
 %token <std::string> PUBLIC CLASS STATIC VOID MAIN RETURN INT BOOLEAN STRING IF ELSE WHILE SYSTEM_OUT_PRINTLN 
-%token <std::string> TRUE FALSE THIS NEW CurlyLB CurlyRB
+%token <std::string> TRUE FALSE THIS NEW 
 
 %token <std::string>  IDENTIFIER INTERGER_LITERAL
 
@@ -64,30 +69,94 @@
 
 /* Specify types for non-terminals in the grammar */
 /* The type specifies the data type of the values associated with these non-terminals */
-%type <Node *> root expression factor identifier type //statement reqStatement 
+%type <Node *> root expression factor identifier type statement reqStatement 
+%type <Node *> MainClass ClassDeclaration VarDeclaration reqVarDeclaration MethodDeclaration  reqMethodDeclaration
+
+
 
 /* Grammar rules section */
 /* This section defines the production rules for the language being parsed */
 %%
 root:       expression {root = $1;}
 			|type {root = $1;}
+            |statement
 			
 			;
 
+MainClass: PUBLIC CLASS identifier CurlyLB PUBLIC STATIC 
+            VOID MAIN LP STRING LB RB identifier RP CurlyLB statement reqStatement CurlyRB CurlyRB
+        ;
+
+ClassDeclaration: CLASS identifier CurlyLB reqVarDeclaration reqMethodDeclaration CurlyRB
+        ;
+VarDeclaration: type identifier SEMICOLON 
+        ;
+reqVarDeclaration: %empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    }
+    |
+     reqVarDeclaration VarDeclaration {
+      $$ = $1;
+      $$->children.push_back($2);
+    }
+    ;
+
+MethodDeclaration: PUBLIC type identifier LP 
+                    type identifier 
+                   //req (COMMA type identifier )
+                   RP
+                   CurlyLB 
+                   //reqVarDeclaration /* or */ statement
+                   RETURN expression SEMICOLON CurlyRB
+        ;
+
+reqMethodDeclaration: %empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    }
+    |
+     reqMethodDeclaration MethodDeclaration {
+      $$ = $1;
+      $$->children.push_back($2);
+    }
+    ;
 
 /*
-reqStatement:  %empty { $$ = "null/nothing";}| reqStatement statement;
-
-statement: CurlyLB reqStatement CurlyRB {
-                $$ = new Node("Statement", $2,  yylineno);
-                $$->children.push_back();
-};
 */
 
-type: INT LB RB {$$ = new Node("TYPE: INT LB RB", "", yylineno);}
-	| BOOLEAN {$$ = new Node("TYPE: BOOLEAN", "", yylineno);}
-	| INT{$$ = new Node("TYPE: INT", "", yylineno);}
-	| identifier ;
+reqStatement: %empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    }
+    | reqStatement statement {
+      $$ = $1;
+      $$->children.push_back($2);
+    }
+    ;
+
+statement: CurlyLB reqStatement CurlyRB {
+                $$ = new Node("Statement", "", yylineno);
+                $$->children.push_back($2);
+            }
+          | expression SEMICOLON {
+                $$ = $1;
+            }
+          | IF LP expression RP statement ELSE statement {
+                $$ = new Node("IfElseStatement", "", yylineno);
+                $$->children.push_back($3); // condition
+                $$->children.push_back($5); // if block
+                $$->children.push_back($7); // else block
+            }
+          | WHILE LP expression RP statement {
+                $$ = new Node("WhileStatement", "", yylineno);
+                $$->children.push_back($3); // condition
+                $$->children.push_back($5); // loop body
+            }
+          ;
+
+type: INT LB RB     {$$ = new Node("TYPE: INT LB RB", "", yylineno);}
+	| BOOLEAN       {$$ = new Node("TYPE: BOOLEAN", "", yylineno);}
+	| INT           {$$ = new Node("TYPE: INT", "", yylineno);}
+	| identifier    {$$ = $1; } 
+    ;
 	
 
 expression: expression PLUSOP expression {      /*
@@ -197,7 +266,7 @@ expression: expression PLUSOP expression {      /*
 
             |THIS{  $$ = new Node("THIS", "", yylineno);}
 
-            | NEW INT RB expression LB  {
+            |NEW INT LB expression RB  {
                 $$ = new Node("NEW INT RB exp LB", "", yylineno);
                 $$->children.push_back($4);
         	}
@@ -206,7 +275,7 @@ expression: expression PLUSOP expression {      /*
                 $$ = new Node("NEW Identifier LP RP", "", yylineno);
                 $$->children.push_back($2);
         	}
-            | EXCLAMATION_MARK expression
+            |EXCLAMATION_MARK expression
             {
                 $$ = new Node("NOT exp ", "", yylineno);
                 $$->children.push_back($2);
@@ -216,15 +285,15 @@ expression: expression PLUSOP expression {      /*
             ;
 
 identifier: IDENTIFIER{
-                $$ = new Node("Identifier", $1, yylineno);
-
-	};
+            $$ = new Node("Identifier", $1, yylineno);
+        	}
+    ;
 
 
 // 
 
-factor:     INTERGER_LITERAL           {  $$ = new Node("Int", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
-            | LP expression RP { $$ = $2; /* printf("r6 ");  simply return the expression */}
+factor: INTERGER_LITERAL{  $$ = new Node("Int", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
+        | LP expression RP { $$ = $2; /* printf("r6 ");  simply return the expression */}
     ;
 
 
