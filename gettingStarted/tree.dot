@@ -1,17 +1,91 @@
 digraph {
-n0 [label="MainClass:"];
-n1 [label="Identifier:SemanticValidMethodCall"];
-n0 -> n1
-n2 [label="Identifier:a"];
-n0 -> n2
-n3 [label="SYSTEM_OUT_PRINTLN:"];
-n4 [label="left right brackets:"];
-n5 [label="NEW Identifier LP RP:"];
-n6 [label="Identifier:A"];
+n0 [label="GOALLLLL:"];
+n1 [label="MainClass:"];
+n2 [label="Identifier:SemanticValidMethodCall"];
+n1 -> n2
+n3 [label="Identifier:a"];
+n1 -> n3
+n4 [label="SYSTEM_OUT_PRINTLN:"];
+n5 [label="left right brackets:"];
+n6 [label="NEW Identifier LP RP:"];
+n7 [label="Identifier:A"];
+n6 -> n7
 n5 -> n6
 n4 -> n5
-n3 -> n4
-n0 -> n3
-n7 [label="EmptyStatementList:"];
-n0 -> n7
+n1 -> n4
+n8 [label="EmptyStatementList:"];
+n1 -> n8
+n0 -> n1
+n9 [label="ClassDeclaration:"];
+n10 [label="ClassDeclaration:"];
+n11 [label="Identifier:A"];
+n10 -> n11
+n12 [label="EmptyStatementList:"];
+n10 -> n12
+n13 [label="EmptyStatementList:"];
+n14 [label="MethodDeclaration:"];
+n15 [label="Identifier:A"];
+n14 -> n15
+n16 [label="Identifier:a1"];
+n14 -> n16
+n17 [label="ParamList:"];
+n14 -> n17
+n18 [label="EmptyStatementList:"];
+n14 -> n18
+n19 [label="THIS:"];
+n14 -> n19
+n13 -> n14
+n20 [label="MethodDeclaration:"];
+n21 [label="TYPE: INT:"];
+n20 -> n21
+n22 [label="Identifier:a2"];
+n20 -> n22
+n23 [label="EmptyStatementList:"];
+n20 -> n23
+n24 [label="EmptyStatementList:"];
+n20 -> n24
+n25 [label="Int:0"];
+n20 -> n25
+n13 -> n20
+n26 [label="MethodDeclaration:"];
+n27 [label="Identifier:A"];
+n26 -> n27
+n28 [label="Identifier:a3"];
+n26 -> n28
+n29 [label="EmptyStatementList:"];
+n26 -> n29
+n30 [label="EmptyStatementList:"];
+n26 -> n30
+n31 [label="Identifier:a"];
+n26 -> n31
+n13 -> n26
+n32 [label="MethodDeclaration:"];
+n33 [label="Identifier:A"];
+n32 -> n33
+n34 [label="Identifier:a4"];
+n32 -> n34
+n35 [label="EmptyStatementList:"];
+n32 -> n35
+n36 [label="EmptyStatementList:"];
+n32 -> n36
+n37 [label="NEW Identifier LP RP:"];
+n38 [label="Identifier:A"];
+n37 -> n38
+n32 -> n37
+n13 -> n32
+n39 [label="MethodDeclaration:"];
+n40 [label="TYPE: INT:"];
+n39 -> n40
+n41 [label="Identifier:a5"];
+n39 -> n41
+n42 [label="ParamList:"];
+n39 -> n42
+n43 [label="EmptyStatementList:"];
+n39 -> n43
+n44 [label="Int:1"];
+n39 -> n44
+n13 -> n39
+n10 -> n13
+n9 -> n10
+n0 -> n9
 }

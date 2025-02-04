@@ -70,7 +70,7 @@
 /* Specify types for non-terminals in the grammar */
 /* The type specifies the data type of the values associated with these non-terminals */
 %type <Node *> root expression factor identifier type statement reqStatement 
-%type <Node *> MainClass ClassDeclaration reqClassDeclaration VarDeclaration reqVarDeclaration MethodDeclaration 
+%type <Node *> GOAL MainClass ClassDeclaration reqClassDeclaration VarDeclaration reqVarDeclaration MethodDeclaration 
 %type <Node *> reqMethodDeclaration varDecOrSTMT ParamList Parameters arguments argumentsList
 
 
@@ -79,15 +79,14 @@
 /* This section defines the production rules for the language being parsed */
 %%
 root:       
-            MainClass reqClassDeclaration END{root = $1;}
-            |MainClass {root = $1;}
-            |ClassDeclaration{root = $1;}
-            |VarDeclaration	{root = $1;}
-            |MethodDeclaration{root = $1;}
-            |statement{root = $1;}
-            |expression{root = $1;}
-            |type{root = $1;}
+            GOAL{root = $1;}
 			;
+
+GOAL : MainClass reqClassDeclaration END{  
+            $$ = new Node("GOALLLLL", "", yylineno);
+            $$->children.push_back($1);
+            $$->children.push_back($2);}
+    ;
 
 MainClass: PUBLIC CLASS identifier CurlyLB PUBLIC STATIC 
             VOID MAIN LP STRING LB RB identifier RP CurlyLB statement reqStatement CurlyRB CurlyRB  {
@@ -207,9 +206,7 @@ statement: CurlyLB reqStatement CurlyRB {
                 $$ = new Node("Statement", "", yylineno);
                 $$->children.push_back($2);
             }
-          | expression SEMICOLON {
-                $$ = $1;
-            }
+          
           | IF LP expression RP statement  {
                 $$ = new Node("IF Only", "", yylineno);
                 $$->children.push_back($3); // condition
@@ -257,11 +254,7 @@ type: INT LB RB     {$$ = new Node("TYPE: INT LB RB", "", yylineno);}
 arguments: %empty {
       $$ = new Node("EmptyStatementList", "", yylineno);
     }|
-    argumentsList{
-                $$ = new Node("arguments", "", yylineno);
-                $$->children.push_back($1); // condition
-              
-    }
+    argumentsList
     ;
 
 argumentsList:
@@ -405,6 +398,7 @@ expression: expression PLUSOP expression {      /*
 identifier: IDENTIFIER{
             $$ = new Node("Identifier", $1, yylineno);
         	}
+         
     ;
 
 
