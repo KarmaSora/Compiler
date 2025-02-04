@@ -70,26 +70,64 @@
 /* Specify types for non-terminals in the grammar */
 /* The type specifies the data type of the values associated with these non-terminals */
 %type <Node *> root expression factor identifier type statement reqStatement 
-%type <Node *> MainClass ClassDeclaration VarDeclaration reqVarDeclaration MethodDeclaration  reqMethodDeclaration
+%type <Node *> MainClass ClassDeclaration reqClassDeclaration VarDeclaration reqVarDeclaration MethodDeclaration 
+%type <Node *> reqMethodDeclaration varDecOrSTMT ParamList Parameters arguments argumentsList
 
 
 
 /* Grammar rules section */
 /* This section defines the production rules for the language being parsed */
 %%
-root:       expression {root = $1;}
-			|type {root = $1;}
-            |statement
-			
+root:       
+            MainClass reqClassDeclaration END{root = $1;}
+            |MainClass {root = $1;}
+            |ClassDeclaration{root = $1;}
+            |VarDeclaration	{root = $1;}
+            |MethodDeclaration{root = $1;}
+            |statement{root = $1;}
+            |expression{root = $1;}
+            |type{root = $1;}
 			;
 
 MainClass: PUBLIC CLASS identifier CurlyLB PUBLIC STATIC 
-            VOID MAIN LP STRING LB RB identifier RP CurlyLB statement reqStatement CurlyRB CurlyRB
+            VOID MAIN LP STRING LB RB identifier RP CurlyLB statement reqStatement CurlyRB CurlyRB  {
+                $$ = new Node("MainClass", "", yylineno);
+                $$->children.push_back($3);
+                $$->children.push_back($13);
+                $$->children.push_back($16);
+                $$->children.push_back($17);                
+            }
         ;
 
 ClassDeclaration: CLASS identifier CurlyLB reqVarDeclaration reqMethodDeclaration CurlyRB
+            {
+                $$ = new Node("ClassDeclaration", "", yylineno);
+                $$->children.push_back($2);
+                $$->children.push_back($4);
+                $$->children.push_back($5);
+            }
+            
         ;
-VarDeclaration: type identifier SEMICOLON 
+reqClassDeclaration: ClassDeclaration  {
+                $$ = new Node("ClassDeclaration", "", yylineno);
+                $$->children.push_back($1);
+                }
+                |
+                reqClassDeclaration ClassDeclaration {
+                $$ = new Node("reqClassDeclaration ClassDeclaration", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($2);
+                }
+          
+        
+        ;
+
+
+VarDeclaration: type identifier SEMICOLON {
+                $$ = new Node("VarDeclaration", "", yylineno);
+                $$->children.push_back($1);
+                $$->children.push_back($2);
+            }
         ;
 reqVarDeclaration: %empty {
       $$ = new Node("EmptyStatementList", "", yylineno);
@@ -102,13 +140,48 @@ reqVarDeclaration: %empty {
     ;
 
 MethodDeclaration: PUBLIC type identifier LP 
-                    type identifier 
-                   //req (COMMA type identifier )
-                   RP
-                   CurlyLB 
-                   //reqVarDeclaration /* or */ statement
-                   RETURN expression SEMICOLON CurlyRB
+                    Parameters
+                    RP
+                    CurlyLB 
+                    varDecOrSTMT
+                    RETURN expression SEMICOLON CurlyRB
+                   {
+                $$ = new Node("MethodDeclaration", "", yylineno);
+                $$->children.push_back($2);
+                $$->children.push_back($3);
+                $$->children.push_back($5);
+                $$->children.push_back($8);
+                $$->children.push_back($10);
+            }
         ;
+
+/* func(), func( int a, string b, bool c ) */
+Parameters:%empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    } | ParamList {$$ = new Node("ParamList", "", yylineno);}
+     ;
+
+ParamList: type identifier {
+        $$ = new Node("MultExpression", "", yylineno);
+        $$->children.push_back($1);
+        $$->children.push_back($2);
+    }
+    | ParamList COMMA type identifier
+    {
+        $$ = new Node("MultExpression", "", yylineno);
+        $$->children.push_back($1);
+        $$->children.push_back($3);
+        $$->children.push_back($4);
+    }
+    ;
+
+varDecOrSTMT : %empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    }
+    |varDecOrSTMT statement 
+    |varDecOrSTMT VarDeclaration
+    ;
+
 
 reqMethodDeclaration: %empty {
       $$ = new Node("EmptyStatementList", "", yylineno);
@@ -120,8 +193,6 @@ reqMethodDeclaration: %empty {
     }
     ;
 
-/*
-*/
 
 reqStatement: %empty {
       $$ = new Node("EmptyStatementList", "", yylineno);
@@ -150,14 +221,44 @@ statement: CurlyLB reqStatement CurlyRB {
                 $$->children.push_back($3); // condition
                 $$->children.push_back($5); // loop body
             }
+            | SYSTEM_OUT_PRINTLN LP expression RP SEMICOLON
+            {
+                $$ = new Node("SYSTEM_OUT_PRINTLN", "", yylineno);
+                $$->children.push_back($3); // condition
+            }
           ;
+/*
+*/
 
 type: INT LB RB     {$$ = new Node("TYPE: INT LB RB", "", yylineno);}
 	| BOOLEAN       {$$ = new Node("TYPE: BOOLEAN", "", yylineno);}
 	| INT           {$$ = new Node("TYPE: INT", "", yylineno);}
-	| identifier    {$$ = $1; } 
+	| identifier     
     ;
 	
+
+arguments: %empty {
+      $$ = new Node("EmptyStatementList", "", yylineno);
+    }|
+    argumentsList{
+                $$ = new Node("arguments", "", yylineno);
+                $$->children.push_back($1); // condition
+              
+    }
+    ;
+
+argumentsList:
+        expression {
+            $$ = new Node("argumentsList", "", yylineno);
+                $$->children.push_back($1); // condition
+
+            }|
+            argumentsList COMMA expression{
+                $$ = new Node("argumentsList", "", yylineno);
+                $$->children.push_back($1); // condition
+                $$->children.push_back($3); // condition
+    };
+
 
 expression: expression PLUSOP expression {      /*
             Create a subtree that corresponds to the AddExpression
@@ -253,7 +354,7 @@ expression: expression PLUSOP expression {      /*
                 $$->children.push_back($1);
         	}
         	|
-            expression DOT identifier expression COMMA expression {
+            expression DOT identifier LP arguments RP {
                 $$ = new Node("left right brackets", "", yylineno);
                 $$->children.push_back($1);
         	}

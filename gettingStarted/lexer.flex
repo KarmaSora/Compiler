@@ -47,7 +47,7 @@
 "if"                   {if(USE_LEX_ONLY) {printf("IF ");} else {return yy::parser::make_IF(yytext);}}
 "else"                   {if(USE_LEX_ONLY) {printf("ELSE ");} else {return yy::parser::make_ELSE(yytext);}}
 "while"                   {if(USE_LEX_ONLY) {printf("WHILE ");} else {return yy::parser::make_WHILE(yytext);}}
-"System.out.println"                   {if(USE_LEX_ONLY) {printf("SYSTEM:OUT:PRINTLN ");} else {return yy::parser::make_SYSTEM_OUT_PRINTLN(yytext);}}
+"System.out.println"     {if(USE_LEX_ONLY) {printf("SYSTEM:OUT:PRINTLN ");} else {return yy::parser::make_SYSTEM_OUT_PRINTLN(yytext);}}
 
 "true"                   {if(USE_LEX_ONLY) {printf("TRUE ");} else {return yy::parser::make_TRUE(yytext);}}
 "false"                   {if(USE_LEX_ONLY) {printf("False ");} else {return yy::parser::make_FALSE(yytext);}}

@@ -1,0 +1,17 @@
+digraph {
+n0 [label="MainClass:"];
+n1 [label="Identifier:SemanticValidMethodCall"];
+n0 -> n1
+n2 [label="Identifier:a"];
+n0 -> n2
+n3 [label="SYSTEM_OUT_PRINTLN:"];
+n4 [label="left right brackets:"];
+n5 [label="NEW Identifier LP RP:"];
+n6 [label="Identifier:A"];
+n5 -> n6
+n4 -> n5
+n3 -> n4
+n0 -> n3
+n7 [label="EmptyStatementList:"];
+n0 -> n7
+}
