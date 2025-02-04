@@ -210,6 +210,11 @@ statement: CurlyLB reqStatement CurlyRB {
           | expression SEMICOLON {
                 $$ = $1;
             }
+          | IF LP expression RP statement  {
+                $$ = new Node("IF Only", "", yylineno);
+                $$->children.push_back($3); // condition
+                $$->children.push_back($5); // if block
+            }
           | IF LP expression RP statement ELSE statement {
                 $$ = new Node("IfElseStatement", "", yylineno);
                 $$->children.push_back($3); // condition
@@ -226,6 +231,18 @@ statement: CurlyLB reqStatement CurlyRB {
                 $$ = new Node("SYSTEM_OUT_PRINTLN", "", yylineno);
                 $$->children.push_back($3); // condition
             }
+            
+            | identifier ASSIGN expression SEMICOLON {
+				$$ = new Node("SOMETHING ASSIGNED = TO SOMETHING", "", yylineno);
+				$$->children.push_back($1);
+				$$->children.push_back($3);
+			}
+			| identifier LB expression RB ASSIGN expression SEMICOLON {
+				$$ = new Node("SOMETHING [ASSIGNED] = TO SOMETHING", "", yylineno);
+				$$->children.push_back($1);
+				$$->children.push_back($3);
+				$$->children.push_back($6);
+			}
           ;
 /*
 */
