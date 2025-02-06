@@ -79,8 +79,8 @@
 /* This section defines the production rules for the language being parsed */
 %%
 root:       
-            GOAL{root = $1;}
-			;
+        GOAL{root = $1;}
+        ;
 
 GOAL : MainClass reqClassDeclaration END{  
             $$ = new Node("GOALLLLL", "", yylineno);
@@ -129,12 +129,13 @@ VarDeclaration: type identifier SEMICOLON {
             }
         ;
 reqVarDeclaration: %empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
+      $$ = new Node("EMPTY reqVarDeclaration", "", yylineno);
     }
     |
      reqVarDeclaration VarDeclaration {
-      $$ = $1;
-      $$->children.push_back($2);
+        $$ = new Node("VarDeclaration VarDeclaration", "", yylineno);
+        $$->children.push_back($1);
+        $$->children.push_back($2);
     }
     ;
 
@@ -156,18 +157,22 @@ MethodDeclaration: PUBLIC type identifier LP
 
 /* func(), func( int a, string b, bool c ) */
 Parameters:%empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
-    } | ParamList {$$ = new Node("ParamList", "", yylineno);}
+      $$ = new Node("EmptyParameters", "", yylineno);
+    } | ParamList {
+        $$ = new Node("ParamList", "", yylineno);
+        $$->children.push_back($1);
+        
+        }
      ;
 
 ParamList: type identifier {
-        $$ = new Node("MultExpression", "", yylineno);
+        $$ = new Node("ParamList, Type ID", "", yylineno);
         $$->children.push_back($1);
         $$->children.push_back($2);
     }
     | ParamList COMMA type identifier
     {
-        $$ = new Node("MultExpression", "", yylineno);
+        $$ = new Node("ParamList COMMA type identifier", "", yylineno);
         $$->children.push_back($1);
         $$->children.push_back($3);
         $$->children.push_back($4);
@@ -175,35 +180,45 @@ ParamList: type identifier {
     ;
 
 varDecOrSTMT : %empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
+      $$ = new Node("EMPTY varDecOrSTMT", "", yylineno);
     }
-    |varDecOrSTMT statement 
-    |varDecOrSTMT VarDeclaration
+    |varDecOrSTMT statement {
+        $$ = new Node("varDecOrSTMT statement", "", yylineno);
+        $$->children.push_back($1);
+        $$->children.push_back($2);
+    }
+    |varDecOrSTMT VarDeclaration {
+        $$ = new Node("varDecOrSTMT VarDeclaration", "", yylineno);
+        $$->children.push_back($1);
+        $$->children.push_back($2);
+    }
     ;
 
 
 reqMethodDeclaration: %empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
+      $$ = new Node("EMPTY reqMethodDeclaration", "", yylineno);
     }
     |
      reqMethodDeclaration MethodDeclaration {
-      $$ = $1;
+      $$ = new Node("reqMethodDeclaration MethodDeclaration", "", yylineno);
+      $$->children.push_back($1);
       $$->children.push_back($2);
     }
     ;
 
 
 reqStatement: %empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
+      $$ = new Node("EMPTY reqStatement", "", yylineno);
     }
     | reqStatement statement {
-      $$ = $1;
+      $$ = new Node("reqStatement statement", "", yylineno);
+      $$->children.push_back($1);
       $$->children.push_back($2);
     }
     ;
 
 statement: CurlyLB reqStatement CurlyRB {
-                $$ = new Node("Statement", "", yylineno);
+                $$ = new Node("CurlyLB reqStatement CurlyRB", "", yylineno);
                 $$->children.push_back($2);
             }
           
@@ -252,9 +267,13 @@ type: INT LB RB     {$$ = new Node("TYPE: INT LB RB", "", yylineno);}
 	
 
 arguments: %empty {
-      $$ = new Node("EmptyStatementList", "", yylineno);
+      $$ = new Node("EMPTY arguments", "", yylineno);
     }|
     argumentsList
+    {
+      $$ = new Node("argumentsList", "", yylineno);
+      $$->children.push_back($1);
+    }
     ;
 
 argumentsList:
@@ -347,13 +366,13 @@ expression: expression PLUSOP expression {      /*
 
         	|
             expression EXCLAMATION_MARK  {
-                $$ = new Node("NotExpression", "", yylineno);
+                $$ = new Node("EXCLAMATION_MARK", "", yylineno);
                 $$->children.push_back($1);
             } 
 
         	| 
         	expression LB expression RB{
-                $$ = new Node("Exp left exp right brackets", "", yylineno);
+                $$ = new Node("expression LB expression RB", "", yylineno);
                 $$->children.push_back($1); /*expression 1*/
                 $$->children.push_back($3); /*expression 2*/
 
@@ -365,8 +384,10 @@ expression: expression PLUSOP expression {      /*
         	}
         	|
             expression DOT identifier LP arguments RP {
-                $$ = new Node("left right brackets", "", yylineno);
+                $$ = new Node("expression DOT identifier LP arguments RP", "", yylineno);
                 $$->children.push_back($1);
+                $$->children.push_back($3);
+                $$->children.push_back($5);
         	}
 
         	| factor      {$$ = $1; /* printf("r4 ");*/}
@@ -378,7 +399,7 @@ expression: expression PLUSOP expression {      /*
             |THIS{  $$ = new Node("THIS", "", yylineno);}
 
             |NEW INT LB expression RB  {
-                $$ = new Node("NEW INT RB exp LB", "", yylineno);
+                $$ = new Node("NEW INT LB exp RB", "", yylineno);
                 $$->children.push_back($4);
         	}
 
