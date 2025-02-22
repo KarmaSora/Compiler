@@ -121,7 +121,7 @@ private:
         //
         //
         Node * method_body = *std::next(method_node->children.begin(), 3);
-        Node * returnedNode = *std::next(method_node->children.begin(), 4);
+        //Node * returnedNode = *std::next(method_node->children.begin(), 4);
 
 
     
@@ -196,13 +196,13 @@ private:
         // }
         
         
-        if(method_sym.type != "void"){
+        if(find_return_statement(method_node) != nullptr){
+            Node* returnedNode = find_return_statement(method_node)->children.front();
             //Node* return_node = find_return_statement(method_node);
-            
             
             //std::cout << "return_type_node->type: " << return_type_node->type << std::endl;
             //std::cout << "returnedNode->value: " << returnedNode->value << std::endl;
-       
+            
             if(symtab.lookup(returnedNode->value) != nullptr){
                 //std::cout << "symtab.lookup(returnedNode->value)->type: " << symtab.lookup(returnedNode->value)->type << std::endl;
                 std::string returned_type = symtab.lookup(returnedNode->value)->type;
