@@ -214,7 +214,7 @@ parameters: %empty { $$ = new Node("parameters", "", yylineno);  }
 
 parameter_list: type identifier { 
 				$$ = new Node("parameters", "", yylineno); 
-				Node * params = new Node("parameters", "", yylineno);
+				Node * params = new Node("parameter", "", yylineno);
 				params->children.push_back($1);
 				params->children.push_back($2);
 				$$->children.push_back(params);
@@ -223,7 +223,7 @@ parameter_list: type identifier {
               | parameter_list COMMA type identifier { 
 
 				$$ = $1;
-				Node * params = new Node("parameters", "", yylineno);
+				Node * params = new Node("parameter", "", yylineno);
 				params->children.push_back($3);
 				params->children.push_back($4);
 				$$->children.push_back(params);
