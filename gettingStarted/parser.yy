@@ -77,6 +77,7 @@ goal: mainClass reqClassDeclaration END {
 		$$ = new Node("goal", "", yylineno); 
 		$$->children.push_back($1);
 		$$->children.push_back($2);
+		
 	}
 	;
 
@@ -112,10 +113,15 @@ mainClass: PUBLIC CLASS identifier LEFT_CURLY PUBLIC STATIC VOID MAIN LP STRING 
 		   LEFT_BRACKET RIGHT_BRACKET identifier RP LEFT_CURLY statement reqStatement RIGHT_CURLY RIGHT_CURLY 
 		   {
 				$$ = new Node("MAIN CLASS", "", yylineno);
+
+				Node* methods = new Node("methods", "", yylineno);
+
 				$$->children.push_back($3);
-				$$->children.push_back($13);
-				$$->children.push_back($16);
-				$$->children.push_back($17);
+				$$->children.push_back(methods);
+
+				methods->children.push_back($13);
+				methods->children.push_back($16);
+				methods->children.push_back($17);
 		   }
 		   ;
 				/* 
