@@ -208,23 +208,27 @@ reqVarOrStmt: %empty {	$$ = new Node("empty reqVarOrStmt", "", yylineno); }
 
 
 
-parameters: %empty { $$ = new Node("empty parameters", "", yylineno);  }
-          | parameter_list { $$ = new Node("empty parameters", "", yylineno); $$->children.push_back($1);}
+parameters: %empty { $$ = new Node("parameters", "", yylineno);  }
+          | parameter_list { $$ = $1;}
           ;
 
 parameter_list: type identifier { 
-				$$ = new Node("type identifier", "", yylineno); 
-				$$->children.push_back($1);
-				$$->children.push_back($2);
+				$$ = new Node("parameters", "", yylineno); 
+				Node * params = new Node("parameters", "", yylineno);
+				params->children.push_back($1);
+				params->children.push_back($2);
+				$$->children.push_back(params);
+				
 			}
               | parameter_list COMMA type identifier { 
-				$$ = new Node("parameter_list COMMA type identifier", "", yylineno); 
 
-				$$->children.push_back($1);
-				$$->children.push_back($3);
-				$$->children.push_back($4);
-
+				$$ = $1;
+				Node * params = new Node("parameters", "", yylineno);
+				params->children.push_back($3);
+				params->children.push_back($4);
+				$$->children.push_back(params);
 			  }
+			   
               ;
 
 
