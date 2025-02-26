@@ -26,7 +26,7 @@ n12 [label="classDeclarations:"];
 n13 [label="classDeclaration:"];
 n14 [label="identifier:A"];
 n13 -> n14
-n15 [label="reqVarDeclaration empty:"];
+n15 [label="empty varDeclaration:"];
 n13 -> n15
 n16 [label="methodDeclarations:"];
 n17 [label="methodDec:"];
@@ -44,343 +44,333 @@ n24 [label="identifier:num"];
 n22 -> n24
 n21 -> n22
 n17 -> n21
-n25 [label="reqVarOrStmt statement:"];
-n26 [label="reqVarOrStmt varDeclaration:"];
-n27 [label="empty reqVarOrStmt:"];
+n25 [label="VarOrStmts:"];
+n26 [label="varDECCC:"];
+n27 [label="INT:"];
 n26 -> n27
-n28 [label="var declaration:"];
-n29 [label="INT:"];
-n28 -> n29
-n30 [label="identifier:num_aux"];
-n28 -> n30
+n28 [label="identifier:num_aux"];
 n26 -> n28
 n25 -> n26
-n31 [label="IF LP expression RP statement ELSE statement:"];
-n32 [label="LESS_THAN:"];
-n33 [label="identifier:num"];
-n32 -> n33
-n34 [label="Int:1"];
-n32 -> n34
+n29 [label="varDECCC:"];
+n30 [label="IF LP expression RP statement ELSE statement:"];
+n31 [label="LESS_THAN:"];
+n32 [label="identifier:num"];
 n31 -> n32
-n35 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n36 [label="identifier:num_aux"];
-n35 -> n36
-n37 [label="Int:1"];
-n35 -> n37
-n31 -> n35
-n38 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n39 [label="identifier:num_aux"];
-n38 -> n39
-n40 [label="MultExpression:"];
-n41 [label="identifier:num"];
-n40 -> n41
+n33 [label="Int:1"];
+n31 -> n33
+n30 -> n31
+n34 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n35 [label="identifier:num_aux"];
+n34 -> n35
+n36 [label="Int:1"];
+n34 -> n36
+n30 -> n34
+n37 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n38 [label="identifier:num_aux"];
+n37 -> n38
+n39 [label="MultExpression:"];
+n40 [label="identifier:num"];
+n39 -> n40
+n41 [label="exp DOT ident LP exp COMMA exp RP:"];
 n42 [label="exp DOT ident LP exp COMMA exp RP:"];
-n43 [label="exp DOT ident LP exp COMMA exp RP:"];
-n44 [label="THIS:"];
-n43 -> n44
-n45 [label="identifier:a3"];
-n43 -> n45
-n46 [label="empty arguments:"];
-n43 -> n46
+n43 [label="THIS:"];
 n42 -> n43
-n47 [label="identifier:a2"];
-n42 -> n47
-n48 [label="empty arguments:"];
-n42 -> n48
-n40 -> n42
-n38 -> n40
-n31 -> n38
-n25 -> n31
+n44 [label="identifier:a3"];
+n42 -> n44
+n45 [label="empty arguments:"];
+n42 -> n45
+n41 -> n42
+n46 [label="identifier:a2"];
+n41 -> n46
+n47 [label="empty arguments:"];
+n41 -> n47
+n39 -> n41
+n37 -> n39
+n30 -> n37
+n29 -> n30
+n25 -> n29
 n17 -> n25
-n49 [label="RETURN:"];
-n50 [label="THIS:"];
-n49 -> n50
-n17 -> n49
+n48 [label="RETURN:"];
+n49 [label="THIS:"];
+n48 -> n49
+n17 -> n48
 n16 -> n17
-n51 [label="methodDec:"];
-n52 [label="INT:"];
-n51 -> n52
-n53 [label="identifier:a2"];
-n51 -> n53
-n54 [label="parameters:"];
-n51 -> n54
-n55 [label="empty reqVarOrStmt:"];
-n51 -> n55
-n56 [label="RETURN:"];
-n57 [label="Int:0"];
-n56 -> n57
-n51 -> n56
-n16 -> n51
-n58 [label="methodDec:"];
-n59 [label="typechar:"];
-n60 [label="identifier:A"];
-n59 -> n60
+n50 [label="methodDec:"];
+n51 [label="INT:"];
+n50 -> n51
+n52 [label="identifier:a2"];
+n50 -> n52
+n53 [label="parameters:"];
+n50 -> n53
+n54 [label="VarOrStmts:"];
+n50 -> n54
+n55 [label="RETURN:"];
+n56 [label="Int:0"];
+n55 -> n56
+n50 -> n55
+n16 -> n50
+n57 [label="methodDec:"];
+n58 [label="typechar:"];
+n59 [label="identifier:A"];
 n58 -> n59
-n61 [label="identifier:a3"];
-n58 -> n61
-n62 [label="parameters:"];
-n58 -> n62
-n63 [label="reqVarOrStmt statement:"];
-n64 [label="reqVarOrStmt varDeclaration:"];
-n65 [label="empty reqVarOrStmt:"];
+n57 -> n58
+n60 [label="identifier:a3"];
+n57 -> n60
+n61 [label="parameters:"];
+n57 -> n61
+n62 [label="VarOrStmts:"];
+n63 [label="varDECCC:"];
+n64 [label="typechar:"];
+n65 [label="identifier:A"];
 n64 -> n65
-n66 [label="var declaration:"];
-n67 [label="typechar:"];
-n68 [label="identifier:A"];
-n67 -> n68
-n66 -> n67
-n69 [label="identifier:a"];
-n66 -> n69
-n64 -> n66
 n63 -> n64
-n70 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n71 [label="identifier:a"];
+n66 [label="identifier:a"];
+n63 -> n66
+n62 -> n63
+n67 [label="varDECCC:"];
+n68 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n69 [label="identifier:a"];
+n68 -> n69
+n70 [label="NEW identifier LP RP:"];
+n71 [label="identifier:A"];
 n70 -> n71
-n72 [label="NEW identifier LP RP:"];
-n73 [label="identifier:A"];
+n68 -> n70
+n67 -> n68
+n62 -> n67
+n57 -> n62
+n72 [label="RETURN:"];
+n73 [label="identifier:a"];
 n72 -> n73
-n70 -> n72
-n63 -> n70
-n58 -> n63
-n74 [label="RETURN:"];
-n75 [label="identifier:a"];
+n57 -> n72
+n16 -> n57
+n74 [label="methodDec:"];
+n75 [label="typechar:"];
+n76 [label="identifier:A"];
+n75 -> n76
 n74 -> n75
-n58 -> n74
-n16 -> n58
-n76 [label="methodDec:"];
-n77 [label="typechar:"];
-n78 [label="identifier:A"];
-n77 -> n78
-n76 -> n77
-n79 [label="identifier:a4"];
-n76 -> n79
-n80 [label="parameters:"];
-n76 -> n80
-n81 [label="reqVarOrStmt statement:"];
-n82 [label="reqVarOrStmt varDeclaration:"];
-n83 [label="reqVarOrStmt statement:"];
-n84 [label="reqVarOrStmt statement:"];
-n85 [label="reqVarOrStmt statement:"];
-n86 [label="reqVarOrStmt varDeclaration:"];
-n87 [label="reqVarOrStmt varDeclaration:"];
-n88 [label="empty reqVarOrStmt:"];
-n87 -> n88
-n89 [label="var declaration:"];
-n90 [label="typechar:"];
-n91 [label="identifier:A"];
-n90 -> n91
-n89 -> n90
-n92 [label="identifier:a"];
-n89 -> n92
-n87 -> n89
-n86 -> n87
-n93 [label="var declaration:"];
-n94 [label="INT:"];
-n93 -> n94
-n95 [label="identifier:i"];
-n93 -> n95
-n86 -> n93
-n85 -> n86
-n96 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n97 [label="identifier:a"];
-n96 -> n97
-n98 [label="exp DOT ident LP exp COMMA exp RP:"];
-n99 [label="exp DOT ident LP exp COMMA exp RP:"];
-n100 [label="THIS:"];
-n99 -> n100
-n101 [label="identifier:a1"];
-n99 -> n101
-n102 [label="argument_list:"];
-n103 [label="exp:"];
-n104 [label="exp DOT ident LP exp COMMA exp RP:"];
-n105 [label="exp DOT ident LP exp COMMA exp RP:"];
-n106 [label="NEW identifier LP RP:"];
-n107 [label="identifier:A"];
-n106 -> n107
-n105 -> n106
-n108 [label="identifier:a1"];
-n105 -> n108
-n109 [label="argument_list:"];
-n110 [label="exp:"];
-n111 [label="exp DOT ident LP exp COMMA exp RP:"];
-n112 [label="THIS:"];
-n111 -> n112
-n113 [label="identifier:a2"];
-n111 -> n113
-n114 [label="empty arguments:"];
-n111 -> n114
-n110 -> n111
-n109 -> n110
-n105 -> n109
-n104 -> n105
-n115 [label="identifier:a2"];
-n104 -> n115
-n116 [label="empty arguments:"];
-n104 -> n116
-n103 -> n104
-n102 -> n103
-n99 -> n102
-n98 -> n99
-n117 [label="identifier:a3"];
-n98 -> n117
-n118 [label="empty arguments:"];
-n98 -> n118
-n96 -> n98
-n85 -> n96
+n77 [label="identifier:a4"];
+n74 -> n77
+n78 [label="parameters:"];
+n74 -> n78
+n79 [label="VarOrStmts:"];
+n80 [label="varDECCC:"];
+n81 [label="typechar:"];
+n82 [label="identifier:A"];
+n81 -> n82
+n80 -> n81
+n83 [label="identifier:a"];
+n80 -> n83
+n79 -> n80
+n84 [label="varDECCC:"];
+n85 [label="INT:"];
 n84 -> n85
-n119 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n120 [label="identifier:i"];
-n119 -> n120
+n86 [label="identifier:i"];
+n84 -> n86
+n79 -> n84
+n87 [label="varDECCC:"];
+n88 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n89 [label="identifier:a"];
+n88 -> n89
+n90 [label="exp DOT ident LP exp COMMA exp RP:"];
+n91 [label="exp DOT ident LP exp COMMA exp RP:"];
+n92 [label="THIS:"];
+n91 -> n92
+n93 [label="identifier:a1"];
+n91 -> n93
+n94 [label="argument_list:"];
+n95 [label="exp:"];
+n96 [label="exp DOT ident LP exp COMMA exp RP:"];
+n97 [label="exp DOT ident LP exp COMMA exp RP:"];
+n98 [label="NEW identifier LP RP:"];
+n99 [label="identifier:A"];
+n98 -> n99
+n97 -> n98
+n100 [label="identifier:a1"];
+n97 -> n100
+n101 [label="argument_list:"];
+n102 [label="exp:"];
+n103 [label="exp DOT ident LP exp COMMA exp RP:"];
+n104 [label="THIS:"];
+n103 -> n104
+n105 [label="identifier:a2"];
+n103 -> n105
+n106 [label="empty arguments:"];
+n103 -> n106
+n102 -> n103
+n101 -> n102
+n97 -> n101
+n96 -> n97
+n107 [label="identifier:a2"];
+n96 -> n107
+n108 [label="empty arguments:"];
+n96 -> n108
+n95 -> n96
+n94 -> n95
+n91 -> n94
+n90 -> n91
+n109 [label="identifier:a3"];
+n90 -> n109
+n110 [label="empty arguments:"];
+n90 -> n110
+n88 -> n90
+n87 -> n88
+n79 -> n87
+n111 [label="varDECCC:"];
+n112 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n113 [label="identifier:i"];
+n112 -> n113
+n114 [label="exp DOT ident LP exp COMMA exp RP:"];
+n115 [label="exp DOT ident LP exp COMMA exp RP:"];
+n116 [label="THIS:"];
+n115 -> n116
+n117 [label="identifier:a1"];
+n115 -> n117
+n118 [label="argument_list:"];
+n119 [label="exp:"];
+n120 [label="exp DOT ident LP exp COMMA exp RP:"];
 n121 [label="exp DOT ident LP exp COMMA exp RP:"];
-n122 [label="exp DOT ident LP exp COMMA exp RP:"];
-n123 [label="THIS:"];
+n122 [label="NEW identifier LP RP:"];
+n123 [label="identifier:A"];
 n122 -> n123
+n121 -> n122
 n124 [label="identifier:a1"];
-n122 -> n124
+n121 -> n124
 n125 [label="argument_list:"];
 n126 [label="exp:"];
 n127 [label="exp DOT ident LP exp COMMA exp RP:"];
-n128 [label="exp DOT ident LP exp COMMA exp RP:"];
-n129 [label="NEW identifier LP RP:"];
-n130 [label="identifier:A"];
-n129 -> n130
-n128 -> n129
-n131 [label="identifier:a1"];
-n128 -> n131
-n132 [label="argument_list:"];
-n133 [label="exp:"];
-n134 [label="exp DOT ident LP exp COMMA exp RP:"];
-n135 [label="THIS:"];
-n134 -> n135
-n136 [label="identifier:a2"];
-n134 -> n136
-n137 [label="empty arguments:"];
-n134 -> n137
-n133 -> n134
-n132 -> n133
-n128 -> n132
+n128 [label="THIS:"];
 n127 -> n128
-n138 [label="identifier:a2"];
-n127 -> n138
-n139 [label="empty arguments:"];
-n127 -> n139
+n129 [label="identifier:a2"];
+n127 -> n129
+n130 [label="empty arguments:"];
+n127 -> n130
 n126 -> n127
 n125 -> n126
-n122 -> n125
-n121 -> n122
-n140 [label="identifier:a2"];
-n121 -> n140
-n141 [label="empty arguments:"];
-n121 -> n141
-n119 -> n121
-n84 -> n119
-n83 -> n84
-n142 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n143 [label="identifier:a"];
+n121 -> n125
+n120 -> n121
+n131 [label="identifier:a2"];
+n120 -> n131
+n132 [label="empty arguments:"];
+n120 -> n132
+n119 -> n120
+n118 -> n119
+n115 -> n118
+n114 -> n115
+n133 [label="identifier:a2"];
+n114 -> n133
+n134 [label="empty arguments:"];
+n114 -> n134
+n112 -> n114
+n111 -> n112
+n79 -> n111
+n135 [label="varDECCC:"];
+n136 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n137 [label="identifier:a"];
+n136 -> n137
+n138 [label="exp DOT ident LP exp COMMA exp RP:"];
+n139 [label="exp DOT ident LP exp COMMA exp RP:"];
+n140 [label="THIS:"];
+n139 -> n140
+n141 [label="identifier:a1"];
+n139 -> n141
+n142 [label="argument_list:"];
+n143 [label="exp:"];
+n144 [label="Int:2"];
+n143 -> n144
 n142 -> n143
-n144 [label="exp DOT ident LP exp COMMA exp RP:"];
-n145 [label="exp DOT ident LP exp COMMA exp RP:"];
-n146 [label="THIS:"];
-n145 -> n146
-n147 [label="identifier:a1"];
-n145 -> n147
-n148 [label="argument_list:"];
-n149 [label="exp:"];
-n150 [label="Int:2"];
-n149 -> n150
-n148 -> n149
-n145 -> n148
-n144 -> n145
-n151 [label="identifier:a3"];
-n144 -> n151
-n152 [label="empty arguments:"];
-n144 -> n152
-n142 -> n144
-n83 -> n142
-n82 -> n83
-n153 [label="var declaration:"];
-n154 [label="INT LB RB:"];
+n139 -> n142
+n138 -> n139
+n145 [label="identifier:a3"];
+n138 -> n145
+n146 [label="empty arguments:"];
+n138 -> n146
+n136 -> n138
+n135 -> n136
+n79 -> n135
+n147 [label="varDECCC:"];
+n148 [label="INT LB RB:"];
+n147 -> n148
+n149 [label="identifier:ia"];
+n147 -> n149
+n79 -> n147
+n150 [label="varDECCC:"];
+n151 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
+n152 [label="identifier:i"];
+n151 -> n152
+n153 [label="exp DOT ident LP exp COMMA exp RP:"];
+n154 [label="THIS:"];
 n153 -> n154
-n155 [label="identifier:ia"];
+n155 [label="identifier:a5"];
 n153 -> n155
-n82 -> n153
-n81 -> n82
-n156 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
-n157 [label="identifier:i"];
-n156 -> n157
-n158 [label="exp DOT ident LP exp COMMA exp RP:"];
-n159 [label="THIS:"];
+n156 [label="argument_list:"];
+n157 [label="argument_list COMMA expression:"];
+n158 [label="argument_list COMMA expression:"];
+n159 [label="argument_list COMMA expression:"];
+n160 [label="exp:"];
+n161 [label="FALSE:"];
+n160 -> n161
+n159 -> n160
+n162 [label="identifier:i"];
+n159 -> n162
 n158 -> n159
-n160 [label="identifier:a5"];
-n158 -> n160
-n161 [label="argument_list:"];
-n162 [label="argument_list COMMA expression:"];
-n163 [label="argument_list COMMA expression:"];
-n164 [label="argument_list COMMA expression:"];
-n165 [label="exp:"];
-n166 [label="FALSE:"];
+n163 [label="identifier:ia"];
+n158 -> n163
+n157 -> n158
+n164 [label="THIS:"];
+n157 -> n164
+n156 -> n157
+n153 -> n156
+n151 -> n153
+n150 -> n151
+n79 -> n150
+n74 -> n79
+n165 [label="RETURN:"];
+n166 [label="NEW identifier LP RP:"];
+n167 [label="identifier:A"];
+n166 -> n167
 n165 -> n166
-n164 -> n165
-n167 [label="identifier:i"];
-n164 -> n167
-n163 -> n164
-n168 [label="identifier:ia"];
-n163 -> n168
-n162 -> n163
-n169 [label="THIS:"];
-n162 -> n169
-n161 -> n162
-n158 -> n161
-n156 -> n158
-n81 -> n156
-n76 -> n81
-n170 [label="RETURN:"];
-n171 [label="NEW identifier LP RP:"];
-n172 [label="identifier:A"];
+n74 -> n165
+n16 -> n74
+n168 [label="methodDec:"];
+n169 [label="INT:"];
+n168 -> n169
+n170 [label="identifier:a5"];
+n168 -> n170
+n171 [label="parameters:"];
+n172 [label="parameter:"];
+n173 [label="BOOLEAN:"];
+n172 -> n173
+n174 [label="identifier:a"];
+n172 -> n174
 n171 -> n172
-n170 -> n171
-n76 -> n170
-n16 -> n76
-n173 [label="methodDec:"];
-n174 [label="INT:"];
-n173 -> n174
-n175 [label="identifier:a5"];
-n173 -> n175
-n176 [label="parameters:"];
-n177 [label="parameter:"];
-n178 [label="BOOLEAN:"];
-n177 -> n178
-n179 [label="identifier:a"];
-n177 -> n179
-n176 -> n177
-n180 [label="parameter:"];
-n181 [label="INT:"];
-n180 -> n181
-n182 [label="identifier:b"];
-n180 -> n182
-n176 -> n180
-n183 [label="parameter:"];
-n184 [label="INT LB RB:"];
-n183 -> n184
-n185 [label="identifier:c"];
-n183 -> n185
-n176 -> n183
-n186 [label="parameter:"];
-n187 [label="typechar:"];
-n188 [label="identifier:A"];
-n187 -> n188
+n175 [label="parameter:"];
+n176 [label="INT:"];
+n175 -> n176
+n177 [label="identifier:b"];
+n175 -> n177
+n171 -> n175
+n178 [label="parameter:"];
+n179 [label="INT LB RB:"];
+n178 -> n179
+n180 [label="identifier:c"];
+n178 -> n180
+n171 -> n178
+n181 [label="parameter:"];
+n182 [label="typechar:"];
+n183 [label="identifier:A"];
+n182 -> n183
+n181 -> n182
+n184 [label="identifier:d"];
+n181 -> n184
+n171 -> n181
+n168 -> n171
+n185 [label="VarOrStmts:"];
+n168 -> n185
+n186 [label="RETURN:"];
+n187 [label="Int:1"];
 n186 -> n187
-n189 [label="identifier:d"];
-n186 -> n189
-n176 -> n186
-n173 -> n176
-n190 [label="empty reqVarOrStmt:"];
-n173 -> n190
-n191 [label="RETURN:"];
-n192 [label="Int:1"];
-n191 -> n192
-n173 -> n191
-n16 -> n173
+n168 -> n186
+n16 -> n168
 n13 -> n16
 n12 -> n13
 n0 -> n12

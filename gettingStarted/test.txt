@@ -26,8 +26,11 @@ class MyClass {
         return 1;
     }
 
-    public int Pen2(int param) {
+    public int Pen2(int param, int test) {
         int param; // @error - semantic (Already Declared parameter: 'param')
+        int hehehe;
+        int pooo;
+
         return 1;
     }
 }

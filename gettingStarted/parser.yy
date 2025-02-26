@@ -87,7 +87,7 @@ classDeclaration: singleClassDeclaration  {
 				;
 				
 
-singleClassDeclaration: CLASS identifier LEFT_CURLY reqVarDeclaration 
+singleClassDeclaration: CLASS identifier LEFT_CURLY varDeclaration 
 					methodDeclaration RIGHT_CURLY  {
 						$$ = new Node("classDeclarations", "", yylineno);
 						Node* classes =	new Node("classDeclaration", "", yylineno);
@@ -100,7 +100,7 @@ singleClassDeclaration: CLASS identifier LEFT_CURLY reqVarDeclaration
 					}
 					| // make a recursive
 
-					singleClassDeclaration CLASS identifier LEFT_CURLY reqVarDeclaration 
+					singleClassDeclaration CLASS identifier LEFT_CURLY varDeclaration 
 					reqMethodDeclaration RIGHT_CURLY {
 						$$ = $1; // singleClassDeclaration
 						//$$ = new Node("ClassDeclarationsHERERERERE", "", yylineno);
@@ -174,19 +174,29 @@ mainClass: PUBLIC CLASS identifier LEFT_CURLY PUBLIC STATIC VOID MAIN LP STRING 
 				
 
 
-varDeclaration: type identifier SEMI_COLON {
-				$$ = new Node("var declaration", "", yylineno);
-				$$->children.push_back($1); // type (INT)
-				$$->children.push_back($2); // identifier (a)
-			}
+varDeclaration: %empty { $$ = new Node("empty varDeclaration", "", yylineno); }
+				| reqVarDeclaration { $$ = $1; }
+				;
 			;
 			
-reqVarDeclaration: %empty { $$ = new Node("reqVarDeclaration empty", "", yylineno); }
-				| reqVarDeclaration varDeclaration { 
-					$$ = new Node("reqVarDeclaration", "", yylineno); 
-					$$->children.push_back($1); 
-					$$->children.push_back($2);
-				}
+reqVarDeclaration: type identifier SEMI_COLON {
+		
+				$$ = new Node("var declarations", "", yylineno);
+				Node * varDec = new Node("var declaration", "", yylineno);
+				varDec->children.push_back($1);
+				varDec->children.push_back($2);
+
+				$$->children.push_back(varDec);
+			}
+				| reqVarDeclaration type identifier SEMI_COLON {
+				$$ = $1;
+				Node* varDec = new Node("var declaration", "", yylineno);
+				varDec->children.push_back($2);
+				varDec->children.push_back($3);
+
+				$$->children.push_back(varDec);
+		
+			}
 				;
 
 
@@ -201,18 +211,26 @@ retSTMT: RETURN  { $$ = new Node("RETURN SEMI_COLON", "", yylineno); }
 
 
 /* the "?" is answered here, thank you */
-reqVarOrStmt: %empty {	$$ = new Node("empty reqVarOrStmt", "", yylineno); }
-            | reqVarOrStmt varDeclaration { 
-				$$ = new Node("reqVarOrStmt varDeclaration", "", yylineno); 
+reqVarOrStmt: %empty {	$$ = new Node("VarOrStmts", "", yylineno); }
+            | reqVarOrStmt type identifier SEMI_COLON {
+				$$ = $1;
+				Node* varDec = new Node("varDECCC", "", yylineno);
+				varDec->children.push_back($2);
+				varDec->children.push_back($3);
 
-				$$->children.push_back($1);
-				$$->children.push_back($2);
+				$$->children.push_back(varDec);
+			
 			}
-            | reqVarOrStmt statement { 
-				$$ = new Node("reqVarOrStmt statement", "", yylineno); 
 
-				$$->children.push_back($1);
-				$$->children.push_back($2);
+
+
+            | reqVarOrStmt statement { 
+				$$ = $1;
+				Node* varDec = new Node("varDECCC", "", yylineno);
+				varDec->children.push_back($2);
+
+				$$->children.push_back(varDec);
+	
 			}
             ;
 
