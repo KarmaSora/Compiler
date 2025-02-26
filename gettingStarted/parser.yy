@@ -211,7 +211,7 @@ retSTMT: RETURN  { $$ = new Node("RETURN SEMI_COLON", "", yylineno); }
 
 
 /* the "?" is answered here, thank you */
-reqVarOrStmt: %empty {	$$ = new Node("VarOrStmts", "", yylineno); }
+reqVarOrStmt: %empty {	$$ = new Node("methodBody", "", yylineno); }
             | reqVarOrStmt type identifier SEMI_COLON {
 				$$ = $1;
 				Node* varDec = new Node("var declaration", "", yylineno);
