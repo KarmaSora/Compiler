@@ -214,19 +214,19 @@ retSTMT: RETURN  { $$ = new Node("RETURN SEMI_COLON", "", yylineno); }
 reqVarOrStmt: %empty {	$$ = new Node("VarOrStmts", "", yylineno); }
             | reqVarOrStmt type identifier SEMI_COLON {
 				$$ = $1;
-				Node* varDec = new Node("varDECCC", "", yylineno);
+				Node* varDec = new Node("varDeclaration", "", yylineno);
 				varDec->children.push_back($2);
 				varDec->children.push_back($3);
 
 				$$->children.push_back(varDec);
 			
-			}
+			} 
 
 
 
             | reqVarOrStmt statement { 
 				$$ = $1;
-				Node* varDec = new Node("varDECCC", "", yylineno);
+				Node* varDec = new Node("statement", "", yylineno);
 				varDec->children.push_back($2);
 
 				$$->children.push_back(varDec);
@@ -481,15 +481,17 @@ expression: expression PLUSOP expression {      /*
 			/* hello.a(2,b,a,f,d,s,1,2,4,a,s) */
       		;
 
-arguments: %empty { $$ = new Node("empty arguments", "", yylineno); }
-         | argument_list { $$ = new Node("argument_list", "", yylineno); $$->children.push_back($1); }
+arguments: %empty { $$ = new Node("argument", "", yylineno); }
+         | argument_list { $$ = $1; }
          ;
 
-argument_list: expression { $$ = new Node("exp", "", yylineno);  $$->children.push_back($1);}
+argument_list: expression { $$ = new Node("argument_list", "", yylineno);  $$->children.push_back($1);}
              | argument_list COMMA expression {
-				$$ = new Node("argument_list COMMA expression", "", yylineno);
-				$$->children.push_back($1);
-				$$->children.push_back($3);
+				$$ = $1;
+				Node* arg = new Node("argument", "", yylineno);
+				arg->children.push_back($3);
+				$$->children.push_back(arg);
+			 
 			 }
              ;
 
