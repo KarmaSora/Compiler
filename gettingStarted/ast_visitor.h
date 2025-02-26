@@ -155,33 +155,33 @@ public:
     void visit(Node* node){ /* VISIT ALL THE NODES IN THE AST (pdf file or smthn)*/
         if (!node) return;
 
-        // if (node->type == "goal" || node->type == "classDeclarations"){
-        //     for (auto child : node->children) visit(child);
-        // }
-        // if (node->type == "classDeclaration"){
-        //     curr_class_for_returns = node;
-        //     for (auto child : node->children) visit(child); // visit all children of classDeclaration
-        // }
-        // if (node->type == "reqMethodDeclaration methodDeclaration") for (auto child : node->children) visit(child);
+        if (node->type == "goal" || node->type == "classDeclarations"){
+            for (auto child : node->children) visit(child);
+        }
+        if (node->type == "classDeclaration"){
+            curr_class_for_returns = node;
+            for (auto child : node->children) visit(child); // visit all children of classDeclaration
+        }
+        if (node->type == "methodDeclarations") for (auto child : node->children) visit(child);
 
-        // if (node->type == "METHODDECLARATION VARDECLARATION") for (auto child : node->children) visit(child);
+        if (node->type == "var declarations") for (auto child : node->children) visit(child);
 
-        // if (node->type == "reqVarOrStmt statement") for (auto child : node->children) visit(child);
+        if (node->type == "statements") for (auto child : node->children) visit(child);
 
-        // if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
-        //     Node* identifier_arr = node->children.front(); // identifier:num_aux
-        //     Node* inside_arr_brackets = *std::next(node->children.begin()); // FALSE
-        //     Node* assigned_arr_to = *std::next(node->children.begin(), 2); // Int:2
+        if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
+            Node* identifier_arr = node->children.front(); // identifier:num_aux
+            Node* inside_arr_brackets = *std::next(node->children.begin()); // FALSE
+            Node* assigned_arr_to = *std::next(node->children.begin(), 2); // Int:2
 
-        //     if (inside_arr_brackets->type != "Int"){
-        //         res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
-        //         symtab.error_count++;
-        //     }
-        // }
+            if (inside_arr_brackets->type != "Int"){
+                res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
+                symtab.error_count++;
+            }
+        }
 
-        // if (node->type == "IF LP expression RP statement ELSE statement") for (auto child : node->children) visit(child);
-        // if (node->type == "LESS_THAN") for (auto child : node->children) visit(child);
-        // if (node->type == "expression LEFT_BRACKET expression RIGHT_BRACKET") for (auto child : node->children) visit(child);
+        if (node->type == "IF LP expression RP statement ELSE statement") for (auto child : node->children) visit(child);
+        if (node->type == "LESS_THAN") for (auto child : node->children) visit(child);
+        if (node->type == "expression LEFT_BRACKET expression RIGHT_BRACKET") for (auto child : node->children) visit(child);
         
         
         
@@ -221,6 +221,7 @@ private:
 
     Node* find_declared_method_type(Node* n, const string& searched){
         //cout << n->type << endl;
+        if(!n) return nullptr;
         if (n->type == "METHODDECLARATION VARDECLARATION"){
             Node* identifier = *std::next(n->children.begin());
             //cout << identifier->value << endl; // a1
@@ -240,6 +241,7 @@ private:
     }
 
     void handle_variable(Node* node){
+        if(!node) return;
         // its a normal variable just add it to the symtab
         Node* type_node = node->children.front(); // type of variable (int, string)
         Node* indentifier_var = *std::next(node->children.begin()); //identifier (a, bar)
@@ -263,14 +265,14 @@ private:
         // because it can be anywhere in the AST so we do it recursively until we find it. 
         //Mark please. When found.
         
-        if (child_of_method_dec->type == "reqMethodDeclaration methodDeclaration"){
+        if (child_of_method_dec->type == "methodDeclarations"){
             for (auto i : child_of_method_dec->children){
                 rec_classDeclaration_all_childs(i);
             }
             //rec_classDeclaration_all_childs(child_of_method_dec->children);
         }
         
-        else if (child_of_method_dec->type == "METHODDECLARATION VARDECLARATION"){
+        else if (child_of_method_dec->type == "var declarations"){
             Node* children_of_METHOD_DECLARATION  = child_of_method_dec;
 
             for (auto i : children_of_METHOD_DECLARATION->children){

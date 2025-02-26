@@ -174,7 +174,7 @@ mainClass: PUBLIC CLASS identifier LEFT_CURLY PUBLIC STATIC VOID MAIN LP STRING 
 				
 
 
-varDeclaration: %empty { $$ = new Node("var declaration", "", yylineno); }
+varDeclaration: %empty { $$ = new Node("var declarations", "", yylineno); }
 				| reqVarDeclaration { $$ = $1; }
 				;
 			;
