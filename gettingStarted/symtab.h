@@ -56,6 +56,9 @@ public:
 
     const string& get_name() const { return name; }
 
+
+ 
+
 };
 
 class SymbolTable {
@@ -100,6 +103,14 @@ public:
     }
 
     int get_error_count() const { return error_count; }
+
+    void printAllSymbols(SymbolTable& symtab){
+        cout << "in Scope: " << symtab.current_scope->get_name() << endl;
+        for (auto it = symtab.current_scope->symbols.begin(); it != symtab.current_scope->symbols.end(); ++it){
+            cout << "Name: " << it->second.name << " Kind: " << it->second.kind << " Type: " << it->second.type << " Line: " << it->second.line_no << endl;
+        }
+        cout << "End of symbols.\n" << endl;
+    }
 };
 
 
@@ -115,5 +126,6 @@ public:
 */
 
     
+
 
 #endif // SYMTAB_H
