@@ -37,6 +37,7 @@ private:
     string curr_class_name; // Track current class name
 
     Node* curr_class_for_returns = nullptr;
+    string method_scope_name;
 public:
     ASTVisitor(SymbolTable &st) : symtab(st) {}
 
@@ -94,7 +95,7 @@ public:
             
             Node* indentifier_method = *std::next(node->children.begin()); // identifier:func
             //cout << "TESTING " << indentifier_method->value << endl;
-            string method_scope_name = curr_class_name + "." + indentifier_method->value; // Class.method
+            method_scope_name = curr_class_name + "." + indentifier_method->value; // Class.method
 
             Symbol method_sym {
                 indentifier_method->value,
@@ -104,7 +105,7 @@ public:
             };
             //symtab.exit_scope();
             symtab.add_symbol(method_sym);
-            symtab.enter_scope(method_scope_name); // different here
+            symtab.enter_scope(method_sym.name); // different here
             for (auto child : node->children) visit_THE_WHOLE_AST_FOR_THE_SYMTAB(child);  
             symtab.exit_scope();
 
@@ -117,16 +118,16 @@ public:
             for (auto child : node->children) visit_THE_WHOLE_AST_FOR_THE_SYMTAB(child);             
         }
         if (node->type == "parameter"){
-            Node* indentifier_parameter = *std::next(node->children.begin()); //identifier:param
-
-            Symbol param_sym {
-                indentifier_parameter->value,
+            Node* typeNode = node->children.front();    // e.g. "INT LB RB"
+            Node* idNode   = node->children.back();     // e.g. "identifier:param"
+            
+            Symbol paramSym {
+                idNode->value,            // "param"
                 PARAMETER,
-                indentifier_parameter->type,
+                typeNode->type,           // "INT LB RB"
                 node->lineno
             };
-            //cout << "HRERERERERERERERER " << indentifier_parameter->value << endl; 
-            symtab.add_symbol(param_sym); // ADD parameter or parameters to the symbol table.
+            symtab.add_symbol(paramSym);
 
         }
 
@@ -160,13 +161,41 @@ public:
         }
         if (node->type == "classDeclaration"){
             curr_class_for_returns = node;
+
+
+            Node* class_name_node = node->children.front(); // identifier:DuplicateIdentifiers
+            
+            curr_class_name = class_name_node->value; // Set current class
+
+        
+            symtab.enter_scope(class_name_node->value);
+            // identifier:DuplicateIdentifiers, reqVarDeclaration, reqMethodDeclaration methodDeclaration:
             for (auto child : node->children) visit(child); // visit all children of classDeclaration
+            symtab.exit_scope();
+            curr_class_name.clear(); // Reset after class processing
+
         }
         if (node->type == "methodDeclarations") for (auto child : node->children) visit(child);
 
-        if (node->type == "var declarations") for (auto child : node->children) visit(child);
+        if (node->type == "methodDec") 
+        {
+            
+            Node* indentifier_method = *std::next(node->children.begin()); // identifier:func
+            //cout << "TESTING " << indentifier_method->value << endl;
+            method_scope_name = curr_class_name + "." + indentifier_method->value; // Class.method
+            
+            
+            symtab.enter_scope(indentifier_method->value); // different here
+            for (auto child : node->children) visit(child);
+            symtab.exit_scope();
 
-        if (node->type == "statements") for (auto child : node->children) visit(child);
+        }
+        if (node->type == "methodBody") for (auto child : node->children) visit(child);
+
+        if (node->type == "statement"){
+            // here we visit SOMETHING [ASSIGNED] = TO SOMETHING, IF LP expression RP statement ELSE statement    etc..
+            for (auto child : node->children) visit(child); 
+        } 
 
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
             Node* identifier_arr = node->children.front(); // identifier:num_aux
@@ -177,35 +206,57 @@ public:
                 res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
                 symtab.error_count++;
             }
+
+            if (assigned_arr_to->type == "expression DOT LENGTH"){
+                Node* type_dot_length = assigned_arr_to->children.front(); // identifier:num
+                cout << "value or smthn: " << type_dot_length->value << endl;
+                
+                Symbol* test = symtab.lookup(type_dot_length->value);
+                if(test) cout << "FOUND IT: \n type" << test->type  << "\nname" << test->name<< endl;
+                if("INT LB RB" != test->type){
+                    res.push_back(std::make_tuple(node->lineno, "semantic (member .length is used incorrectly)"));
+                    symtab.error_count++;
+                }
+                //what type is num ? if its not INT LB RB then its NOT okay.
+                cout << symtab.writeAllSymbols();
+                //cout << "dadasdasdasdasdasdasd " << symtab.lookup(type_dot_length->value);
+                type_dot_length->value; //num
+
+            }
+            
+
         }
 
         if (node->type == "IF LP expression RP statement ELSE statement") for (auto child : node->children) visit(child);
         if (node->type == "LESS_THAN") for (auto child : node->children) visit(child);
-        if (node->type == "expression LEFT_BRACKET expression RIGHT_BRACKET") for (auto child : node->children) visit(child);
-        
-        
-        
-        
-        
-        
-        /*
-        if (node->type == "exp DOT ident LP exp COMMA exp RP"){
-            Node* this_or_new = node->children.front(); // THIS
-            Node* identifier_for_this = *std::next(node->children.begin()); // identifier:a2
+        if (node->type == "expression LEFT_BRACKET expression RIGHT_BRACKET"){
+            for (auto child : node->children) visit(child);
+            
+            Node* check_if_its_a_ident_or_exp_DOT_ident = *std::next(node->children.begin());
 
-
-            if (this_or_new->type == "THIS"){
-                //find return statement of this (THIS IS VALID IF THIS.a2 IF a2 IS AN INT)
-
-                // for example if (num_aux[this.a2()] < 1) (find return for a2)
-                Node* return_this_method = find_declared_method_type(curr_class_for_returns, identifier_for_this->value);
-                if (return_this_method->type != "Int"){
-                    res.push_back(std::make_tuple(node->lineno, "semantic (member .length is used incorrectly)"));
-                    symtab.error_count++;
+            if (check_if_its_a_ident_or_exp_DOT_ident->type == "exp DOT ident LP exp COMMA exp RP"){
+                Node* this_or_new = check_if_its_a_ident_or_exp_DOT_ident->children.front(); // THIS
+                Node* identifier_for_this = *std::next(check_if_its_a_ident_or_exp_DOT_ident->children.begin()); // identifier:a2
+                
+                if (this_or_new->type == "THIS"){
+                    //find return statement of this (THIS IS VALID IF THIS.a2 IF a2 IS AN INT)
+    
+                    // for example if (num_aux[this.a2()] < 1) (find return for a2)
+                    Node* return_this_method = find_declared_method_type(curr_class_for_returns, identifier_for_this->value);
+    
+                    // look if the node before is an method then its also ok.
+                    if (return_this_method->type != "Int"){
+                        res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
+                        symtab.error_count++;
+                    }
                 }
             }
-        }
-        */
+
+            
+        } 
+        
+        
+        
         if ("exp DOT ident LP exp COMMA exp RP");
         // if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING") { 
         //     cout << "YOOOOOOOOOOOOOOOOOOOOOOOO";
@@ -221,8 +272,7 @@ private:
 
     Node* find_declared_method_type(Node* n, const string& searched){
         //cout << n->type << endl;
-        if(!n) return nullptr;
-        if (n->type == "METHODDECLARATION VARDECLARATION"){
+        if (n->type == "methodDec"){
             Node* identifier = *std::next(n->children.begin());
             //cout << identifier->value << endl; // a1
             if (identifier->value == searched) { //found it 
@@ -241,7 +291,6 @@ private:
     }
 
     void handle_variable(Node* node){
-        if(!node) return;
         // its a normal variable just add it to the symtab
         Node* type_node = node->children.front(); // type of variable (int, string)
         Node* indentifier_var = *std::next(node->children.begin()); //identifier (a, bar)
@@ -265,14 +314,14 @@ private:
         // because it can be anywhere in the AST so we do it recursively until we find it. 
         //Mark please. When found.
         
-        if (child_of_method_dec->type == "methodDeclarations"){
+        if (child_of_method_dec->type == "reqMethodDeclaration methodDeclaration"){
             for (auto i : child_of_method_dec->children){
                 rec_classDeclaration_all_childs(i);
             }
             //rec_classDeclaration_all_childs(child_of_method_dec->children);
         }
         
-        else if (child_of_method_dec->type == "var declarations"){
+        else if (child_of_method_dec->type == "METHODDECLARATION VARDECLARATION"){
             Node* children_of_METHOD_DECLARATION  = child_of_method_dec;
 
             for (auto i : children_of_METHOD_DECLARATION->children){
@@ -379,6 +428,18 @@ private:
 
     }
     
+    Symbol* findSymbol(Node* node){
+        //cout << "HERE " << node->type << endl;
+        if (node->type == "identifier"){
+            //cout << "HERE " << node->value << endl;
+            return symtab.lookup(node->value);
+        }
+        for (auto child : node->children){
+            Symbol* result = findSymbol(child);
+            if (result) return result;
+        }
+        return nullptr;
+    }
 
     string get_exp_type(Node* exp_node) {
         if (!exp_node) return "unknown";
@@ -422,17 +483,14 @@ private:
             string lhs_type = get_exp_type(lhs);
             cout << "DBNWAOIDWNAODNWADINWADOIAW" << endl;
             // Check if the type is an array type (i.e. ends with "[]")
-            if (lhs_type.size() < 2 || lhs_type.substr(lhs_type.size()-2) != "[]") {
-                //  std::cerr << "\n@error Line " << exp_node->lineno
-                //            << ": semantic (member .length is used incorrectly)" << std::endl;
-                           //<<"on non-array type '" 
-                           //<< lhs_type << "', expected an array type\n";
-                //symtab.error_count++;
-
-                 res.push_back(std::make_tuple(exp_node->lineno, "semantic (member .length is used incorrectly)"));
-                 symtab.error_count++;
-                 return "unknown";
+            if (lhs_type != "INT LB RB") {
+                // Error: .length called on a non-array
+                res.push_back(std::make_tuple(exp_node->lineno,
+                    "semantic (member .length is used incorrectly)"));
+                symtab.error_count++;
+                return "unknown";
             }
+            // If it's "INT LB RB", then arr.length is valid:
             return "int";
         }
 
