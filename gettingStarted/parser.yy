@@ -113,7 +113,6 @@ singleClassDeclaration: CLASS identifier LEFT_CURLY varDeclaration
 
 						$$->children.push_back(classes);
 					}
-					
 					;
 
 
@@ -269,8 +268,7 @@ parameter_list: type identifier {
 
 
 
-methodDeclaration: %empty { $$ = new Node("methodDeclarations", "", yylineno); }
-				| reqMethodDeclaration { $$ = $1; }
+methodDeclaration:  reqMethodDeclaration { $$ = $1; }
 					;
 
 
@@ -289,7 +287,7 @@ reqMethodDeclaration: PUBLIC type identifier LP parameters
 						$$->children.push_back(methDec);
 
 
-					} 
+					}
 					| reqMethodDeclaration PUBLIC type identifier LP parameters
 					RP LEFT_CURLY reqVarOrStmt 
 					retSTMT RIGHT_CURLY
@@ -304,6 +302,8 @@ reqMethodDeclaration: PUBLIC type identifier LP parameters
 
 						$$->children.push_back(methDec);
 					}
+                    |
+                    %empty { $$ = new Node("NOOOOOO methodDeclarations", "", yylineno); }
 					;
 
 

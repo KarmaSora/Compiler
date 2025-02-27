@@ -211,7 +211,7 @@ public:
                 }
                     
             }
-
+            
 
             for (auto child : node->children) visit(child);
             symtab.exit_scope();
@@ -223,6 +223,26 @@ public:
             // here we visit SOMETHING [ASSIGNED] = TO SOMETHING, IF LP expression RP statement ELSE statement    etc..
             for (auto child : node->children) visit(child); 
         } 
+
+        if (node->type == "SOMETHING ASSIGNED = TO SOMETHING"){
+            Node* left_assign = node->children.front();
+            // @error - semantic ('e' does not exist in the current scope)
+            Symbol* found_the_non_existent = symtab.lookup(left_assign->value);
+
+            if (!found_the_non_existent){
+                string error_message = "semantic ('" + left_assign->value + "') does not exist in the current scope)";
+                res.push_back(std::make_tuple(node->lineno, error_message));
+                symtab.error_count++;
+            }
+
+            // om d är en typechar (classdata) så går vi in i d. Sen kollar vi om d har funktionen yfunc.
+            // kolla return type of yfunc jämför (if) om a = d.func om a är valid type boolean
+
+     
+            
+        }
+
+
 
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
             Node* identifier_arr = node->children.front(); // identifier:num_aux

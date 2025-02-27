@@ -69,12 +69,9 @@ public:
     Symbol *lookup(const string& name){
         auto it = symbols.find(name);
         if (it != symbols.end()) {
-            std::cout << "hehhhhhhhh" << std::endl;
             return &it->second;}
         if (parent) {
-            
-            std::cout << "LLLLLLLLLLL" << std::endl;
-            
+                        
             return parent->lookup(name);
         }
             return nullptr;
