@@ -238,7 +238,18 @@ public:
             // om d är en typechar (classdata) så går vi in i d. Sen kollar vi om d har funktionen yfunc.
             // kolla return type of yfunc jämför (if) om a = d.func om a är valid type boolean
 
-     
+            Node * right_assign = *std::next(node->children.begin());
+            if(right_assign->type == "exp DOT ident LP exp COMMA exp RP"){
+
+                Node* firstExpScope = right_assign->children.front(); // THIS
+                Symbol *found = symtab.lookup(firstExpScope->value);
+                if (found){
+                    std::cout << "foundKindmmm: " << found->kind << "\n found.type: " 
+                     << found->type << "foundName: " << found->name <<std::endl;
+                }
+              
+            }
+            
             
         }
 
@@ -350,6 +361,30 @@ private:
     void handle_variable(Node* node){
         // its a normal variable just add it to the symtab
         Node* type_node = node->children.front(); // type of variable (int, string)
+
+        if(type_node->type == "typechar"){
+            //cout << "HERE " << type_node->value << endl;
+            Node* typecharKid = type_node->children.front();
+            Symbol * found = symtab.lookup(typecharKid->value);
+            if (!found){
+                
+                res.push_back(std::make_tuple(typecharKid->lineno, "semantic type " + typecharKid->value + " is undefined"));
+                symtab.error_count++;
+            }
+            else {
+                //cout << "FOUND IT: " << found->name << endl;
+                
+                Symbol var_sym {
+                    node->children.back()->value,
+                    VARIABLE,
+                    found->type,
+                    node->lineno
+                };
+                symtab.add_symbol(var_sym);
+                return;
+            }
+        }
+
         Node* indentifier_var = *std::next(node->children.begin()); //identifier (a, bar)
 
         //string type_str = (type_node->type == "INT LB RB") ? "INT[]" : type_node->type;
