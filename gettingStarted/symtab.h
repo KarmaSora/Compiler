@@ -96,6 +96,7 @@ public:
         global_scope = new Scope("Global");
         current_scope = global_scope;
     }
+    
     void enter_scope(const string& name){
         for (Scope* child : current_scope->children) {
             if (child->name == name) {
@@ -108,7 +109,7 @@ public:
         Scope* new_scope = new Scope(name, current_scope);
         current_scope = new_scope;
         }
-        
+
     void exit_scope(){
         if (current_scope == global_scope) {    return;}
         //Scope* temp = current_scope;

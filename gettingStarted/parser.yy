@@ -113,6 +113,7 @@ singleClassDeclaration: CLASS identifier LEFT_CURLY varDeclaration
 
 						$$->children.push_back(classes);
 					}
+					
 					;
 
 
@@ -288,7 +289,7 @@ reqMethodDeclaration: PUBLIC type identifier LP parameters
 						$$->children.push_back(methDec);
 
 
-					}
+					} 
 					| reqMethodDeclaration PUBLIC type identifier LP parameters
 					RP LEFT_CURLY reqVarOrStmt 
 					retSTMT RIGHT_CURLY
@@ -501,7 +502,7 @@ identifier: IDENTIFIER { $$ = new Node("identifier", $1, yylineno); }
 
 
 
-factor:     INTEGER_LITERAL           {  $$ = new Node("Int", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
+factor:     INTEGER_LITERAL           {  $$ = new Node("INT", $1, yylineno); /* printf("r5 ");  Here we create a leaf node Int. The value of the leaf node is $1 */}
 			 
             | LP expression RP { $$ = $2; /* printf("r6 ");  simply return the expression */}
     ;

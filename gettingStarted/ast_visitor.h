@@ -37,6 +37,7 @@ private:
     string curr_class_name; // Track current class name
 
     Node* curr_class_for_returns = nullptr;
+    //Node* curr_method_for_returns = nullptr;
     string method_scope_name;
 public:
     ASTVisitor(SymbolTable &st) : symtab(st) {}
@@ -179,13 +180,39 @@ public:
 
         if (node->type == "methodDec") 
         {
+            Node* first_type_of_method = node->children.front();
+
+            Node* methodDec_return_node_but_not_type = *std::next(node->children.begin(), 4); //RETURN
+            Node* method_return_node_type = methodDec_return_node_but_not_type->children.front(); // INT:0
+
+            //cout << "Lokokokokokokok " << first_type_of_method->type << endl;
             
             Node* indentifier_method = *std::next(node->children.begin()); // identifier:func
             //cout << "TESTING " << indentifier_method->value << endl;
             method_scope_name = curr_class_name + "." + indentifier_method->value; // Class.method
             
-            
             symtab.enter_scope(indentifier_method->value); // different here
+
+            if (method_return_node_type->type != first_type_of_method->type){
+                // if (method_return_node_type->type != "THIS" && first_type_of_method->type != "typechar"){
+                //     res.push_back(std::make_tuple(first_type_of_method->lineno, "semantic (type mismatch)"));
+                //     symtab.error_count++;
+                // }
+                
+                if (method_return_node_type->type == "identifier"){
+                    
+                    Symbol* found = symtab.lookup(method_return_node_type->value);
+                    //cout << symtab.writeAllSymbols();
+                    if (found){
+                        if (found->type != first_type_of_method->type){
+                            res.push_back(std::make_tuple(first_type_of_method->lineno, "semantic (type mismatch)"));
+                        }
+                    }
+                }
+                    
+            }
+
+
             for (auto child : node->children) visit(child);
             symtab.exit_scope();
 
@@ -200,28 +227,38 @@ public:
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
             Node* identifier_arr = node->children.front(); // identifier:num_aux
             Node* inside_arr_brackets = *std::next(node->children.begin()); // FALSE
-            Node* assigned_arr_to = *std::next(node->children.begin(), 2); // Int:2
+            Node* assigned_arr_to = *std::next(node->children.begin(), 2); // INT:2
 
-            if (inside_arr_brackets->type != "Int"){
+            if (inside_arr_brackets->type != "INT"){
                 res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
                 symtab.error_count++;
             }
 
             if (assigned_arr_to->type == "expression DOT LENGTH"){
                 Node* type_dot_length = assigned_arr_to->children.front(); // identifier:num
-                cout << "value or smthn: " << type_dot_length->value << endl;
+                //cout << "value or smthn: " << type_dot_length->value << endl;
                 
                 Symbol* test = symtab.lookup(type_dot_length->value);
-                if(test) cout << "FOUND IT: \n type" << test->type  << "\nname" << test->name<< endl;
-                if("INT LB RB" != test->type){
-                    res.push_back(std::make_tuple(node->lineno, "semantic (member .length is used incorrectly)"));
-                    symtab.error_count++;
+                //if(test) cout << "FOUND IT: \n type" << test->type  << "\nname" << test->name<< endl;
+                if (test){
+                    if("INT LB RB" != test->type){
+                        res.push_back(std::make_tuple(node->lineno, "semantic (member .length is used incorrectly)"));
+                        symtab.error_count++;
+                    }
                 }
                 //what type is num ? if its not INT LB RB then its NOT okay.
-                cout << symtab.writeAllSymbols();
+                //cout << symtab.writeAllSymbols();
                 //cout << "dadasdasdasdasdasdasd " << symtab.lookup(type_dot_length->value);
                 type_dot_length->value; //num
 
+            }
+
+            // trying to use int as an array.
+            if (identifier_arr->type == "identifier"){
+                Symbol* found = symtab.lookup(identifier_arr->value);
+                if (found->type != "INT LB RB"){
+                    res.push_back(std::make_tuple(node->lineno, "semantic (trying to use int as int array)"));
+                }
             }
             
 
@@ -245,7 +282,7 @@ public:
                     Node* return_this_method = find_declared_method_type(curr_class_for_returns, identifier_for_this->value);
     
                     // look if the node before is an method then its also ok.
-                    if (return_this_method->type != "Int"){
+                    if (return_this_method->type != "INT"){
                         res.push_back(std::make_tuple(node->lineno, "semantic (invalid type of array index)"));
                         symtab.error_count++;
                     }
@@ -361,7 +398,7 @@ private:
     }
     */
 
-    /* InvalidArrayInteger.java (handle arrays access) */
+    /* InvalidArrayINTeger.java (handle arrays access) */
     void handle_array_this_access(Node* array_this_access){
 
         
@@ -446,7 +483,7 @@ private:
         /* handle literals */
         
         if (exp_node->type == "FALSE" || exp_node->type == "TRUE") return "boolean";
-        if (exp_node->type == "Int" || exp_node->type == "INT") return "int";
+        if (exp_node->type == "INT" || exp_node->type == "INT") return "int";
         
         //cout << "yo " << exp_node->type << endl;
 
@@ -607,7 +644,7 @@ public:
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
             Node* identifier_arr = node->children.front(); // identifier:num_aux
             Node* inside_arr_brackets = *std::next(node->children.begin()); // FALSE
-            Node* assigned_arr_to = *std::next(node->children.begin(), 2); // Int:2
+            Node* assigned_arr_to = *std::next(node->children.begin(), 2); // INT:2
 
             Symbol array_sym {
                 identifier_arr->value,
