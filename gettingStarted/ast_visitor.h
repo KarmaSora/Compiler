@@ -490,6 +490,23 @@ public:
         // } // num_aux[false] = 2;
         //cout << "WE ARE HERE: " << node->type << endl;
         
+        if(node->type == "karma"){
+            //cout << "WE ARE HERE: " << node->type << endl;
+            Node* nameOfScope = node->children.front();
+            Node* nameOfFunction = *std::next(node->children.begin());
+            Node* funcParams = *std::next(node->children.begin(), 2);
+
+            if(funcParams->type == "identifier"){
+                
+                Symbol* found = symtab.lookup(funcParams->value);
+                if (!found){
+                    string error_msg = "semantic ('" + funcParams->value + "' is undefined)";
+                    res.push_back(std::make_tuple(node->lineno, error_msg));
+                    symtab.error_count++;
+                }
+                
+            }
+        }
 
         
     }
