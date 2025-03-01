@@ -1,7 +1,7 @@
 # include "Node.h"
 # include "symtab.h"
 # include <algorithm>
-
+# include <unordered_set>
 
  /*
  My own lexicon of errors:  
@@ -39,6 +39,7 @@ private:
     Node* curr_class_for_returns = nullptr;
     //Node* curr_method_for_returns = nullptr;
     string method_scope_name;
+    unordered_set<string> declared_vars; // Track local declarations
 public:
     ASTVisitor(SymbolTable &st) : symtab(st) {}
 
@@ -92,8 +93,15 @@ public:
         }
 
         if (node->type == "methodDec"){
-            //Node* method_type = node->children.front(); // INT RETURN TYPE (HERERERERE) open it up if it needs usage
-            
+            string type_char_check_or_NOT;
+            Node* method_type = node->children.front(); // INT RETURN TYPE (HERERERERE) open it up if it needs usage
+
+            if (method_type->type == "typechar"){
+                Node* method_type_ident_because_it_has_typechar = method_type->children.front();
+                type_char_check_or_NOT = method_type_ident_because_it_has_typechar->value;
+            }
+            else { type_char_check_or_NOT = method_type->type; }
+
             Node* indentifier_method = *std::next(node->children.begin()); // identifier:func
             //cout << "TESTING " << indentifier_method->value << endl;
             method_scope_name = curr_class_name + "." + indentifier_method->value; // Class.method
@@ -101,7 +109,7 @@ public:
             Symbol method_sym {
                 indentifier_method->value,
                 METHOD,
-                indentifier_method->type,
+                type_char_check_or_NOT,
                 indentifier_method->lineno
             };
             //symtab.exit_scope();
@@ -119,13 +127,21 @@ public:
             for (auto child : node->children) visit_THE_WHOLE_AST_FOR_THE_SYMTAB(child);             
         }
         if (node->type == "parameter"){
-            Node* typeNode = node->children.front();    // e.g. "INT LB RB"
+            Node* typeNode = node->children.front();    // e.g. "INT LB RB" OR SOME CASES TYPECHAR
             Node* idNode   = node->children.back();     // e.g. "identifier:param"
             
+            string type_str;
+            if (typeNode->type == "typechar") {
+                Node* class_node_val = typeNode->children.front();
+                type_str = class_node_val->value;
+            } else {
+                type_str = typeNode->type;
+            }
+
             Symbol paramSym {
                 idNode->value,            // "param"
                 PARAMETER,
-                typeNode->type,           // "INT LB RB"
+                type_str,           // "INT LB RB" or "some_class_name"
                 node->lineno
             };
             symtab.add_symbol(paramSym);
@@ -162,7 +178,7 @@ public:
         }
         if (node->type == "classDeclaration"){
             curr_class_for_returns = node;
-
+            
 
             Node* class_name_node = node->children.front(); // identifier:DuplicateIdentifiers
             
@@ -172,14 +188,16 @@ public:
             symtab.enter_scope(class_name_node->value);
             // identifier:DuplicateIdentifiers, reqVarDeclaration, reqMethodDeclaration methodDeclaration:
             for (auto child : node->children) visit(child); // visit all children of classDeclaration
+            declared_vars.clear();
             symtab.exit_scope();
             curr_class_name.clear(); // Reset after class processing
 
         }
-        if (node->type == "methodDeclarations") for (auto child : node->children) visit(child);
+        if (node->type == "methodDeclarations"){ for (auto child : node->children) visit(child);}
 
         if (node->type == "methodDec") 
-        {
+        {   
+            
             Node* first_type_of_method = node->children.front();
 
             Node* methodDec_return_node_but_not_type = *std::next(node->children.begin(), 4); //RETURN
@@ -200,18 +218,27 @@ public:
                 // }
                 
                 if (method_return_node_type->type == "identifier"){
-                    
                     Symbol* found = symtab.lookup(method_return_node_type->value);
-                    //cout << symtab.writeAllSymbols();
-                    if (found){
-                        if (found->type != first_type_of_method->type){
+                    if (first_type_of_method->type == "typechar"){
+                        Node* what_is_this_typechar = first_type_of_method->children.front(); //identifier:A 
+                        if (found->type != what_is_this_typechar->value){
                             res.push_back(std::make_tuple(first_type_of_method->lineno, "semantic (type mismatch)"));
+                            symtab.error_count++;
+                        }
+                    }
+                    else {
+                        
+                        //cout << symtab.writeAllSymbols();
+                        if (found){
+                            if (found->type != first_type_of_method->type){
+                                res.push_back(std::make_tuple(first_type_of_method->lineno, "semantic (type mismatch)"));
+                                symtab.error_count++;
+                            }
                         }
                     }
                 }
-                    
             }
-            
+
 
             for (auto child : node->children) visit(child);
             symtab.exit_scope();
@@ -226,19 +253,134 @@ public:
 
         if (node->type == "SOMETHING ASSIGNED = TO SOMETHING"){
             Node* left_assign = node->children.front();
+            Node* either_an_ident_or_exp_DOT_ident = *std::next(node->children.begin());
             // @error - semantic ('e' does not exist in the current scope)
-            Symbol* found_the_non_existent = symtab.lookup(left_assign->value);
+            Symbol* found_the_non_existent = symtab.lookup(left_assign->value); // IMPORTANT
 
-            if (!found_the_non_existent){
-                string error_message = "semantic ('" + left_assign->value + "') does not exist in the current scope)";
-                res.push_back(std::make_tuple(node->lineno, error_message));
-                symtab.error_count++;
+            //cout<< "SOMETHING " << found_the_non_existent<< endl;
+            // kolla i klassen scope
+            if (found_the_non_existent){ // variable exists later or sooner.
+                //cout << "is this a d ?? " << found_the_non_existent->name << endl;
+                
+                    //Scope* check_if_var_in_scope = symtab.get_class_scope(found_the_non_existent->name);
+                    // cout << "LASDASDASDASD" << endl;
+                    // for (auto i : declared_vars){
+                        
+                    //     cout << i << " ";
+                    // }
+                    if (!declared_vars.count(left_assign->value)){
+                        
+                        string error_message = "semantic ('" + left_assign->value + "' is not defined yet)";
+                        res.push_back(std::make_tuple(node->lineno, error_message));
+                        symtab.error_count++;
+                    }
+                
+                
+            }
+            
+
+            if (either_an_ident_or_exp_DOT_ident->type == "identifier" && found_the_non_existent){
+                Symbol* right_assign = symtab.lookup(either_an_ident_or_exp_DOT_ident->value);
+
+                // @error - semantic ('a' and expression 'b' are of different types)
+                if (found_the_non_existent->type != right_assign->type){
+                    string error_message = "semantic ('" + found_the_non_existent->name + "' and expression '" \
+                    + right_assign->name + " are of different types)";
+                    res.push_back(std::make_tuple(node->lineno, error_message));
+                    symtab.error_count++;
+                }
+                // else if (!declared_vars.count(either_an_ident_or_exp_DOT_ident->value)){
+                //     string error_message = "semantic ('" + left_assign->value + "' is not defined yet)";
+                //     res.push_back(std::make_tuple(node->lineno, error_message));
+                //     symtab.error_count++;
+                // }
             }
 
-            // om d är en typechar (classdata) så går vi in i d. Sen kollar vi om d har funktionen yfunc.
+            if (!found_the_non_existent ){ // @error - semantic ('e' does not exist in the current scope) 
+                // Scope* class_scoping = symtab.get_class_scope(found_the_non_existent->type); //Get class scope (e.g., "classdata")
+                // if (class_scoping){
+                //     string error_message = "semantic ('" + left_assign->value + "' does not exist in the current scope)";
+                //     res.push_back(std::make_tuple(node->lineno, error_message));
+                //     symtab.error_count++;
+                // }
+                string error_message = "semantic ('" + left_assign->value + "' does not exist in the current scope)";
+                res.push_back(std::make_tuple(node->lineno, error_message));
+                symtab.error_count++;
+                //cout << "AAAAAAAAAAAAA"<<endl;
+            }
+
+            // om d är en identifier (classdata) så går vi in i d. Sen kollar vi om d har funktionen yfunc.
             // kolla return type of yfunc jämför (if) om a = d.func om a är valid type boolean
 
-            
+            if (either_an_ident_or_exp_DOT_ident->type == "exp DOT ident LP exp COMMA exp RP"){
+                Node* method_name_node = *std::next(either_an_ident_or_exp_DOT_ident->children.begin()); //yFunc
+                Node* obj_node = either_an_ident_or_exp_DOT_ident->children.front(); //
+
+                // try to see if even the function (.zzFunc) even exists.
+                // Symbol* does_this_exist = symtab.lookup(method_name_node->value);
+                
+                
+                // if (!does_this_exist){ //it doesnt exist.
+                //     Scope* class_scope = symtab.get_class_scope(does_this_exist->type); //Get class scope (e.g., "classdata")
+                //     if (!class_scope){
+                //         string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
+                //         res.push_back(std::make_tuple(node->lineno, error_msg));
+                //         //semantic ('zzFunc' does not exist)
+                //         symtab.error_count++;
+                //     }
+                    
+                // }
+
+                if (obj_node->type == "THIS"){
+                    Symbol* obj_sym = symtab.lookup(method_name_node->value);
+                    //cout << "found it name " << obj_sym->name <<" type "<<obj_sym->type<< endl;
+                    if (obj_sym){
+                        if (obj_sym->type != found_the_non_existent->type){
+                            res.push_back(std::make_tuple(node->lineno, "semantic (type mismatch)"));
+                            symtab.error_count++;
+                        }
+                    }
+                    else {
+                        //// @error - semantic ('zFunc' does not exist)
+                        string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
+                        res.push_back(std::make_tuple(node->lineno, error_msg));
+                        symtab.error_count++;
+                    }
+                }
+                else if (obj_node->type == "identifier") {
+                    Symbol* obj_sym = symtab.lookup(obj_node->value); // check type of the first node (type of "d")
+                    //cout << symtab.writeAllSymbols() << endl;
+                    if (obj_sym) {
+                        string class_name = obj_sym->type;
+                        Scope* class_scope = symtab.get_class_scope(class_name); //Get class scope (e.g., "classdata")
+                        
+                        //cout << "just look here: " << method_name_node->value <<" and here "<<class_scope->name<< endl;
+                        if (class_scope) {
+                            //cout << "class scope name " << class_scope->name<<endl; 
+                            // Look up the method in the class's scope
+                            Symbol* method_sym = class_scope->lookup(method_name_node->value);
+                            //cout << "NEWEWEWEWE " << method_sym->name <<" AADNADNADNADNADNANDNA " << method_sym->type<< endl;
+                            if (method_sym) {
+                                // Check return type compatibility, etc.
+                                if (found_the_non_existent->type != method_sym->type){
+                                    string error_msg = "semantic ('" + found_the_non_existent->name + "' and expression '" +\
+                                    obj_node->value + "." + method_name_node->value + "()' are of different types)";
+                                    
+                                    // ('a' and expression 'd.yFunc()' are of different types)
+                                    res.push_back(std::make_tuple(node->lineno, error_msg));
+                                    symtab.error_count++;
+                                }  
+                            }
+                            else {
+                                string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
+                                res.push_back(std::make_tuple(node->lineno, error_msg));
+                                //semantic ('zzFunc' does not exist)
+                                symtab.error_count++;
+                            } 
+                        }
+                    }
+                } 
+            }  
         }
 
 
@@ -277,6 +419,7 @@ public:
                 Symbol* found = symtab.lookup(identifier_arr->value);
                 if (found->type != "INT LB RB"){
                     res.push_back(std::make_tuple(node->lineno, "semantic (trying to use int as int array)"));
+                    symtab.error_count++;
                 }
             }
             
@@ -312,8 +455,35 @@ public:
         } 
         
         
+        if (node->type == "var declarations") for (auto child : node->children) visit(child);
+
+        if (node->type == "var declaration"){
+            Node* check_if_type_or_type = node->children.front(); // typechar or INT etc..
+            Node* check_name = *std::next(node->children.begin());
+            if (check_if_type_or_type->type == "typechar"){
+                Node* check_class_name = check_if_type_or_type->children.front();
+                //declared_vars.insert(check_class_name->value);
+                Symbol* trytofindme = symtab.lookup(check_class_name->value);
+                if (!trytofindme){
+                    //// @error - semantic ('classthatdoesntExist' is undefined)
+                    string error_msg = "semantic ('" + check_class_name->value + "' is undefined)";
+                    res.push_back(std::make_tuple(node->lineno, error_msg));
+                    symtab.error_count++;
+                }
+                
+            }
+            
+            declared_vars.insert(check_name->value);
+            
         
-        if ("exp DOT ident LP exp COMMA exp RP");
+        }
+        if (node->type == "parameters"){
+            for (auto child : node->children) visit(child);
+        }
+        if (node->type == "parameter"){
+            Node* name_of_parameter = *std::next(node->children.begin());
+            declared_vars.insert(name_of_parameter->value);
+        }
         // if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING") { 
         //     cout << "YOOOOOOOOOOOOOOOOOOOOOOOO";
         //     handle_array_access(node); 
@@ -349,39 +519,21 @@ private:
     void handle_variable(Node* node){
         // its a normal variable just add it to the symtab
         Node* type_node = node->children.front(); // type of variable (int, string)
-
-        if(type_node->type == "typechar"){
-            //cout << "HERE " << type_node->value << endl;
-            Node* typecharKid = type_node->children.front();
-            // Symbol * found = symtab.lookup(typecharKid->value);
-            // if (!found){
-                
-            //     res.push_back(std::make_tuple(typecharKid->lineno, "semantic type " + typecharKid->value + " is undefined"));
-            //     symtab.error_count++;
-            //     return;
-            // }
-            // else {
-            //     //cout << "FOUND IT: " << found->name << endl;
-                
-            //     Symbol var_sym {
-            //         node->children.back()->value,
-            //         VARIABLE,
-            //         type_node->type,
-            //         node->lineno
-            //     };
-            //     symtab.add_symbol(var_sym);
-            //     return;
-            // }
-        }
-
         Node* indentifier_var = *std::next(node->children.begin()); //identifier (a, bar)
 
         //string type_str = (type_node->type == "INT LB RB") ? "INT[]" : type_node->type;
+        string type_str;
+        if (type_node->type == "typechar") {
+            Node *class_name = type_node->children.front();
+            type_str = class_name->value; // Use class name "classdata"
+        } else {
+            type_str = type_node->type;  // Primitive types like "INT", "boolean"
+        }
 
         Symbol var_sym {
             indentifier_var->value,
             VARIABLE,
-            type_node->type,  // Store as "INT[]" for arrays
+            type_str,  // Store as "INT[]" for arrays
             node->lineno
         };
         
