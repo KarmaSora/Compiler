@@ -18,7 +18,7 @@ class A {
         return this;
     }
 
-    public int a2() {
+    public int a2() {       //a1 ska ta emot int, den tar emot a3, a3 är boolean
         b = this.a1(new A().a1(this.a3()).a4()).a3(); // @error - semantic (invalid parameter method 'a1')
         b = this.a1(new A().a1(2)).a3(); // @error - semantic (invalid method parameter for 'a1')
         b = this.a1(new A().a1(2).a3()).a3(); // @error - semantic (invalid method parameter for 'a1')
