@@ -37,9 +37,10 @@ private:
     string curr_class_name; // Track current class name
 
     Node* curr_class_for_returns = nullptr;
-    vector<string> save_all_curr_arguments;
-    Symbol* does_this_exist;
     //Node* curr_method_for_returns = nullptr;
+    bool flag = false; //used for when its okay for example i1 = ia1[1] + ia2[2]; or b1 = i1 < i2;
+    Symbol* a1 = nullptr;
+
     vector<string> method_scope_name;
     unordered_set<string> declared_vars; // Track local declarations
 public:
@@ -47,12 +48,8 @@ public:
 
     void visit_THE_WHOLE_AST_FOR_THE_SYMTAB(Node* node){
         if (!node) return;
-
-        //bool handled = false;
-        // if (node->type == "var declaration"){ //REMOVE THIS LATER JUST PUT HANDLE_VARIABLE IN BOTH MAIN CLASS AND CLASS DEC
-        //     handle_variable(node);
-        // }
-        //cout << "AAAA " << node->type << " name: " << node->value<< endl;
+        
+        
         if (node->type == "goal" || node->type == "classDeclarations"){
             
             for (auto child : node->children) visit_THE_WHOLE_AST_FOR_THE_SYMTAB(child);
@@ -119,24 +116,24 @@ public:
             symtab.enter_scope(method_sym.name); // different here
             for (auto child : node->children) visit_THE_WHOLE_AST_FOR_THE_SYMTAB(child);  
 
-            // // Collect parameter types from current scope (method's scope)
-            // vector<string> param_types;
+            // Collect parameter types from current scope (method's scope)
+            vector<string> param_types;
 
-            // for (const auto& entry : symtab.current_scope->symbols){
-            //     if (entry.second.kind == PARAMETER){
-            //         //cout << entry.second.name <<" "; 
-            //         param_types.push_back(entry.second.name); // why is it the wrong order?
-            //     }
-            // }
+            for (const auto& entry : symtab.current_scope->symbols){
+                if (entry.second.kind == PARAMETER){
+                    //cout << entry.second.name <<" "; 
+                    param_types.push_back(entry.second.name);
+                }
+            }
 
-            // // Update method symbol in CLASS scope with parameters
-            // Scope* class_scope = symtab.current_scope->parent;
-            // if (class_scope) {
-            //     Symbol* method_symbol = class_scope->lookup(method_sym.name);
-            //     if (method_symbol) {
-            //         method_symbol->param_types = param_types;
-            //     }
-            // }
+            // Update method symbol in CLASS scope with parameters
+            Scope* class_scope = symtab.current_scope->parent;
+            if (class_scope) {
+                Symbol* method_symbol = class_scope->lookup(method_sym.name);
+                if (method_symbol) {
+                    method_symbol->param_types = param_types;
+                }
+            }
 
             symtab.exit_scope();
 
@@ -167,15 +164,7 @@ public:
                 node->lineno
             };
             symtab.add_symbol(paramSym);
-            // Add the parameter name to the method's param_types here
-            Scope* class_scope = symtab.current_scope->parent;
-            if (class_scope) {
-                string method_name = symtab.current_scope->name;
-                Symbol* method_symbol = class_scope->lookup(method_name);
-                if (method_symbol) {
-                    method_symbol->param_types.push_back(idNode->value); // Add parameter name in order
-                }
-            }
+
         }
 
         
@@ -202,7 +191,7 @@ public:
 
     void visit(Node* node){ /* VISIT ALL THE NODES IN THE AST (pdf file or smthn)*/
         if (!node) return;
-
+        flag = false; //reset
         if (node->type == "goal" || node->type == "classDeclarations"){
             for (auto child : node->children) visit(child);
         }
@@ -371,15 +360,15 @@ public:
             // here we visit SOMETHING [ASSIGNED] = TO SOMETHING, IF LP expression RP statement ELSE statement    etc..
             for (auto child : node->children) visit(child); 
         } 
-        if (node->type == "argument_list") for (auto child : node->children) visit(child); 
+
         if (node->type == "SOMETHING ASSIGNED = TO SOMETHING"){
-            for (auto child : node->children) visit(child); 
+            for (auto child : node->children) visit(child);
             Node* left_assign = node->children.front();
             Node* either_an_ident_or_exp_DOT_ident = *std::next(node->children.begin()); // it can even be an operator like ADD OR EVEN AN NEW LIKE WHAAAT
             // @error - semantic ('e' does not exist in the current scope)
             Symbol* found_the_non_existent = symtab.lookup(left_assign->value); // IMPORTANT
 
-            bool flag = false; //used for when its okay for example i1 = ia1[1] + ia2[2]; or b1 = i1 < i2;
+            
 
 
 
@@ -686,22 +675,27 @@ public:
                 Node* obj_node = either_an_ident_or_exp_DOT_ident->children.front(); //
                 Node* argument_list_or_argument = *std::next(either_an_ident_or_exp_DOT_ident->children.begin(), 2);
                 // try to see if even the function (.zzFunc) even exists.
-                does_this_exist = symtab.lookup(method_name_node->value);
+                Symbol* does_this_exist = symtab.lookup(method_name_node->value);
+                
                 if (argument_list_or_argument->type == "argument_list"){
                     // this one below can be 3 things (1. exp_dot_ident 2. argument 3. INT)
-                    Node* get_first_argument = argument_list_or_argument->children.front();//identifier:b
-                    save_all_curr_arguments.push_back(get_first_argument->value);
-                    for (auto child : argument_list_or_argument->children) visit(child); //argument:
-                    // Node* check_if_argument_or_DOT_ident = argument_list_or_argument->children.front();
-                    // if (check_if_argument_or_DOT_ident->type == "identifier"){
-                    //     Node* check_if_argument_exist = check_if_argument_or_DOT_ident->children.front();
-                    //     if (check_if_argument_exist){ // loop through all arguments.
-                    //         cout<<"OIOIOIOI"<<endl;
-                    //         for (auto child : node->children) visit(child);
-                    //     }
-                    // }
+                    Node* check_if_argument_or_DOT_ident = argument_list_or_argument->children.front();
+                    if (check_if_argument_or_DOT_ident->type == "identifier"){
+                        Node* check_if_argument_exist = check_if_argument_or_DOT_ident->children.front();
+                        if (check_if_argument_exist){ // loop through all arguments.
+                            for (auto child : node->children) visit(child);
+                        }
+                    }
                 }
-                
+                else if (argument_list_or_argument->type == "argument"){
+                    Node* check_if_its_an_THIS = either_an_ident_or_exp_DOT_ident->children.front();
+                    Node* get_the_name = *std::next(either_an_ident_or_exp_DOT_ident->children.begin());
+                    cout<<"YWDAWDAWD "<<check_if_its_an_THIS->type<<endl;
+                    if (check_if_its_an_THIS->type == "THIS"){
+                        Symbol* check_its_type = symtab.lookup(get_the_name->value);
+                        cout << "FOUND YUEA " << check_its_type<<endl;
+                    }
+                }
 
                 // KIND OF CORRECT BUT MAY NEEDS CHANGINGS.
                 if (obj_node->type == "exp DOT ident LP exp COMMA exp RP"){
@@ -746,63 +740,8 @@ public:
                     }
                 }
 
-                // just incorrect:
-                if (does_this_exist){
-                    Node* check_if_this = either_an_ident_or_exp_DOT_ident->children.front(); // THIS
-                    Node* check_left_name_for_lookup = *std::next(either_an_ident_or_exp_DOT_ident->children.begin());
-
-                    if (check_left_name_for_lookup && check_if_this){ // just to be sure to not get segmentation fault
-                        if (check_if_this->type == "THIS"){       
-                            //cout << "GOTOOTTO " <<check_left_name_for_lookup->value<<endl;
-                            Symbol* find_me = symtab.lookup(check_left_name_for_lookup->value);
-                            //cout << "LOSADOAKDOASKDOKSD " << find_me->name << endl;
-                            //if (check_left_name_for_lookup->type == ) 
-                        }
-                    }
-                    
-                    //Scope* method_sym = symtab.get_class_scope(does_this_exist->type);
-                    // Extract arguments from the method call node
-                    vector<Node*> args;
-                    //cout << symtab.writeAllSymbols()<<endl;
-                    extract_arguments(obj_node, args);
-                    //for (auto i : args) cout << i->value << " ";
-                    //cout << "size: " << does_this_exist->type << endl; // BOOLEAN == ?
-                    //if (does_this_exist->type == );
-                    //if (args.size() != does_this_exist->param_types.size()) cout <<"DOHNAODSADOIANSD"; 
-                    // if (args.size() != does_this_exist->param_types.size()) {
-                    //     string error_msg = "semantic (method '" + method_name_node->value + 
-                    //                       "' expects " + to_string(does_this_exist->param_types.size()) + 
-                    //                       " parameters)";
-                    //     res.push_back(make_tuple(node->lineno, error_msg));
-                    //     symtab.error_count++;
-                    // } else {
-                    //     // Check each argument type
-                    //     for (int i = 0; i < args.size(); i++) {
-                    //         string arg_type = get_exp_type(args[i]);
-                    //         if (arg_type != does_this_exist->param_types[i]) {
-                    //             string error_msg = "semantic (parameter " + to_string(i+1) + 
-                    //                               " of '" + method_name_node->value + 
-                    //                               "' expects " + does_this_exist->param_types[i] + 
-                    //                               ", got " + arg_type + ")";
-                    //             res.push_back(make_tuple(node->lineno, error_msg));
-                    //             symtab.error_count++;
-                    //         }
-                    //     }
-                    // }
-                    //Node* args_node = *std::next(either_an_ident_or_exp_DOT_ident->children.begin(), 2);  //change
-                    //cout << "args_node " << args_node->type << endl;
-                }
                 
-                // if (!does_this_exist){ //it doesnt exist.
-                //     Scope* class_scope = symtab.get_class_scope(does_this_exist->type); //Get class scope (e.g., "classdata")
-                //     if (!class_scope){
-                //         string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
-                //         res.push_back(std::make_tuple(node->lineno, error_msg));
-                //         //semantic ('zzFunc' does not exist)
-                //         symtab.error_count++;
-                //     }
-                    
-                // }
+                
 
 
                 // THIS IS GOOD: (other errors.)
@@ -957,14 +896,7 @@ public:
         }
         if (node->type == "parameter"){
             Node* name_of_parameter = *std::next(node->children.begin());
-
-            if (name_of_parameter->type == "typechar"){
-                Node* name_of_parameter2 = name_of_parameter->children.front();
-                declared_vars.insert(name_of_parameter2->value);
-            }
-            else{
-                declared_vars.insert(name_of_parameter->value);
-            }
+            declared_vars.insert(name_of_parameter->value);
         }
         // if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING") { 
         //     cout << "YOOOOOOOOOOOOOOOOOOOOOOOO";
@@ -972,104 +904,63 @@ public:
         // } // num_aux[false] = 2;
         //cout << "WE ARE HERE: " << node->type << endl;
         
-        if (node->type == "argument"){ // check SOMETHING ASSIGNED TO SOMETHING.
-
-            
-            Node* get_argument = node->children.front(); //identifier:a or NEW identifier LP RP
-            string push_this;
-            if (get_argument->type == "NEW identifier LP RP"){
-                Node* get_argument2 = get_argument->children.front();
-                save_all_curr_arguments.push_back(get_argument2->value);
+        if (node->type == "functionCall"){ // check SOMETHING ASSIGNED TO SOMETHING.
+            for (auto child : node->children) visit(child);
+            //cout<<"NDIAOWDNAWIODNAWIOD"<<endl;
+            Node* func_name = *std::next(node->children.begin());//identifier:a1
+            //go into a1 scope
+            Symbol* get_class_name_for_func = symtab.lookup(func_name->value);
+            //cout<<get_class_name_for_func->type<<endl;
+            if (get_class_name_for_func){
+                Scope* get_class_for_func = symtab.get_class_scope(get_class_name_for_func->type);
+                if(get_class_for_func){
+                    //CP
+                    //cout<<"AAAA"<<endl;
+                    Symbol* func_sym = get_class_for_func->lookup(func_name->value);
+                    a1 = func_sym;
+                    if (func_sym){
+                        for(auto i : func_sym->param_types){ //loop through all arguments of a1
+                            //cout << i <<" ";
+                        }
+                    }
+                    //cout<<endl;
+                }
             }
-            else{
-                save_all_curr_arguments.push_back(get_argument->value);
+            
+
+        }
+
+        if (node->type == "argument_list"){
+            for (auto child : node->children) visit(child);
+            Node* functionCall_or_argument = node->children.front();
+            if (functionCall_or_argument->type != "functionCall"){//its arguments.
+                
             }
         }
-        
-        if (save_all_curr_arguments.size() > 0){ // we have arguments provided.
-            //get the parameters for a5 and check if they are the same type of parameters as all these.
-            if (does_this_exist){
-                Scope* get_class_scope = symtab.get_class_scope(curr_class_name);
-                //cout<<does_this_exist->param_types<<endl;
-                if (get_class_scope && does_this_exist){
-                    Scope* get_method_scope = symtab.get_method_scope(get_class_scope->name, does_this_exist->name);
-                    //cout <<get_method_scope<<endl;
-                    if (get_method_scope){
-                        Symbol* get_param_for_method = get_method_scope->lookup(does_this_exist->name);
+        if (node->type == "exp DOT ident LP exp COMMA exp RP"){
+            //for (auto child : node->children) visit(child);
+            Node* get_func_var = *std::next(node->children.begin()); // a3
+            //find a3 type:
+            string found_class = extractClass(method_scope_name, get_func_var->value);
 
-                        vector<Symbol*> allArgumentsInMethod;
-                        if (get_param_for_method){
-                            // COME HERE2
-                            // for (auto curr_arg_in_first : save_all_curr_arguments){
-                            //     for (auto i : get_param_for_method->param_types){
-                            //         //find what type these parameters are.
-                            //         //cout <<i<<" ";
-                            //         Symbol* arg_param_types = get_method_scope->lookup(i);
-                                    
-                            //         if (arg_param_types){
-                            //             if (curr_arg_in_first != arg_param_types->type){
-                            //                 cout<<"DSADASD"<<endl;
-                            //             }
-                            //             // for (auto j : save_all_curr_arguments){
-                            //             //     cout << j <<" ";
-                            //             // }
-                            //             allArgumentsInMethod.push_back(arg_param_types);
-                            //             //if (arg_param_types->type != )
-                            //             //cout<<arg_param_types->type<<endl;
-                            //         }
-                            //     }
-                            // }   
-                            // fill allArgumentsInMethod
-                            for (auto i : get_param_for_method->param_types){
-                                //find what type these parameters are.
-                                //cout <<i<<" ";
-                                Symbol* arg_param_types = get_method_scope->lookup(i);
-                                
-                                if (arg_param_types){  
-                                    allArgumentsInMethod.push_back(arg_param_types);
-                                }
-                            }
-
-                            //for (int i=0; i<allArgumentsInMethod.size(); i++){
-                            Symbol* get_typeOf_arg_curr = symtab.lookup(save_all_curr_arguments[0]);
-                            if (get_typeOf_arg_curr){
-                                if (get_typeOf_arg_curr->type != allArgumentsInMethod[0]->type){
-                                    //cout<<"DWOAINDWOAINIOANWD"<<endl;
-                                }
-                            }
-                                
-                            //}
-                            //cout<<allArgumentsInMethod.size()<<endl; 4
-                            //cout<<save_all_curr_arguments[0]<<endl;
-                            // for (auto i : allArgumentsInMethod){
-                            //     cout << i->type <<" "; // BOOLEAN INT INT LB RB A 
-                            // }
-                            
+            Scope* get_class_scope = symtab.get_class_scope(found_class); // FIND a3 (A)
+            if (get_class_scope){
+                Symbol* get_class_name_for_func = get_class_scope->lookup(get_func_var->value);
+                cout<<found_class<<endl;
+                if (get_class_name_for_func){
+                    Scope* get_method_for_func = symtab.get_method_scope(get_class_scope->name, get_func_var->value);
+                    if (get_method_for_func){
+                        Symbol* func_sym = get_method_for_func->lookup(get_func_var->value);
+                        cout<<"ASDASDASD " << func_sym->name <<" "<<node->lineno<<endl;
+                        for (int i=0; i<func_sym->param_types.size(); i++){
+                            //if ()
                         }
-                        //cout<<endl;
                     }
                 }
-                
-                // cout<<endl;
-                // for (auto argument : save_all_curr_arguments){
-                //     //cout<<does_this_exist->name<<endl;
-                //     Symbol* find_the_argument = symtab.lookup(argument);
-                //     if(find_the_argument){
-                //         //cout<<find_the_argument->type<<endl;
-                //     }
-                // }
             }
-
             
-
-            save_all_curr_arguments.clear();
+            
         }
-
-
-        if (node->type == "functionCall"){
-            cout<<"BBBBBBBBBBBBBBB"<<endl;
-            for (auto child : node->children) visit(child);
-        } 
     }
 
 private:
