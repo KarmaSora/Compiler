@@ -2,7 +2,7 @@
 # include "symtab.h"
 # include <algorithm>
 # include <unordered_set>
-
+#include "IR.h" 
  /*
  My own lexicon of errors:  
  Node* id_node = *std::next(var_node->children.begin(), 2000); gives segmentation fault if the child/node does not exist.
@@ -539,6 +539,20 @@ public:
         }
     }
 
+
+    void visit_for_IR(Node* node){
+        if(!node) return;
+        //visit Nodes for Intermediate Representation
+
+        if (node->type == "goal" || node->type == "classDeclarations"){
+            for (auto child : node->children) visit_for_IR(child);
+        }
+
+        if (node->type == "classDeclaration"){
+            for (auto child : node->children) visit_for_IR(child);
+            
+        }
+    }
 private:
 std::string getNodeReturnType(Node* n) {
     if (!n) return "unknown";
@@ -555,11 +569,6 @@ std::string getNodeReturnType(Node* n) {
     if (n->type == "identifier") {
         Symbol* sym = symtab.lookup(n->value);
         if (sym) {
-            if (sym->type.empty()) {
-                std::cout << "WARNING: Symbol '" << n->value 
-                          << "' has an empty type!" << std::endl;
-                return "unknown";
-            }
             return sym->type;
         }
         return "unknown";
