@@ -365,6 +365,13 @@ public:
             Node* leftNode = node->children.front();
             Node* rightNode = *std::next(node->children.begin(),1);
 
+            Symbol* lhs = symtab.lookup(leftNode->value);
+            if(!lhs || lhs->line_no > node->lineno){
+                res.push_back(std::make_tuple(leftNode->lineno, "Vairable not defined yet: " + leftNode->value));
+                symtab.error_count++;
+            }
+   
+
             if(getNodeReturnType(leftNode)!= getNodeReturnType(rightNode)){
                 std::cout << "typeLeft : "<<leftNode->type <<
                 " typeRight: " << rightNode->type <<std::endl;
@@ -373,6 +380,7 @@ public:
                 symtab.error_count++;
             }
 
+            
         }
 
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
