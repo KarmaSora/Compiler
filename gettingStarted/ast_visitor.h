@@ -62,7 +62,7 @@ public:
             Symbol class_sym {
                 class_name_node->value,
                 CLASS,
-                "regular class",
+                class_name_node->value,
                 class_name_node->lineno ///SDASDASDASDASD
             };
             
@@ -362,442 +362,18 @@ public:
         } 
 
         if (node->type == "SOMETHING ASSIGNED = TO SOMETHING"){
-            for (auto child : node->children) visit(child);
-            Node* left_assign = node->children.front();
-            Node* either_an_ident_or_exp_DOT_ident = *std::next(node->children.begin()); // it can even be an operator like ADD OR EVEN AN NEW LIKE WHAAAT
-            // @error - semantic ('e' does not exist in the current scope)
-            Symbol* found_the_non_existent = symtab.lookup(left_assign->value); // IMPORTANT
+            Node* leftNode = node->children.front();
+            Node* rightNode = *std::next(node->children.begin(),1);
 
-            
-
-
-
-            if (either_an_ident_or_exp_DOT_ident->type == "NEW INT LEFT_BRACKET expression RIGHT_BRACKET"){
-                Node* ident = either_an_ident_or_exp_DOT_ident->children.front();
-                
-                if (ident->type == "TRUE" || ident->type == "FALSE"){ //FALSE doesnt exist in the tests but who knows?
-                    // @error - semantic ('true': is of wrong type)
-                    string error_msg = "semantic ('" + ident->type + "': is of wrong type)";
-                    res.push_back(std::make_tuple(node->lineno, error_msg));
-                    symtab.error_count++;
-                }
-
-                if (found_the_non_existent->type != ident->type &&
-                    found_the_non_existent->type != "INT LB RB"){
-                    // @error - semantic ('x' and expression new int[1] new are of different types)
-                    string error_msg = "semantic ('" + found_the_non_existent->name + "' and expression new int[1] new are of different types)";
-                    res.push_back(std::make_tuple(node->lineno, error_msg));
-                    symtab.error_count++;
-                }
-                
-            }
-
-            if (either_an_ident_or_exp_DOT_ident->type == "expression DOT LENGTH"){
-                Node* get_exp = either_an_ident_or_exp_DOT_ident->children.front();
-
-                Symbol* get_sym_exp = symtab.lookup(get_exp->value); // identifier:e
-
-                if (get_sym_exp){
-                    //cout << "name: "<<get_sym_exp->name<<" "<< get_sym_exp->type << endl;
-                    if (get_sym_exp->type == "INT LB RB" && found_the_non_existent->type == "INT"){
-                        flag = true; //its okay because a = e.length; is valid since a is an INT and e is an INT LB RB
-                    }
-
-                    if (get_sym_exp->type != found_the_non_existent->type && !flag){
-                        // @error - semantic ('x' and expression 'e.length' are of different types)
-                        string error_msg = "semantic ('" + found_the_non_existent->name + "' and expression '" +\
-                        get_sym_exp->name + ".length' are of different types)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }
-                }
-
-                if (get_exp->type == "expression LEFT_BRACKET expression RIGHT_BRACKET"){
-                    Node* get_var_name_arr = get_exp->children.front();
-                    // @error - semantic ('e' is undefined or wrong)
-                    string error_msg = "semantic ('" + get_var_name_arr->value + "' is undefined or wrong)";
-                    res.push_back(std::make_tuple(node->lineno, error_msg));
-                    symtab.error_count++;
-                }
-            }
-
-            else if (either_an_ident_or_exp_DOT_ident->type == "NEW identifier LP RP"){
-                Node* find_var_in_NEW = either_an_ident_or_exp_DOT_ident->children.front();
-                Symbol* find_the_NEW_var = symtab.lookup(find_var_in_NEW->value);
-
-                if (!find_the_NEW_var){
-                    string error_msg = "semantic ('" + find_var_in_NEW->value + "' is not a valid Class)";
-                    res.push_back(std::make_tuple(node->lineno, error_msg));
-                    symtab.error_count++;
-                }
-                else if (find_the_NEW_var){
-                    //c = new Element();// @error - semantic ('c' and expression 'Element' new are of different types)
-                    if (found_the_non_existent->type != find_the_NEW_var->name){ //BECAUSE THIS IS A CLASS WE USE NAME NOT TYPE (CLASS NAME IS THE TYPE)
-                        string error_msg = "semantic ('" + found_the_non_existent->name + "'and expression '" +\
-                        find_the_NEW_var->name + "' new are of different types)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }
-                }
-            }
-
-            else if (either_an_ident_or_exp_DOT_ident->type == "EXCLAMATION_MARK expression"){
-                Node* var_in_exclamation_mark = either_an_ident_or_exp_DOT_ident->children.front(); 
-
-                // find it
-                Symbol* var_sym_in_exclamation_mark = symtab.lookup(var_in_exclamation_mark->value);
-
-                if (var_sym_in_exclamation_mark){
-                    if (var_sym_in_exclamation_mark->type != "BOOLEAN"){
-                        res.push_back(std::make_tuple(node->lineno, "semantic"));
-                        symtab.error_count++;
-                    }
-                }
-            }
-
-            if (either_an_ident_or_exp_DOT_ident->type == "AddExpression"){
-                
-                //then get the two types yalla
-                Node* left_after_equal = either_an_ident_or_exp_DOT_ident->children.front(); //identifier:i1
-                Node* right_after_equal = *std::next(either_an_ident_or_exp_DOT_ident->children.begin()); //identifier:b1
-                //does it even exist?
-                Symbol* left_sym_after_equal = symtab.lookup(left_after_equal->value);
-                Symbol* right_sym_after_equal =  symtab.lookup(right_after_equal->value);
-
-
-                if (found_the_non_existent->type == "BOOLEAN"){//b1 = b1 + b1;// @error - semantic
-                    if (left_sym_after_equal->type == "BOOLEAN" && right_sym_after_equal->type == "BOOLEAN"){
-                        res.push_back(std::make_tuple(node->lineno, "semantic"));
-                        symtab.error_count++;
-                    }
-                }
-               
-
-                if (left_sym_after_equal && right_sym_after_equal) { //it does indeed exist.
-                    if (found_the_non_existent->type != left_sym_after_equal->type){ 
-                        //i1 = b1 + b1;// @error - semantic ('b1' is of wrong type)
-                        string error_msg = "semantic ('" + left_sym_after_equal->name +\
-                        "' is of wrong type)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }
-                    else if (found_the_non_existent->type != right_sym_after_equal->type){
-                        // now the same as before but for right side.
-                        string error_msg = "semantic ('" + right_sym_after_equal->name +\
-                        "' is of wrong type)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }    
-                    else if (found_the_non_existent->type == "INT LB RB"){//ia1 = ia1 + ia2;// @error - semantic
-                        res.push_back(std::make_tuple(node->lineno, "semantic"));
-                        symtab.error_count++;
-                    }       
-                }
-                if (left_after_equal->type == "expression LEFT_BRACKET expression RIGHT_BRACKET" &&
-                    right_after_equal->type == "expression LEFT_BRACKET expression RIGHT_BRACKET"){
-                    
-                    Node* vararr_of_left = left_after_equal->children.front();
-                    Node* vararr_of_right = right_after_equal->children.front();
-                    
-                    Symbol* left_sym = symtab.lookup(vararr_of_left->value);
-                    Symbol* right_sym = symtab.lookup(vararr_of_right->value);
-
-                    if (left_sym && right_sym){
-                        if (left_sym->type == right_sym->type){ //THEY BOTH ARE SAME TYPE arrays.
-                            if (left_sym->type == "INT LB RB" && right_sym->type == "INT LB RB"){
-                                if (found_the_non_existent->type == "INT"){
-                                    flag = true; // ITS OKAY THEY BOTH ARRAYS ARE INT AND THE LEFT ASSIGN VAR IS ALSO AN INT.
-                                }
-                            }
-                        }
-                    }
-                }
-                if (right_after_equal->type == "expression LEFT_BRACKET expression RIGHT_BRACKET"){
-                    //i1 = ia1 + ia1[0];// @error - semantic ('ia1' is of wrong type)
-
-                    //now get the two childs:
-                    Node* var_name_for_arr = right_after_equal->children.front(); //identifier:ia1
-                    Node* get_inside_brackets = *std::next(right_after_equal->children.begin()); // INT:0
-                    //cout << var_name_for_arr->value << endl;
-                    //cout << get_inside_brackets->type << endl;
-                    Symbol* find_the_variable_as_arr = symtab.lookup(var_name_for_arr->value);
-                    if (find_the_variable_as_arr){
-                        // its okay if they both are INT [] and the left  assign (found_the_non_existent) is an int.
-                        
-                        if (found_the_non_existent->type != find_the_variable_as_arr->type && !flag){
-                            
-                            string error_msg = "semantic ('" + find_the_variable_as_arr->name +\
-                            "' is of wrong type)";
-                            res.push_back(std::make_tuple(node->lineno, error_msg));
-                            symtab.error_count++;
-                        }
-                    }
-                }
-                
-            }
-
-            else if (either_an_ident_or_exp_DOT_ident->type == "AND"){
-                //get the two childs:
-                Node* left_in_AND = either_an_ident_or_exp_DOT_ident->children.front();
-                Node* right_in_AND = *std::next(either_an_ident_or_exp_DOT_ident->children.begin());
-
-                Symbol* left_sym_in_AND = symtab.lookup(left_in_AND->value);
-                Symbol* right_sym_in_AND = symtab.lookup(right_in_AND->value);
-
-                if (left_sym_in_AND->type != right_sym_in_AND->type && !flag){
-                    res.push_back(std::make_tuple(node->lineno, "semantic"));
-                    symtab.error_count++;
-                }
-
-                if (left_sym_in_AND && right_sym_in_AND){
-                    
-                    if (found_the_non_existent->type != left_sym_in_AND->type && found_the_non_existent->type != right_sym_in_AND->type){
-                        //@error - semantic ('c1' is of wrong type, 'i1' and expression 'c1 && c1' are of different types)
-                        string error_msg = "semantic ('" + left_sym_in_AND->name +\
-                        "' is of wrong type, '" + found_the_non_existent->name + "' and expression '" +\
-                        left_sym_in_AND->name + " && " + right_sym_in_AND->name + "' are of different types)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }
-                    else if (found_the_non_existent->type == "INT LB RB"){//ia1 = ia1 + ia2;// @error - semantic
-                        res.push_back(std::make_tuple(node->lineno, "semantic"));
-                        symtab.error_count++;
-                    }  
-                }
-            }
-
-            else if (either_an_ident_or_exp_DOT_ident->type == "OR" ||
-                either_an_ident_or_exp_DOT_ident->type == "LESS_THAN" ||
-                either_an_ident_or_exp_DOT_ident->type == "EQUAL"){
-                
-                Node* left_of_op = either_an_ident_or_exp_DOT_ident->children.front();
-                Node* right_of_op = *std::next(either_an_ident_or_exp_DOT_ident->children.begin());
-
-                Symbol* left_sym_of_op = symtab.lookup(left_of_op->value);
-                Symbol* right_sym_of_op = symtab.lookup(right_of_op->value);
-                
-                //sometimes its okay.
-                
-
-                if (left_sym_of_op && right_sym_of_op){
-
-                    if (left_sym_of_op->type == right_sym_of_op->type){
-                        if (left_sym_of_op->type == "BOOLEAN" &&
-                            right_sym_of_op->type == "BOOLEAN" &&
-                            found_the_non_existent->type == "BOOLEAN"){
-                            res.push_back(std::make_tuple(node->lineno, "semantic"));
-                            symtab.error_count++;
-                        }
-                        if (found_the_non_existent->type == "BOOLEAN" &&
-                            right_sym_of_op->type != "BOOLEAN" &&
-                            left_sym_of_op->type != "BOOLEAN"){
-                            flag = true; //THIS IS OKAY b1 = i1 < i2;
-                        }
-                    }
-                    
-                    if (left_sym_of_op->type != right_sym_of_op->type && !flag){
-                        res.push_back(std::make_tuple(node->lineno, "semantic"));
-                        symtab.error_count++;
-                    }
-
-                    if (found_the_non_existent->type != left_sym_of_op->type &&
-                        found_the_non_existent->type != right_sym_of_op->type && !flag){
-                            res.push_back(std::make_tuple(node->lineno, "semantic"));
-                            symtab.error_count++;
-                        }
-                }
-
-            }
-            //cout<< "SOMETHING " << found_the_non_existent<< endl;
-            // kolla i klassen scope
-            if (found_the_non_existent){ // variable exists later or sooner.
-                //cout << "is this a d ?? " << found_the_non_existent->name << endl;
-                
-                    //Scope* check_if_var_in_scope = symtab.get_class_scope(found_the_non_existent->name);
-                    // cout << "LASDASDASDASD" << endl;
-                    // for (auto i : declared_vars){
-                        
-                    //     cout << i << " ";
-                    // }
-                    if (!declared_vars.count(left_assign->value)){
-                        
-                        string error_message = "semantic ('" + left_assign->value + "' is not defined yet)";
-                        res.push_back(std::make_tuple(node->lineno, error_message));
-                        symtab.error_count++;
-                    }
-                
-                
-            }
-            
-            
-            if (either_an_ident_or_exp_DOT_ident->type == "identifier" && found_the_non_existent){
-
-
-                Symbol* right_assign = symtab.lookup(either_an_ident_or_exp_DOT_ident->value);
-
-                
-
-
-
-                // @error - semantic ('a' and expression 'b' are of different types)
-                if (found_the_non_existent->type != right_assign->type){
-                    string error_message = "semantic ('" + found_the_non_existent->name + "' and expression '" \
-                    + right_assign->name + " are of different types)";
-                    res.push_back(std::make_tuple(node->lineno, error_message));
-                    symtab.error_count++;
-                }
-                // else if (!declared_vars.count(either_an_ident_or_exp_DOT_ident->value)){
-                //     string error_message = "semantic ('" + left_assign->value + "' is not defined yet)";
-                //     res.push_back(std::make_tuple(node->lineno, error_message));
-                //     symtab.error_count++;
-                // }
-            }
-
-            if (!found_the_non_existent ){ // @error - semantic ('e' does not exist in the current scope) 
-                // Scope* class_scoping = symtab.get_class_scope(found_the_non_existent->type); //Get class scope (e.g., "classdata")
-                // if (class_scoping){
-                //     string error_message = "semantic ('" + left_assign->value + "' does not exist in the current scope)";
-                //     res.push_back(std::make_tuple(node->lineno, error_message));
-                //     symtab.error_count++;
-                // }
-                string error_message = "semantic ('" + left_assign->value + "' does not exist in the current scope)";
-                res.push_back(std::make_tuple(node->lineno, error_message));
+            if(getNodeReturnType(leftNode)!= getNodeReturnType(rightNode)){
+                std::cout << "typeLeft : "<<leftNode->type <<
+                " typeRight: " << rightNode->type <<std::endl;
+                std::cout <<" funcretTYPE: "<< getNodeReturnType(leftNode)<< " rightFuncRetTYPE: " << getNodeReturnType(rightNode) << std::endl;
+                res.push_back(std::make_tuple(node->lineno, "Type missmatch!"));
                 symtab.error_count++;
-                //cout << "AAAAAAAAAAAAA"<<endl;
             }
 
-            // om d är en identifier (classdata) så går vi in i d. Sen kollar vi om d har funktionen yfunc.
-            // kolla return type of yfunc jämför (if) om a = d.func om a är valid type boolean
-            
-            //PROBABLY CHANGE LATER:
-            if (either_an_ident_or_exp_DOT_ident->type == "exp DOT ident LP exp COMMA exp RP"){
-                Node* method_name_node = *std::next(either_an_ident_or_exp_DOT_ident->children.begin()); //yFunc
-                Node* obj_node = either_an_ident_or_exp_DOT_ident->children.front(); //
-                Node* argument_list_or_argument = *std::next(either_an_ident_or_exp_DOT_ident->children.begin(), 2);
-                // try to see if even the function (.zzFunc) even exists.
-                Symbol* does_this_exist = symtab.lookup(method_name_node->value);
-                
-                if (argument_list_or_argument->type == "argument_list"){
-                    // this one below can be 3 things (1. exp_dot_ident 2. argument 3. INT)
-                    Node* check_if_argument_or_DOT_ident = argument_list_or_argument->children.front();
-                    if (check_if_argument_or_DOT_ident->type == "identifier"){
-                        Node* check_if_argument_exist = check_if_argument_or_DOT_ident->children.front();
-                        if (check_if_argument_exist){ // loop through all arguments.
-                            for (auto child : node->children) visit(child);
-                        }
-                    }
-                }
-                else if (argument_list_or_argument->type == "argument"){
-                    Node* check_if_its_an_THIS = either_an_ident_or_exp_DOT_ident->children.front();
-                    Node* get_the_name = *std::next(either_an_ident_or_exp_DOT_ident->children.begin());
-                    cout<<"YWDAWDAWD "<<check_if_its_an_THIS->type<<endl;
-                    if (check_if_its_an_THIS->type == "THIS"){
-                        Symbol* check_its_type = symtab.lookup(get_the_name->value);
-                        cout << "FOUND YUEA " << check_its_type<<endl;
-                    }
-                }
-
-                // KIND OF CORRECT BUT MAY NEEDS CHANGINGS.
-                if (obj_node->type == "exp DOT ident LP exp COMMA exp RP"){
-                    
-                    Node* check_this = obj_node->children.front(); // THIS
-                    Node* ident_name_to_find = *std::next(obj_node->children.begin()); // identifier:extract 
-                    // Node* argument_list_or_argument = *std::next(obj_node->children.begin(), 2);
-                    // cout << argument_list_or_argument->type<<endl;
-                    // if (check_this->type == "exp DOT ident LP exp COMMA exp RP" ){
-
-                    // }
-
-                    if (check_this->type == "THIS"){
-                        Symbol* method_sym = symtab.lookup(ident_name_to_find->value);
-    
-                        if (method_sym && method_sym->kind == METHOD) {
-                            // 1. Get class scope (parent of current method scope)
-                            Scope* class_scope = symtab.current_scope->parent;
-                            
-                            // 2. Find method's own scope
-                            Scope* method_scope = nullptr;
-                            for (Scope* child : class_scope->children) {
-                                if (child->name == method_sym->name) {
-                                    method_scope = child;
-                                    break;
-                                }
-                            }
-                            
-                            // 3. Extract parameter types
-                            vector<string> param_types;
-                            if (method_scope) {
-                                for (const auto& entry : method_scope->symbols) {
-                                    if (entry.second.kind == PARAMETER) {
-                                        param_types.push_back(entry.second.type);
-                                    }
-                                }
-                            }
-                            
-                            // Now param_types contains ["int"] for a1()
-                            // Use these to validate arguments
-                        }
-                    }
-                }
-
-                
-                
-
-
-                // THIS IS GOOD: (other errors.)
-                if (obj_node->type == "THIS"){
-                    Symbol* obj_sym = symtab.lookup(method_name_node->value);
-                    //cout << "found it name " << obj_sym->name <<" type "<<obj_sym->type<< endl;
-                    if (obj_sym){
-                        if (obj_sym->type != found_the_non_existent->type){
-                            res.push_back(std::make_tuple(node->lineno, "semantic (type mismatch)"));
-                            symtab.error_count++;
-                        }
-                    }
-                    else {
-                        //// @error - semantic ('zFunc' does not exist)
-                        string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
-                        res.push_back(std::make_tuple(node->lineno, error_msg));
-                        symtab.error_count++;
-                    }
-                }
-                else if (obj_node->type == "identifier") {
-                    Symbol* obj_sym = symtab.lookup(obj_node->value); // check type of the first node (type of "d")
-                    //cout << symtab.writeAllSymbols() << endl;
-                    if (obj_sym) {
-                        string class_name = obj_sym->type;
-                        Scope* class_scope = symtab.get_class_scope(class_name); //Get class scope (e.g., "classdata")
-                        
-                        //cout << "just look here: " << method_name_node->value <<" and here "<<class_scope->name<< endl;
-                        if (class_scope) {
-                            //cout << "class scope name " << class_scope->name<<endl; 
-                            // Look up the method in the class's scope
-                            Symbol* method_sym = class_scope->lookup(method_name_node->value);
-                            //cout << "NEWEWEWEWE " << method_sym->name <<" AADNADNADNADNADNANDNA " << method_sym->type<< endl;
-                            if (method_sym) {
-                                // Check return type compatibility, etc.
-                                if (found_the_non_existent->type != method_sym->type){
-                                    string error_msg = "semantic ('" + found_the_non_existent->name + "' and expression '" +\
-                                    obj_node->value + "." + method_name_node->value + "()' are of different types)";
-                                    
-                                    // ('a' and expression 'd.yFunc()' are of different types)
-                                    res.push_back(std::make_tuple(node->lineno, error_msg));
-                                    symtab.error_count++;
-                                }  
-                            }
-                            else {
-                                string error_msg = "semantic ('" + method_name_node->value + "' does not exist)";
-                                res.push_back(std::make_tuple(node->lineno, error_msg));
-                                //semantic ('zzFunc' does not exist)
-                                symtab.error_count++;
-                            } 
-                        }
-                    }
-                } 
-            }  
         }
-
-
 
         if (node->type == "SOMETHING [ASSIGNED] = TO SOMETHING"){
             Node* identifier_arr = node->children.front(); // identifier:num_aux
@@ -951,7 +527,7 @@ public:
                     Scope* get_method_for_func = symtab.get_method_scope(get_class_scope->name, get_func_var->value);
                     if (get_method_for_func){
                         Symbol* func_sym = get_method_for_func->lookup(get_func_var->value);
-                        cout<<"ASDASDASD " << func_sym->name <<" "<<node->lineno<<endl;
+                        //cout<<"ASDASDASD " << func_sym->name <<" "<<node->lineno<<endl;
                         for (int i=0; i<func_sym->param_types.size(); i++){
                             //if ()
                         }
@@ -964,7 +540,180 @@ public:
     }
 
 private:
-    string extractClass(const vector<string>& vec, string toFind) {
+std::string getNodeReturnType(Node* n) {
+    if (!n) return "unknown";
+
+    // 1) Handle literals
+    if (n->type == "INT" || n->type == "expression DOT LENGTH") {
+        return "INT";
+    }
+    if (n->type == "TRUE" || n->type == "FALSE") {
+        return "BOOLEAN";
+    }
+
+    // 2) Handle Identifiers
+    if (n->type == "identifier") {
+        Symbol* sym = symtab.lookup(n->value);
+        if (sym) {
+            if (sym->type.empty()) {
+                std::cout << "WARNING: Symbol '" << n->value 
+                          << "' has an empty type!" << std::endl;
+                return "unknown";
+            }
+            return sym->type;
+        }
+        return "unknown";
+    }
+
+    // 3) Handle Function Calls (`functionCall`)
+    if (n->type == "functionCall") {
+        if (n->children.size() < 2) {
+            return "unknown";
+        }
+
+        auto firstChildIter = n->children.begin();
+        Node* functionNameNode = *std::next(firstChildIter);
+
+        if (!functionNameNode || functionNameNode->value.empty()) {
+            return "unknown";
+        }
+
+        std::string functionName = functionNameNode->value;
+        Symbol* funcSym = symtab.lookup(functionName);
+        if (funcSym && !funcSym->type.empty()) {
+            return funcSym->type;
+        }
+
+        Scope* classScope = symtab.get_class_scope(curr_class_name);
+        if (classScope) {
+            Symbol* methodSym = classScope->lookup(functionName);
+            if (methodSym && !methodSym->type.empty()) {
+                return methodSym->type;
+            }
+        }
+
+        return "unknown";
+    }
+
+    // 4) Handle `THIS` keyword
+    if (n->type == "THIS") {
+        return curr_class_name;
+    }
+
+    // 5) Handle Class Instantiation (`new ClassName()`)
+    if (n->type == "NEW identifier LP RP") {
+        if (n->children.empty()) {
+            return "unknown";
+        }
+
+        Node* classNameNode = n->children.front();
+        if (!classNameNode || classNameNode->value.empty()) {
+            return "unknown";
+        }
+
+        std::string className = classNameNode->value;
+        Scope* classScope = symtab.get_class_scope(className);
+        if (!classScope) {
+            return "unknown";
+        }
+
+        return className;
+    }
+
+    // 6) Handle Array Allocation (`new int[expression]`)
+    if (n->type == "NEW INT LEFT_BRACKET expression RIGHT_BRACKET") {
+        std::cout << "DEBUG: Resolving 'new int[expression]' to 'INT LB RB'" << std::endl;
+        return "INT LB RB";  // Represents an `int[]`
+    }
+
+    // 7) Handle Method Calls (`exp DOT ident LP arguments RP`)
+    if (n->type == "exp DOT ident LP arguments RP" || n->type == "exp DOT ident LP exp COMMA exp RP") {
+        if (n->children.size() < 2) {
+            return "unknown";
+        }
+
+        Node* objectNode = n->children.front();
+        Node* methodNameNode = *std::next(n->children.begin());
+
+        if (!methodNameNode || methodNameNode->value.empty()) {
+            return "unknown";
+        }
+
+        std::string objectType = getNodeReturnType(objectNode);
+        std::string methodName = methodNameNode->value;
+
+        if (objectType == "unknown") {
+            return "unknown";
+        }
+
+        Scope* classScope = symtab.get_class_scope(objectType);
+        if (!classScope) {
+            return "unknown";
+        }
+
+        Symbol* methodSym = classScope->lookup(methodName);
+        if (!methodSym || methodSym->type.empty()) {
+            return "unknown";
+        }
+
+        return methodSym->type;
+    }
+
+    // 8) Handle Arithmetic Expressions
+    if (n->type == "MultExpression" || n->type == "AddExpression" || n->type == "SubExpression") {
+        if (n->children.size() < 2) {
+            return "unknown";
+        }
+
+        Node* leftNode  = n->children.front();
+        Node* rightNode = *std::next(n->children.begin());
+
+        std::string leftType  = getNodeReturnType(leftNode);
+        std::string rightType = getNodeReturnType(rightNode);
+
+        if (leftType == "INT" && rightType == "INT") {
+            return "INT";
+        }
+
+        return "unknown";
+    }
+
+    // 9) Assignment Validation: Prevent `int = int[]`
+    if (n->type == "assignment") {
+        if (n->children.size() < 2) {
+            return "unknown";
+        }
+
+        Node* leftNode = n->children.front();
+        Node* rightNode = *std::next(n->children.begin());
+
+        std::string leftType = getNodeReturnType(leftNode);
+        std::string rightType = getNodeReturnType(rightNode);
+
+        std::cout << "DEBUG: Assignment leftType: " << leftType 
+                  << " rightType: " << rightType << std::endl;
+
+        if (leftType == "INT" && rightType == "INT LB RB") {
+            std::cout << "Error: Cannot assign 'int[]' to 'int'" << std::endl;
+            return "unknown";
+        }
+
+        return leftType;
+    }
+
+    // 10) Recursive Fallback
+    for (Node* child : n->children) {
+        std::string childType = getNodeReturnType(child);
+        if (childType != "unknown") {
+            return childType;
+        }
+    }
+
+    return "unknown";
+}
+
+
+string extractClass(const vector<string>& vec, string toFind) {
         for (const string& s : vec) {
             // Check if the string contains "InInt"
             if (s.find(toFind) != string::npos) {

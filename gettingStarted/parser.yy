@@ -478,7 +478,7 @@ expression: expression PLUSOP expression {      /*
 			}
 			| expression DOT identifier LP //wtf will happen now (req or smthn)
 			arguments RP dotExpTest {
-				$$ = new Node("functionCall", "", yylineno);
+				$$ = new Node("functionCall", $3->value, yylineno);
 				$$->children.push_back($1); /* `new A()` */
         		$$->children.push_back($3); /* `a2` */
 				$$->children.push_back($5);
