@@ -59,6 +59,8 @@ public:
                 return false; // Variable and parameter with same name
             }
         }
+
+
         
         symbols[sym.name] = sym; // Allow same name if kinds differ
         return true;

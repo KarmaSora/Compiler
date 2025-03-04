@@ -576,32 +576,9 @@ std::string getNodeReturnType(Node* n) {
 
     // 3) Handle Function Calls (`functionCall`)
     if (n->type == "functionCall") {
-        if (n->children.size() < 2) {
-            return "unknown";
-        }
 
-        auto firstChildIter = n->children.begin();
-        Node* functionNameNode = *std::next(firstChildIter);
-
-        if (!functionNameNode || functionNameNode->value.empty()) {
-            return "unknown";
-        }
-
-        std::string functionName = functionNameNode->value;
-        Symbol* funcSym = symtab.lookup(functionName);
-        if (funcSym && !funcSym->type.empty()) {
-            return funcSym->type;
-        }
-
-        Scope* classScope = symtab.get_class_scope(curr_class_name);
-        if (classScope) {
-            Symbol* methodSym = classScope->lookup(functionName);
-            if (methodSym && !methodSym->type.empty()) {
-                return methodSym->type;
-            }
-        }
-
-        return "unknown";
+        Node* DotExpNode = *std::next(n->children.begin(),3);
+       return getNodeReturnType(DotExpNode);
     }
 
     // 4) Handle `THIS` keyword
