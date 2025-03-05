@@ -59,8 +59,6 @@ public:
                 return false; // Variable and parameter with same name
             }
         }
-
-
         
         symbols[sym.name] = sym; // Allow same name if kinds differ
         return true;
@@ -183,6 +181,20 @@ public:
         }
         return nullptr;
     }
+    
+    Scope* get_parameter_scope(const string& class_name, const string& method_name, const string& param_name) {
+        Scope* method_scope = get_method_scope(class_name, method_name); // Get method scope
+        
+        if (method_scope) {
+            
+            Symbol* param_sym = method_scope->lookup(param_name);
+            if (param_sym && param_sym->kind == PARAMETER) {
+                return method_scope; // Or return param_sym->type directly
+            }
+        }
+        return nullptr;
+    }
+   
 };
 
 
