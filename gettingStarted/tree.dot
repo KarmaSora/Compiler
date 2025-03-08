@@ -225,5 +225,49 @@ n77 -> n112
 n16 -> n77
 n13 -> n16
 n12 -> n13
+n114 [label="classDeclaration:kakakak"];
+n115 [label="identifier:kakakak"];
+n114 -> n115
+n116 [label="var declarations:"];
+n114 -> n116
+n117 [label="methodDeclarations:"];
+n118 [label="methodDec:nothing"];
+n119 [label="INT:"];
+n118 -> n119
+n120 [label="identifier:nothing"];
+n118 -> n120
+n121 [label="parameters:"];
+n118 -> n121
+n122 [label="methodBody:"];
+n118 -> n122
+n123 [label="RETURN:"];
+n124 [label="INT:3"];
+n123 -> n124
+n118 -> n123
+n117 -> n118
+n114 -> n117
+n12 -> n114
+n125 [label="classDeclaration:ooooppppp"];
+n126 [label="identifier:ooooppppp"];
+n125 -> n126
+n127 [label="var declarations:"];
+n125 -> n127
+n128 [label="methodDeclarations:"];
+n129 [label="methodDec:nothing"];
+n130 [label="INT:"];
+n129 -> n130
+n131 [label="identifier:nothing"];
+n129 -> n131
+n132 [label="parameters:"];
+n129 -> n132
+n133 [label="methodBody:"];
+n129 -> n133
+n134 [label="RETURN:"];
+n135 [label="INT:3"];
+n134 -> n135
+n129 -> n134
+n128 -> n129
+n125 -> n128
+n12 -> n125
 n0 -> n12
 }

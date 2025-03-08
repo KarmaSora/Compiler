@@ -20,16 +20,19 @@ struct BlockContext {
 //enum class OpCode { ADD, SUB, MOV, LOAD, STORE };
 
 enum class TACType {
-    ASSIGN,     // e.g., x := y
-    BIN_OP,     // e.g., t1 = a + b
-    COND_JUMP,  // e.g., if x < y goto L1
-    JUMP,       // e.g., goto L2
-    LABEL,      // e.g., L1:
-    CALL,       // e.g., t1 = CALL foo, a, b
-    RETURN,     // e.g., RETURN t1
-    PRINT,      // e.g., PRINT t1
-    NEW         // e.g., t1 = NEW Foo
+    ASSIGN,    
+    BIN_OP,    
+    COND_JUMP, 
+    JUMP,      
+    LABEL,     
+    CALL,      
+    RETURN,    
+    PRINT,     
+    NEW,       
+    CLASS,     // e.g., CLASS Foo
+    METHOD     // e.g., METHOD bar
 };
+
 
 class TAC {
 public:
@@ -43,40 +46,44 @@ public:
     TAC(TACType t, const std::string& d, const std::string& s1, const std::string& s2, const std::string& l = "")
         : type(t), dest(d), src1(s1), src2(s2), label(l) {}
 
-    void printAll() const {
-        switch (type) {
-            case TACType::ASSIGN:
-                printf("%s := %s\n", dest.c_str(), src1.c_str());
-                break;
-            case TACType::BIN_OP:
-                printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), label.c_str(), src2.c_str());
-                break;
-            case TACType::COND_JUMP:
-                printf("if %s goto %s else goto %s\n", src1.c_str(), label.c_str(), src2.c_str());
-                break;
-            case TACType::JUMP:
-                printf("goto %s\n", label.c_str());
-                break;
-            case TACType::CALL:
-                printf("%s := CALL %s(%s)\n", dest.c_str(), src1.c_str(), src2.c_str());
-                break;
-            case TACType::RETURN:
-                printf("RETURN %s\n", src1.c_str()); // Use src1, not dest
-                break;
-            case TACType::PRINT:
-                printf("PRINT %s\n", src1.c_str());
-                break;
-            case TACType::NEW:
-                printf("%s := NEW %s\n", dest.c_str(), src1.c_str());
-                break;
-            default:
-                printf("Unknown TAC type\n");
+        void printAll() const {
+            switch (type) {
+                case TACType::ASSIGN:
+                    printf("%s := %s\n", dest.c_str(), src1.c_str());
+                    break;
+                case TACType::BIN_OP:
+                    printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), label.c_str(), src2.c_str());
+                    break;
+                case TACType::COND_JUMP:
+                    printf("if %s goto %s else goto %s\n", src1.c_str(), label.c_str(), src2.c_str());
+                    break;
+                case TACType::JUMP:
+                    printf("goto %s\n", label.c_str());
+                    break;
+                case TACType::CALL:
+                    printf("%s := CALL %s(%s)\n", dest.c_str(), src1.c_str(), src2.c_str());
+                    break;
+                case TACType::RETURN:
+                    printf("RETURN %s\n", src1.c_str());
+                    break;
+                case TACType::PRINT:
+                    printf("PRINT %s\n", src1.c_str());
+                    break;
+                case TACType::NEW:
+                    printf("%s := NEW %s\n", dest.c_str(), src1.c_str());
+                    break;
+                case TACType::CLASS:
+                    printf("CLASS %s\n", dest.c_str());
+                    break;
+                case TACType::METHOD:
+                    printf("METHOD %s IN %s\n", dest.c_str(), src1.c_str());
+                    break;
+                default:
+                    printf("Unknown TAC type\n");
+            }
         }
-    }
-
-    void addToTac() {
-        // Implementation for adding to TAC (if needed)
-    }
+        
+  
 };
 
 class BasicBlock {
@@ -169,6 +176,7 @@ public:
     }
 
     void printAllInstructions() {
+        std::cout <<"size of blocks: " << blocks.size() << std::endl;
         for (const auto& block : blocks) {
             block->printInstructions();
         }

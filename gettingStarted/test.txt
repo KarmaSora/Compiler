@@ -35,3 +35,20 @@ class Bar {
 		return 4;
 	}
 }
+
+class kakakak {
+
+	public int nothing(){
+		return 3;
+	}
+
+}
+
+
+class ooooppppp {
+
+	public int nothing(){
+		return 3;
+	}
+
+}
