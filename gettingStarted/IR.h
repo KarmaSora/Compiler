@@ -105,6 +105,7 @@ public:
     BasicBlock* entry_block;   // Entry block of the CFG
     std::vector<BasicBlock*> blocks;  // All basic blocks
 
+
     void addBlock(BasicBlock* block){
         blocks.push_back(block);
     }

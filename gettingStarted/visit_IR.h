@@ -198,6 +198,23 @@ private:
             }
             return ctx.current_block;
         }
+        else if (node->type == "methodDec") {
+            std::string method_name = node->children.front()->value; // Method name
+            CFG* method_cfg = new CFG();
+            BasicBlock* method_entry = create_block(method_cfg);
+            method_cfg->entry_block = method_entry;
+            //method_cfg->entry_block->label = node->type;
+        
+            BlockContext method_ctx{method_entry, method_cfg}; 
+            ctx.cfg->addBlock(method_entry);  // Store method CFG
+        
+            for (auto child : node->children) {
+                traverse_generic(child, method_ctx);
+            }
+        
+            return method_entry; // Return the block for linking
+        }
+        
         
         // ... handle other statements (WhileLoop, Assignment, etc.)
         return ctx.current_block; // Default return
@@ -211,9 +228,12 @@ private:
         if (node->type == "methodDec") {
             CFG* method_cfg = new CFG();
             BasicBlock* method_entry = create_block(method_cfg);
+            //method_cfg->entry_block->label = "asjkndkasnd";
+        
             method_cfg->entry_block = method_entry;
     
             BlockContext method_ctx{method_entry, method_cfg}; // Correct initialization
+
             for (auto child : node->children) {
                 if (child->type == "methodBody") {
                     traverse_generic(child, method_ctx);
@@ -224,7 +244,7 @@ private:
         }
         else if (node->type == "statements") {
             for (auto child : node->children) {
-                ctx.current_block = visit_stmt(child, ctx); // Ensure BlockContext has current_block
+                traverse_generic(child, ctx);
             }
         }
         else if (node->type == "MAIN METHOD") {
@@ -237,6 +257,28 @@ private:
                 }
             }
         }
+        else if( node->type == "classDeclarations"){
+            for (auto child : node->children)
+            traverse_generic(child, ctx);
+        }
+        else if (node->type == "classDeclaration") {
+            std::string class_name = node->children.front()->value; // Class name
+        
+            CFG* class_cfg = new CFG();
+            BasicBlock* class_entry = create_block(class_cfg);
+            class_cfg->entry_block = class_entry;
+            
+            BlockContext class_ctx{class_entry, class_cfg}; 
+
+            class_entry->label= class_name;
+
+            ctx.cfg->addBlock(class_entry);  // Store class CFG
+            
+            for (auto child : node->children) {
+                traverse_generic(child, class_ctx);
+            }
+        }
+        
         else {
             std::cerr << "Generic traversal for node type: " << node->type << std::endl;
             for (auto child : node->children) {
