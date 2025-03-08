@@ -1,4 +1,4 @@
-compiler: lex.yy.c parser.tab.o main.cc
+compiler: lex.yy.c parser.tab.o main.cc 
 		g++ -g -w -ocompiler parser.tab.o lex.yy.c main.cc -std=c++14
 parser.tab.o: parser.tab.cc
 		g++ -g -w -c parser.tab.cc -std=c++14
@@ -9,5 +9,9 @@ lex.yy.c: lexer.flex parser.tab.cc
 tree: 
 		 dot -Tpdf tree.dot -otree.pdf
 clean:
-		rm -f parser.tab.* lex.yy.c* compiler stack.hh position.hh location.hh tree.dot tree.pdf
+		rm -f parser.tab.* lex.yy.c* compiler stack.hh position.hh location.hh tree.dot tree.pdf cfg.dot tree2.pdf
 		rm -R compiler.dSYM
+		
+
+tree2:
+		dot -Tpdf cfg.dot -otree2.pdf

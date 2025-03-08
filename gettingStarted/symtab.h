@@ -140,6 +140,7 @@ public:
     int get_error_count() const { return error_count; }
 
 
+ 
 
     
     void writeAllSymbolsHelper(Scope* scope, string indent, string& res) {
@@ -148,7 +149,7 @@ public:
         res += indent + "Scope: " + scope->name + " -> ";
         
         for (const auto& entry : scope->symbols) {
-            res += entry.first + " ";
+            res += entry.first + " " ;
         }
         res += "\n";
         

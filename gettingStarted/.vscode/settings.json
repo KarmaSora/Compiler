@@ -50,6 +50,7 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "unordered_set": "cpp",
-    "sstream": "cpp"
+    "sstream": "cpp",
+    "cstring": "cpp"
   }
 }
