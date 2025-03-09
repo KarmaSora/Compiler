@@ -47,7 +47,7 @@ class kakakak {
 
 class ooooppppp {
 
-	public int nothing(){
+	public int nothing2(){
 		return 3;
 	}
 

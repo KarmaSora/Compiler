@@ -81,32 +81,102 @@ private:
             );
             return temp;
         }
-        else if (node->type == "exp DOT ident LP exp COMMA exp RP") {
-            Node* obj_node = node->children.front();    // Object (e.g., "this" or "new Bar")
-            Node* method_node = *std::next(node->children.begin()); // Method name
-            Node* args_node = *std::next(node->children.begin(), 2); // Arguments
+        else if (node->type == "exp DOT ident LP arguments RP") 
+        {
+            // 1) Evaluate object and arguments
+            Node* obj_node    = node->children.front();                // The left part: object
+            Node* method_node = *std::next(node->children.begin());    // The identifier
+            Node* args_node   = *std::next(node->children.begin(), 2); // The arguments
         
-            // Process object and arguments
             std::string obj_temp = visit_expr(obj_node, ctx);
-            std::vector<std::string> arg_temps;
-            for (auto arg_child : args_node->children) {
-                arg_temps.push_back(visit_expr(arg_child, ctx));
+        
+            std::vector<std::string> argTemps;
+            for (auto child : args_node->children) {
+                argTemps.push_back(visit_expr(child, ctx));
+            }
+            // Convert argTemps into a comma‐separated list
+            std::string args_str;
+            for (size_t i = 0; i < argTemps.size(); i++) {
+                args_str += argTemps[i];
+                if (i < argTemps.size() - 1) args_str += ", ";
             }
         
-            // Build args string (e.g., "t1, t2")
+            // 2) Generate TAC for the call
+            std::string result_temp = new_temp();  // e.g. "__t7"
+            ctx.current_block->tacInstructions.push_back(
+                TAC{
+                    TACType::CALL,      // type
+                    result_temp,        // dest
+                    method_node->value, // src1 (method name)
+                    args_str,           // src2 (arguments)
+                    obj_temp            // label: sometimes used for “object”
+                }
+            );
+        
+            // 3) Optionally connect your CFG block to the method’s block
+            //    (If you want a single CFG that physically links calls)
+            std::string method_label = "method_" + method_node->value;
+            for (BasicBlock* block : ctx.cfg->blocks) {
+                if (block->label == method_label) {
+                    ctx.current_block->next_true = block;
+                    // Usually we break once we find it
+                    break;
+                }
+            }
+        
+            // 4) Return the temp holding the call’s result
+            return result_temp;
+        }
+                
+        else if (node->type == "exp DOT ident LP exp COMMA exp RP") 
+        {
+            // 1) Extract components: object, method name, and arguments
+            Node* obj_node    = node->children.front();                // The object being called on
+            Node* method_node = *std::next(node->children.begin());    // The method name
+            Node* args_node   = *std::next(node->children.begin(), 2); // The argument list
+        
+            // 2) Evaluate the object
+            std::string obj_temp = visit_expr(obj_node, ctx);
+        
+            // 3) Process argument expressions
+            std::vector<std::string> arg_temps;
+            for (auto child : args_node->children) {
+                arg_temps.push_back(visit_expr(child, ctx));
+            }
+        
+            // 4) Convert the argument list into a string
             std::string args_str;
             for (size_t i = 0; i < arg_temps.size(); i++) {
                 args_str += arg_temps[i];
-                if (i != arg_temps.size() - 1) args_str += ", ";
+                if (i < arg_temps.size() - 1) args_str += ", ";
             }
         
-            // Generate CALL instruction
+            // 5) Create a new basic block for the function call
+            BasicBlock* call_block = create_block(ctx.cfg);
+            call_block->label = "call_" + method_node->value;  // Name it uniquely
+            if (!ctx.cfg->blocks.empty() && ctx.cfg->blocks.back() != call_block) {
+                ctx.cfg->addBlock(call_block);
+            }
+                    
+            // 6) Generate a temporary variable for function return
             std::string result_temp = new_temp();
-            ctx.current_block->tacInstructions.push_back(
+        
+            // 7) Insert `CALL` TAC into the new block
+            call_block->tacInstructions.push_back(
                 TAC{TACType::CALL, result_temp, method_node->value, args_str, obj_temp}
             );
+        
+            // 8) Link current block to function call block
+            ctx.current_block->next_true = call_block;
+        
+            // 9) Update the context's current block to continue from this call
+            ctx.current_block = call_block;
+        
+            // 10) Return the function's result temp (useful for assignments)
             return result_temp;
         }
+        
+        
         else if (node->type == "LESS_THAN") {
             std::string left = visit_expr(node->children.front(), ctx);
             std::string right = visit_expr(*std::next(node->children.begin()), ctx);
@@ -203,6 +273,61 @@ private:
         
         
         // ... handle other statements (WhileLoop, Assignment, etc.)
+        else if (node->type == "WHILE LP expression RP statement") {
+            BasicBlock* cond_block = create_block(ctx.cfg);
+            BasicBlock* body_block = create_block(ctx.cfg);
+            BasicBlock* exit_block = create_block(ctx.cfg);
+        
+            // Link current block to condition block
+            ctx.current_block->tacInstructions.push_back(
+                TAC{TACType::JUMP, "", "", "", cond_block->label}
+            );
+        
+            // Evaluate condition
+            ctx.current_block = cond_block;
+            std::string cond_temp = visit_expr(node->children.front(), ctx);
+            cond_block->tacInstructions.push_back(
+                TAC{TACType::COND_JUMP, cond_temp, "", body_block->label, exit_block->label}
+            );
+        
+            // Process loop body
+            ctx.current_block = body_block;
+            BasicBlock* body_exit = visit_stmt(*std::next(node->children.begin()), ctx);
+            body_exit->tacInstructions.push_back(TAC{TACType::JUMP, "", "", "", cond_block->label});
+        
+            // Set exit block as next block
+            ctx.current_block = exit_block;
+            return exit_block;
+        }
+        
+        else if (node->type == "IF LP expression RP statement") {  // No ELSE
+            BasicBlock* cond_block = create_block(ctx.cfg);
+            BasicBlock* true_block = create_block(ctx.cfg);
+            BasicBlock* merge_block = create_block(ctx.cfg);
+        
+            // Link current block to condition block
+            ctx.current_block->tacInstructions.push_back(
+                TAC{TACType::JUMP, "", "", "", cond_block->label}
+            );
+        
+            // Evaluate condition
+            ctx.current_block = cond_block;
+            std::string cond_temp = visit_expr(node->children.front(), ctx);
+            cond_block->tacInstructions.push_back(
+                TAC{TACType::COND_JUMP, cond_temp, "", true_block->label, merge_block->label}
+            );
+        
+            // Process true branch
+            ctx.current_block = true_block;
+            BasicBlock* true_exit = visit_stmt(*std::next(node->children.begin()), ctx);
+            true_exit->tacInstructions.push_back(TAC{TACType::JUMP, "", "", "", merge_block->label});
+        
+            // Set merge block as the next block
+            ctx.current_block = merge_block;
+            return merge_block;
+        }
+        
+
         return ctx.current_block; // Default return
     }
     
@@ -212,40 +337,35 @@ private:
         //std::cerr << "Visiting node: " << node->type << std::endl;
 
         
-
+/*
         else if (node->type == "methodDec") {
-            Node* retNode = (node->children.size() > 4) ? *std::next(node->children.begin(), 4) : nullptr;
             std::string method_name = node->value;
             std::cerr << "Processing method declaration: " << method_name << std::endl;
         
-            // Use existing CFG instead of creating a new one
+            // Create method entry block inside the existing CFG
             BasicBlock* method_entry = create_block(ctx.cfg);
             method_entry->label = "method_" + method_name;
             ctx.cfg->addBlock(method_entry);
         
             BlockContext method_ctx{method_entry, ctx.cfg};
         
-            // Add method TAC instruction
-            method_entry->tacInstructions.push_back(TAC{TACType::METHOD, method_name, ctx.cfg->entry_block->label, ""});
+            // Add METHOD TAC instruction (metadata)
+            //method_entry->tacInstructions.push_back(TAC{TACType::METHOD, method_name, "", ""});
         
             // Process method body
             for (auto child : node->children) {
                 traverse_generic(child, method_ctx);
             }
         
-            // Ensure return statement exists
-            if (retNode && !retNode->children.empty()) {
+            // Ensure return statement exists at the end of the method
+            Node* retNode = node->children.back(); // Check last child for return
+            if (retNode && retNode->type == "RETURN" && !retNode->children.empty()) {
                 method_entry->tacInstructions.push_back(TAC{TACType::RETURN, "", retNode->children.front()->value, ""});
             } else {
-                method_entry->tacInstructions.push_back(TAC{TACType::RETURN, "", "0", ""});
+                method_entry->tacInstructions.push_back(TAC{TACType::RETURN, "", "0", ""}); // Default return value
             }
-        
-            // Ensure method is linked back to main CFG
-            ctx.current_block->tacInstructions.push_back(
-                TAC{TACType::CALL, "", method_name, "", ""}
-            );
         }
-                                                        
+*/                                                
         else if (node->type == "statements") {
             for (auto child : node->children) {
                 traverse_generic(child, ctx);
@@ -268,23 +388,17 @@ private:
         else if (node->type == "classDeclaration") {
             std::string class_name = node->children.front()->value; // Class name
         
-            // Add TAC instruction for the class
+            // Add CLASS TAC only as metadata (not part of CFG)
             ctx.current_block->tacInstructions.push_back(TAC{TACType::CLASS, class_name, "", ""});
         
-            CFG* class_cfg = new CFG();
-            BasicBlock* class_entry = create_block(class_cfg);
-            class_cfg->entry_block = class_entry;
-            
-            BlockContext class_ctx{class_entry, class_cfg}; 
-        
-            class_entry->label= class_name;
-            ctx.cfg->addBlock(class_entry);  // Store class CFG
-            
+            // Traverse class members without creating a new CFG
             for (auto child : node->children) {
-                traverse_generic(child, class_ctx);
+                traverse_generic(child, ctx);
             }
         }
-                
+        else if (node->type == "exp DOT ident LP exp COMMA exp RP") {
+            visit_expr(node, ctx);
+        }
         else {
             std::cerr << "Generic traversal for node type: " << node->type << std::endl;
             for (auto child : node->children) {
