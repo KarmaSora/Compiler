@@ -20,7 +20,8 @@ struct BlockContext {
 //enum class OpCode { ADD, SUB, MOV, LOAD, STORE };
 
 enum class TACType {
-    ASSIGN,    
+    ASSIGN,
+
     BIN_OP,    
     COND_JUMP, 
     JUMP,      
@@ -51,8 +52,9 @@ public:
                 case TACType::ASSIGN:
                     printf("%s := %s\n", dest.c_str(), src1.c_str());
                     break;
-                case TACType::BIN_OP:
-                    printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), label.c_str(), src2.c_str());
+                    case TACType::BIN_OP:
+                    printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), 
+                        dest.c_str(), src2.c_str()); // FIX THIS IN FINAL ANSWER
                     break;
                 case TACType::COND_JUMP:
                     printf("if %s goto %s else goto %s\n", src1.c_str(), label.c_str(), src2.c_str());
@@ -78,6 +80,7 @@ public:
                 case TACType::METHOD:
                     printf("METHOD %s IN %s\n", dest.c_str(), src1.c_str());
                     break;
+
                 default:
                     printf("Unknown TAC type\n");
             }
@@ -90,8 +93,11 @@ class BasicBlock {
 public:
     string label;  // Unique identifier (e.g., "block_0")
     vector<TAC> tacInstructions;
-    BasicBlock* next_true;   // Successor for true condition (if applicable)
-    BasicBlock* next_false;  // Successor for false condition (if applicable)
+    std::vector<BasicBlock*> successors; // Replaces next_true/false
+    BasicBlock* exit_block; // Replaces next_true/false
+  
+    std::string condition; // Optional: for branch conditions
+
     // For simplicity, track predecessors if needed
 
 
@@ -151,24 +157,34 @@ public:
                     case TACType::NEW:
                         label += tac.dest + " := NEW " + tac.src1 + "\\n";
                         break;
-                    
+                    case TACType::CLASS:
+                        label += "CLASS " + tac.dest + "\\n";
+                        break;
+                    case TACType::METHOD:
+                        label += "METHOD " + tac.dest + " IN " + tac.src1 + "\\n";
+                        break;
+                    case TACType::LABEL:
+                        label += "LABEL " + tac.label + "\\n";
+                        break;
                     default:
                         break;
                 }
+
             }
+                // Add edges to successors
+                for (BasicBlock* succ : block->successors) {
+                    string edge_label = getEdgeLabel(block, succ);
+                    outStream << block->label << " -> " << succ->label;
+                    if (!edge_label.empty()) {
+                        outStream << " [xlabel=\"" << edge_label << "\"]";
+                    }
+                    outStream << ";\n";
+                }
+
     
             // Write the node with formatted label
             outStream << block->label << " [label=\"" << label << "\"];" << std::endl;
     
-            // Add edges with xlabel
-            if (block->next_true) {
-                outStream << block->label << " -> " << block->next_true->label 
-                          << " [xlabel=\"true\"];" << std::endl;
-            }
-            if (block->next_false) {
-                outStream << block->label << " -> " << block->next_false->label 
-                          << " [xlabel=\"false\"];" << std::endl;
-            }
         }
     
         outStream << "}" << std::endl;
@@ -180,6 +196,22 @@ public:
         for (const auto& block : blocks) {
             block->printInstructions();
         }
+    }
+private:
+    string getEdgeLabel(const BasicBlock* from, const BasicBlock* to) const {
+        if (from->tacInstructions.empty()) return "";
+        
+        const TAC& last_tac = from->tacInstructions.back();
+        if (last_tac.type == TACType::COND_JUMP) {
+            // First successor is true branch, second is false branch
+            if (!from->successors.empty() && from->successors[0] == to) {
+                return "true";
+            }
+            if (from->successors.size() > 1 && from->successors[1] == to) {
+                return "false";
+            }
+        }
+        return ""; // No label for unconditional jumps
     }
 };
 

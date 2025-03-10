@@ -1,5 +1,6 @@
 public class A {
 	public static void main(String[] a) {
+
 		System.out.println(new Bar().foo());
 	}
 }
@@ -34,21 +35,4 @@ class Bar {
 		System.out.println(p2 - p1);
 		return 4;
 	}
-}
-
-class kakakak {
-
-	public int nothing(){
-		return 3;
-	}
-
-}
-
-
-class ooooppppp {
-
-	public int nothing2(){
-		return 3;
-	}
-
 }
