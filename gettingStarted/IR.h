@@ -52,9 +52,9 @@ public:
                 case TACType::ASSIGN:
                     printf("%s := %s\n", dest.c_str(), src1.c_str());
                     break;
-                    case TACType::BIN_OP:
-                    printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), 
-                        dest.c_str(), src2.c_str()); // FIX THIS IN FINAL ANSWER
+                case TACType::BIN_OP:
+                    printf("%s := %s %s %s\n",  // Fixed operator printing
+                        dest.c_str(), src1.c_str(), label.c_str(), src2.c_str());
                     break;
                 case TACType::COND_JUMP:
                     printf("if %s goto %s else goto %s\n", src1.c_str(), label.c_str(), src2.c_str());
@@ -96,6 +96,11 @@ public:
     std::vector<BasicBlock*> successors; // Replaces next_true/false
     BasicBlock* exit_block; // Replaces next_true/false
   
+    BasicBlock* next_true; // Replaces next_true/false
+    BasicBlock* next_false; // Replaces next_true/false
+
+
+
     std::string condition; // Optional: for branch conditions
 
     // For simplicity, track predecessors if needed

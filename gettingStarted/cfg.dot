@@ -1,7 +1,0 @@
-digraph CFG {
-graph [splines=ortho];
-node [shape=box];
-block_0 -> block_1;
-block_0 [label="block_0\n__t0 := NEW A\n__t1 := CALL __t0.a2()\nPRINT __t1\n"];
-block_1 [label="block_1\n__t2 := 1\n__t3 := NEW A\n__t5 := i\n__t6 := ia\n__t7 := \n__t4 := CALL .a5(FALSE,__t5,__t6,__t7)\n"];
-}
