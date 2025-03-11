@@ -116,6 +116,18 @@ private:
         else if (node->type == "LESS THAN"){
 
         }
+        else if (node->type == "SubExpression"){
+            std::string temp = this->new_temp();
+            Node* left = node->children.front();
+            Node* right = *std::next(node->children.begin());
+
+            string lesS = visit_expr(left,ctx);
+            string resS = visit_expr(right,ctx);
+            TAC ta(TACType::BIN_OP, temp, lesS,resS, "","-");
+            ctx.current_block->tacInstructions.push_back(ta);
+            return temp;            
+        }
+
         else if(node->type == "LC statement RC"){
             return visit_expr(node->children.front(),ctx);
         }

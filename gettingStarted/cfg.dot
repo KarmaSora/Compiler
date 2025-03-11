@@ -19,6 +19,6 @@ block_7 -> block_9;
 block_7 [label="block_7\nPRINT 1\ngoto block_9\n"];
 block_8 -> block_9;
 block_8 [label="block_8\nPRINT 0\nPRINT 33\nPRINT 33\nPRINT 3\nPRINT 99\ngoto block_9\n"];
-block_9 [label="block_9\nPRINT p1\nPRINT \nRETURN 4\n"];
+block_9 [label="block_9\nPRINT p1\n__t2 := p2 - p1\nPRINT __t2\nRETURN 4\n"];
 block_10 [label="block_10\n"];
 }
