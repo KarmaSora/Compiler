@@ -1,0 +1,24 @@
+digraph CFG {
+graph [splines=ortho];
+node [shape=box];
+block_0 -> block_1;
+block_0 [label="block_0\n__t0 := NEW Bar\n__t1 := CALL __t0.foo()\nPRINT __t1\n"];
+block_1 [label="block_1\naux := 1\naux2 := True\naux := CALL this.foo2(aux)\naux := CALL this.foo3(2,5,aux2)\nRETURN aux\n"];
+block_2 -> block_3 [xlabel="true"];
+block_2 -> block_4 [xlabel="false"];
+block_2 [label="block_2\nif p1 < 2 goto block_3 else goto block_4\n"];
+block_3 -> block_5;
+block_3 [label="block_3\nPRINT 10\ngoto block_5\n"];
+block_4 -> block_5;
+block_4 [label="block_4\nPRINT 0\ngoto block_5\n"];
+block_5 [label="block_5\nRETURN 1\n"];
+block_6 -> block_7 [xlabel="true"];
+block_6 -> block_8 [xlabel="false"];
+block_6 [label="block_6\nif p3 goto block_7 else goto block_8\n"];
+block_7 -> block_9;
+block_7 [label="block_7\nPRINT 1\ngoto block_9\n"];
+block_8 -> block_9;
+block_8 [label="block_8\nPRINT 0\nPRINT 33\nPRINT 33\nPRINT 3\nPRINT 99\ngoto block_9\n"];
+block_9 [label="block_9\nPRINT p1\nPRINT \nRETURN 4\n"];
+block_10 [label="block_10\n"];
+}
