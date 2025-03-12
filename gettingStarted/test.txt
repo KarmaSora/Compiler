@@ -26,6 +26,9 @@ class Bar {
 	}
 
 	public int foo3(int p1, int p2, boolean p3) {
+		System.out.println(p1);
+		System.out.println(p1);
+
 		if (p3) {
 			System.out.println(1);
 		} else {

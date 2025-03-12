@@ -85,6 +85,7 @@ private:
             TAC ta(TACType::CALL, temp, firstExpThis +"."+ getFuncName->value, argruments,"");  
             ctx.current_block->tacInstructions.push_back(ta);
 
+            
 
 
             return temp;
@@ -225,6 +226,11 @@ private:
                 TAC ta(TACType::CALL, left->value, isThis +"."+ secChild->value, arg,"");  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
+
+
+                BasicBlock* newBlock = create_block(ctx.cfg);
+                ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
+                ctx.current_block = newBlock; // Switch to the new block
                 //BasicBlock* newBlock = create_block(ctx.cfg);
                 //ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
                 //ctx.current_block = newBlock; // Switch to the new block
@@ -353,4 +359,5 @@ private:
 
 
     }
+
 };
