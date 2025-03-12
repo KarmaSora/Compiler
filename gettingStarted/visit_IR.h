@@ -1,5 +1,6 @@
 #include "Node.h"
 #include "IR.h"
+#include "symtab.h"
 
 
 /*
@@ -39,13 +40,13 @@ private:
     }
 public:
 
-    CFG* generate_IR(Node* root) {
+    CFG* generate_IR(Node* root,SymbolTable& symtab) {
         CFG* cfg = new CFG(); // Create a CFG on the heap
         BasicBlock* entry_block = create_block(cfg); // Pass CFG to create_block
         cfg->entry_block = entry_block;
 
         BlockContext ctx{entry_block, cfg};
-        traverse_generic(root, ctx);
+        traverse_generic(root->children.front(), ctx, symtab);
 
         return cfg; // Return the fully built CFG
     }
@@ -155,13 +156,7 @@ private:
             std::string t = visit_expr(node->children.front(),ctx);
             TAC ta (TACType::PRINT,"",t,"","");
             ctx.current_block->tacInstructions.push_back(ta);  
-            if(node->children.front()->type =="exp DOT ident LP exp COMMA exp RP"){
-                BasicBlock* newBlock = create_block(ctx.cfg);
-                ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
-                ctx.current_block = newBlock; // Switch to the new block
-                return ctx.current_block;
-            }
-
+            return ctx.current_block;
         }
 
         //karmaHere
@@ -325,39 +320,83 @@ private:
     }   
     
     
-    void traverse_generic(Node* node, BlockContext& ctx) {
+    void traverse_generic(Node* node, BlockContext& ctx, SymbolTable & symtab) {
         if (!node) return;
+        else if (node->type == "exp DOT ident LP exp COMMA exp RP"){
 
-       
+            std::cout <<"jfjjfjfjfjfjqqq: " << std::endl;
+            //get the method name:
+            Node* methodName = *std::next(node->children.begin());
+            //get class name could be NEW identifier LP RP
+            Node* className = node->children.front();
+            if (className->type == "NEW identifier LP RP"){
+                //get the name (first child)
+                Node* classNameIfNEW = className->children.front();
+                symtab.enter_scope(classNameIfNEW->value);
+            }
+            else{
+                symtab.enter_scope(className->value);
+
+            }
+            //make a function that returns a node of the methodDec in the class AND func.
+            std::cout << "metVAL.  "<< methodName->value << endl;
+            std::cout << symtab.writeAllSymbols() <<endl;
+            
+            Symbol* currentSymDecNode = symtab.lookup(methodName->value);
+            if(currentSymDecNode){
+
+                Node* currentMethDecNode = currentSymDecNode->symbolNodePtr;
+                std::cout << "hhhhhhhh: " <<currentMethDecNode->value;
+                std::cout << "llllllllllll: " <<currentMethDecNode->type;
+
+                traverse_methBody(currentMethDecNode,ctx);
+
+            }
+
+
+
+        }
         else if(node->type =="SIMPLE PRINT LOL"){
             BasicBlock *res = visit_stmt(node,ctx);
-            if(node->type == "exp DOT ident LP exp COMMA exp RP"){
-                //ctx.cfg->addBlock(res);
-                
+
+            for(auto child : node->children){
+                std::cout << "was here!!" <<endl; 
+                traverse_generic(child, ctx,symtab);
             }
         }
+        else
+        for(auto child : node->children){
+            std::cout <<" left To ProcessMETH: " + child->type << std::endl;
+            traverse_generic(child, ctx,symtab);
+        }
+
+    }
+
+    void traverse_methBody(Node* node, BlockContext& ctx){
+        // used for creating connections between blocks.
+        if (!node) return;
         else if(node->type =="SOMETHING ASSIGNED = TO SOMETHING"){
             BasicBlock *res = visit_stmt(node,ctx);
+     
         }
         else if (node->type == "IF LP expression RP statement ELSE statement"){
             BasicBlock *res = visit_stmt(node, ctx);
+            
         }
         else if (node->type == "RETURN"){
             BasicBlock *res = visit_stmt(node, ctx);
         }
-        //default:
+        // default:
         else
         for(auto child : node->children){
-            //std::cout <<" left To Process: " + child->type << std::endl;
-            traverse_generic(child, ctx);
+            std::cout <<" left To ProcessMETH: " + child->type << std::endl;
+            traverse_methBody(child, ctx);
         }
 
-    }
-
-    void traverse_basic_blocks(Node* n, BlockContext& ctx){
-        // used for creating connections between blocks.
 
 
     }
 
+
+  
 };
