@@ -1,16 +1,22 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-block_0 -> block_1;
-block_0 [label="block_0\n__t0 := NEW Bar\n__t1 := CALL __t0.foo()\nPRINT __t1\n"];
-block_1 [label="block_1\n"];
-foo [label="foo\nRETURN aux\n"];
-foo [label="foo\nRETURN aux\n"];
-block_2 [label="block_2\n"];
-foo2 [label="foo2\nRETURN 1\n"];
-foo2 [label="foo2\nRETURN 1\n"];
-block_3 [label="block_3\n"];
-foo3 [label="foo3\nRETURN 4\n"];
-foo3 [label="foo3\nRETURN 4\n"];
-block_4 [label="block_4\n"];
+Main [label="Main\n__t0 := NEW Bar\n__t1 := CALL __t0.foo()\nPRINT __t1\n"];
+foo [label="foo\naux := 1\naux2 := True\naux := CALL this.foo2(aux)\naux := CALL this.foo3(2,5,aux2)\nRETURN aux\n"];
+foo2 -> block_1 [xlabel="true"];
+foo2 -> block_2 [xlabel="false"];
+foo2 [label="foo2\nif p1 < 2 goto block_1 else goto block_2\n"];
+block_1 -> block_3;
+block_1 [label="block_1\nPRINT 10\ngoto block_3\n"];
+block_2 -> block_3;
+block_2 [label="block_2\nPRINT 0\ngoto block_3\n"];
+block_3 [label="block_3\nRETURN 1\n"];
+foo3 -> block_4 [xlabel="true"];
+foo3 -> block_5 [xlabel="false"];
+foo3 [label="foo3\nif p3 goto block_4 else goto block_5\n"];
+block_4 -> block_6;
+block_4 [label="block_4\nPRINT 1\ngoto block_6\n"];
+block_5 -> block_6;
+block_5 [label="block_5\nPRINT 0\ngoto block_6\n"];
+block_6 [label="block_6\nPRINT p1\n__t2 := p2 - p1\nPRINT __t2\nRETURN 4\n"];
 }
