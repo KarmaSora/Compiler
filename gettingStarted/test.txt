@@ -1,7 +1,6 @@
 public class A {
 	public static void main(String[] a) {
-
-		System.out.println(2);
+		System.out.println(new Bar().foo());
 	}
 }
 
@@ -26,17 +25,10 @@ class Bar {
 	}
 
 	public int foo3(int p1, int p2, boolean p3) {
-		System.out.println(p1);
-		System.out.println(p1);
-
 		if (p3) {
 			System.out.println(1);
 		} else {
 			System.out.println(0);
-			System.out.println(33);
-			System.out.println(33);
-			System.out.println(3);
-			System.out.println(99);
 		}
 		System.out.println(p1);
 		System.out.println(p2 - p1);

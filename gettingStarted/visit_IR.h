@@ -31,9 +31,10 @@ private:
     string new_temp() {
         return "__t" + std::to_string(temp_counter++);
     }
-    BasicBlock* create_block(CFG* cfg) {
+    BasicBlock* create_block(CFG* cfg, const string& label = "") {
         BasicBlock* block = new BasicBlock();
-        block->label = "block_" + std::to_string(block_counter++); // Unique label
+        if (!label.empty()) block->label = label;
+        else block->label = "block_" + std::to_string(block_counter++); // Unique label
         cfg->addBlock(block); // Add to CFG
         return block;
     }
@@ -221,7 +222,7 @@ private:
                 TAC ta(TACType::CALL, left->value, isThis +"."+ secChild->value, arg,"");  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
-                // TAC ta2(TACType::JUMP, "", "", "", ctx.current_block->successors.front()->label);
+                // TAC ta2(TACType::JUMP, "", "", "", secChild->value, "");
                 // ctx.current_block->tacInstructions.push_back(ta2);
 
                 //BasicBlock* newBlock = create_block(ctx.cfg);
@@ -332,9 +333,26 @@ private:
         else if(node->type =="SOMETHING ASSIGNED = TO SOMETHING"){
             BasicBlock *res = visit_stmt(node,ctx);
         }
-        else if (node->type == "IF LP expression RP statement ELSE statement"){
-            BasicBlock *res = visit_stmt(node, ctx);
+        else if (node->type == "methodDec"){
+            BasicBlock *res = create_block(ctx.cfg, node->value); //provided  method name AS BLOCK NAME
+
+            //push it back
+            ctx.cfg->addBlock(res);
+
+            ctx.current_block = res;
+
+            for(auto child : node->children){
+                traverse_generic(child, ctx);
+            }
+            
         }
+
+        else if (node->type == "methodBody"){
+            
+        }
+        // else if (node->type == "IF LP expression RP statement ELSE statement"){
+        //     BasicBlock *res = visit_stmt(node, ctx);
+        // }
         else if (node->type == "RETURN"){
             BasicBlock *res = visit_stmt(node, ctx);
         }

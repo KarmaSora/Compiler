@@ -8,6 +8,7 @@
 #include <fstream>
 
 using namespace std;
+
 // Forward declarations
 class BasicBlock;
 class CFG;
@@ -20,8 +21,7 @@ struct BlockContext {
 //enum class OpCode { ADD, SUB, MOV, LOAD, STORE };
 
 enum class TACType {
-    ASSIGN,
-
+    ASSIGN,    
     BIN_OP,    
     COND_JUMP, 
     JUMP,      
@@ -34,7 +34,6 @@ enum class TACType {
     METHOD     // e.g., METHOD bar
 };
 
-
 class TAC {
 public:
     TACType type;
@@ -43,8 +42,7 @@ public:
     std::string src2;   // Second source operand (for binary ops)
     std::string label;  // Label for jumps (e.g., "L1")
     std::string object; // Method calls
-
-    std::string op ;  // Method calls
+    std::string op;
 
     TAC(TACType t, const std::string& d, const std::string& s1, const std::string& s2, const std::string& l = "", const std::string& o = "")
         : type(t), dest(d), src1(s1), src2(s2), label(l), op(o) {}
@@ -55,8 +53,8 @@ public:
                     printf("%s := %s\n", dest.c_str(), src1.c_str());
                     break;
                 case TACType::BIN_OP:
-                    printf("%s := %s %s %s\n",  // Fixed operator printing
-                        dest.c_str(), src1.c_str(), op.c_str(), src2.c_str());
+                    printf("%s := %s %s %s\n", dest.c_str(), src1.c_str(), 
+                        op.c_str(), src2.c_str()); // FIX THIS IN FINAL ANSWER
                     break;
                 case TACType::COND_JUMP:
                     printf("if %s goto %s else goto %s\n", src1.c_str(), label.c_str(), src2.c_str());
@@ -96,13 +94,6 @@ public:
     string label;  // Unique identifier (e.g., "block_0")
     vector<TAC> tacInstructions;
     std::vector<BasicBlock*> successors; // Replaces next_true/false
-    BasicBlock* exit_block; // Replaces next_true/false
-  
-    BasicBlock* next_true; // Replaces next_true/false
-    BasicBlock* next_false; // Replaces next_true/false
-
-
-
     std::string condition; // Optional: for branch conditions
 
     // For simplicity, track predecessors if needed
@@ -177,17 +168,18 @@ public:
                         break;
                 }
 
-            }
-                // Add edges to successors
-                for (BasicBlock* succ : block->successors) {
-                    string edge_label = getEdgeLabel(block, succ);
-                    outStream << block->label << " -> " << succ->label;
-                    if (!edge_label.empty()) {
-                        outStream << " [xlabel=\"" << edge_label << "\"]";
-                    }
-                    outStream << ";\n";
-                }
+                
 
+            }
+            // Add edges to successors
+            for (BasicBlock* succ : block->successors) {
+                string edge_label = getEdgeLabel(block, succ);
+                outStream << block->label << " -> " << succ->label;
+                if (!edge_label.empty()) {
+                    outStream << " [xlabel=\"" << edge_label << "\"]";
+                }
+                outStream << ";\n";
+            }
     
             // Write the node with formatted label
             outStream << block->label << " [label=\"" << label << "\"];" << std::endl;
@@ -199,7 +191,6 @@ public:
     }
 
     void printAllInstructions() {
-        std::cout <<"size of blocks: " << blocks.size() << std::endl;
         for (const auto& block : blocks) {
             block->printInstructions();
         }
@@ -207,7 +198,7 @@ public:
 private:
     string getEdgeLabel(const BasicBlock* from, const BasicBlock* to) const {
         if (from->tacInstructions.empty()) return "";
-        
+
         const TAC& last_tac = from->tacInstructions.back();
         if (last_tac.type == TACType::COND_JUMP) {
             // First successor is true branch, second is false branch
