@@ -4,7 +4,7 @@ node [shape=box];
 Main [label="Main\n__t0 := NEW A\n__t1 := CALL __t0.a2()\nPRINT __t1\nEXIT\n"];
 A_a1 -> block_1 [xlabel="true"];
 A_a1 -> block_2 [xlabel="false"];
-A_a1 [label="A_a1\nif num < 1 goto block_1 else goto block_2\n"];
+A_a1 [label="A_a1\n__t2 := num < 1\nif __t2 goto block_1 else goto block_2\n"];
 block_1 -> block_3;
 block_1 [label="block_1\nnum_aux := 1\ngoto block_3\n"];
 block_2 -> block_3;

@@ -140,6 +140,38 @@ private:
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
+
+        if (node->type == "LESS_THAN"){
+            std::string temp = this->new_temp();
+
+            Node* f1 = node->children.front();
+            Node* f2 = *std::next(node->children.begin());
+
+            
+            std::string condTemp1 = visit_expr(f1, ctx);
+            std::string condTemp2 = visit_expr(f2, ctx);
+            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "<");
+            ctx.current_block->tacInstructions.push_back(ta);
+
+
+            return temp;
+        }
+        // HANDLE MORE CASES:
+        else if (node->type == "MORE_THAN"){
+            std::string temp = this->new_temp();
+
+            Node* f1 = node->children.front();
+            Node* f2 = *std::next(node->children.begin());
+
+            
+            std::string condTemp1 = visit_expr(f1, ctx);
+            std::string condTemp2 = visit_expr(f2, ctx);
+            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", ">");
+            ctx.current_block->tacInstructions.push_back(ta);
+
+            return temp;
+        }
+
         
 
         return "";
@@ -257,30 +289,9 @@ private:
 
             // 1. Evaluate condition to a temporary variable
             //std::string condTemp = visit_expr(conditionNode, ctx);
-            string tempting = "";
+            string tempting = visit_expr(conditionNode,ctx);
 
-            if (conditionNode->type == "LESS_THAN"){
-                Node* f1 = conditionNode->children.front();
-                Node* f2 = *std::next(conditionNode->children.begin());
-
-                std::string condTemp1 = visit_expr(f1, ctx);
-                std::string condTemp2 = visit_expr(f2, ctx);
-
-                tempting = condTemp1 + " < " + condTemp2;
-            }
-            // HANDLE MORE CASES:
-            else if (conditionNode->type == "MORE_THAN"){
-                Node* f1 = conditionNode->children.front();
-                Node* f2 = *std::next(conditionNode->children.begin());
-
-                std::string condTemp1 = visit_expr(f1, ctx);
-                std::string condTemp2 = visit_expr(f2, ctx);
-
-                tempting = condTemp1 + " > " + condTemp2;
-            }
-            else {
-                tempting = conditionNode->value; //for identifiers
-            }
+            
 
             // 2. Create basic blocks for control flow
             BasicBlock* thenBlock = create_block(ctx.cfg);
