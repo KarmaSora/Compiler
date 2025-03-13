@@ -172,6 +172,34 @@ private:
             return temp;
         }
 
+        else if (node->type == "AND"){
+            std::string temp = this->new_temp();
+
+            Node* f1 = node->children.front();
+            Node* f2 = *std::next(node->children.begin());
+
+            
+            std::string condTemp1 = visit_expr(f1, ctx);
+            std::string condTemp2 = visit_expr(f2, ctx);
+            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "&&");
+            ctx.current_block->tacInstructions.push_back(ta);
+
+            return temp;
+        }
+
+        else if (node->type == "EXCLAMATION_MARK expression"){
+            std::string temp = this->new_temp();
+
+            Node* f1 = node->children.front();
+
+            
+            std::string condTemp1 = visit_expr(f1, ctx);
+            TAC ta(TACType::NOT, temp, condTemp1, "", "", "");
+            ctx.current_block->tacInstructions.push_back(ta);
+
+            return temp;
+        }
+
         
 
         return "";
