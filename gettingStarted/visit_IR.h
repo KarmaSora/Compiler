@@ -200,6 +200,21 @@ private:
             return temp;
         }
 
+        else if (node->type == "MultExpression"){
+            std::string temp = this->new_temp();
+
+            Node* f1 = node->children.front();
+            Node* f2 = *std::next(node->children.begin());
+
+            
+            std::string condTemp1 = visit_expr(f1, ctx);
+            std::string condTemp2 = visit_expr(f2, ctx);
+            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "*");
+            ctx.current_block->tacInstructions.push_back(ta);
+
+            return temp;
+        }
+
         
 
         return "";
@@ -270,7 +285,15 @@ private:
 
             // TAC t(TACType::ASSIGN, left->value, temp, "", "");
             // ctx.current_block->tacInstructions.push_back(t);
+            if(right->type == "MultExpression"){
 
+                std::string src = visit_expr(right, ctx);
+                TAC ta(TACType::ASSIGN, left->value, src, "","");  // foo2 
+                ctx.current_block->tacInstructions.push_back(ta);
+                return ctx.current_block;
+
+            } 
+            
             if (right->type == "exp DOT ident LP exp COMMA exp RP"){
                 // handle single do not make temp variables.
                 Node* firstChild = right->children.front();
