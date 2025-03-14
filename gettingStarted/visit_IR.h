@@ -85,7 +85,7 @@ private:
             Node* argNode = *std::next(node->children.begin(),2); //aka FOO
             std::string argruments = visit_expr(argNode,ctx);  //can be argument_list or emptyArgumet
             
-            TAC ta(TACType::CALL, temp, firstExpThis +"."+ getFuncName->value, argruments,"");  
+            TAC ta("CALL", temp, firstExpThis +"."+ getFuncName->value, argruments);  
             ctx.current_block->tacInstructions.push_back(ta);
 
 
@@ -97,7 +97,7 @@ private:
 
             Node* idNode = node->children.front();
             std::string temp = this->new_temp();
-            TAC ta(TACType::NEW, temp, idNode->value, "","");
+            TAC ta("NEW", temp, idNode->value, "");
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
 
@@ -136,7 +136,7 @@ private:
             Node* rightVal = *std::next(node->children.begin());
 
             std::string temp = this->new_temp();
-            TAC ta(TACType::BIN_OP, temp, leftVal->value, rightVal->value, "", "-");
+            TAC ta("SUB", temp, leftVal->value, rightVal->value);
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
@@ -146,7 +146,7 @@ private:
             Node* rightVal = *std::next(node->children.begin());
 
             std::string temp = this->new_temp();
-            TAC ta(TACType::BIN_OP, temp, leftVal->value, rightVal->value, "", "+");
+            TAC ta("ADD", temp, leftVal->value, rightVal->value);
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
@@ -159,7 +159,7 @@ private:
             
             std::string condTemp1 = visit_expr(f1, ctx);
             std::string condTemp2 = visit_expr(f2, ctx);
-            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "<");
+            TAC ta("LESS_THAN", temp, condTemp1, condTemp2);
             ctx.current_block->tacInstructions.push_back(ta);
 
 
@@ -175,7 +175,7 @@ private:
             
             std::string condTemp1 = visit_expr(f1, ctx);
             std::string condTemp2 = visit_expr(f2, ctx);
-            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", ">");
+            TAC ta("MORE_THAN", temp, condTemp1, condTemp2);
             ctx.current_block->tacInstructions.push_back(ta);
 
             return temp;
@@ -190,7 +190,7 @@ private:
             
             std::string condTemp1 = visit_expr(f1, ctx);
             std::string condTemp2 = visit_expr(f2, ctx);
-            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "&&");
+            TAC ta("AND", temp, condTemp1, condTemp2);
             ctx.current_block->tacInstructions.push_back(ta);
 
             return temp;
@@ -203,7 +203,7 @@ private:
 
             
             std::string condTemp1 = visit_expr(f1, ctx);
-            TAC ta(TACType::NOT, temp, condTemp1, "", "", "");
+            TAC ta("NOT", temp, condTemp1, "");
             ctx.current_block->tacInstructions.push_back(ta);
 
             return temp;
@@ -218,7 +218,7 @@ private:
             
             std::string condTemp1 = visit_expr(f1, ctx);
             std::string condTemp2 = visit_expr(f2, ctx);
-            TAC ta(TACType::BIN_OP, temp, condTemp1, condTemp2, "", "*");
+            TAC ta("MULT", temp, condTemp1, condTemp2);
             ctx.current_block->tacInstructions.push_back(ta);
 
             return temp;
@@ -235,7 +235,7 @@ private:
         if(!node) return nullptr;
         else if(node->type == "SIMPLE PRINT LOL"){    
             std::string t = visit_expr(node->children.front(),ctx);
-            TAC ta (TACType::PRINT,"",t,"","");
+            TAC ta ("PRINT","",t,"");
             ctx.current_block->tacInstructions.push_back(ta);  
             // if(node->children.front()->type =="exp DOT ident LP exp COMMA exp RP"){
             //     BasicBlock* newBlock = create_block(ctx.cfg);
@@ -279,7 +279,7 @@ private:
 
 
 
-            TAC ta(TACType::RETURN, "", first_CHILD->value, "","");  
+            TAC ta("RETURN", "", first_CHILD->value, "");  
             ctx.current_block->tacInstructions.push_back(ta);
 
             // BasicBlock* newBlock = create_block(ctx.cfg);
@@ -298,7 +298,7 @@ private:
             if(right->type == "MultExpression" || right->type == "AddExpression"|| right->type == "SubExpression" ) {
 
                 std::string src = visit_expr(right, ctx);
-                TAC ta(TACType::ASSIGN, left->value, src, "","");  // foo2 
+                TAC ta("ASSIGN", left->value, src, "");  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
                 return ctx.current_block;
 
@@ -324,7 +324,7 @@ private:
                 else isThis = firstChild->value;
                 string arg = visit_expr(thirdChild, ctx);
                 
-                TAC ta(TACType::CALL, left->value, isThis +"."+ secChild->value, arg,"");  // foo2 
+                TAC ta("CALL", left->value, isThis +"."+ secChild->value, "");  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
                 // TAC ta2(TACType::JUMP, "", "", "", secChild->value, "");
@@ -342,7 +342,7 @@ private:
                 string leftVal = visit_expr(left,ctx);
                 string rightVal = visit_expr(right,ctx);
 
-                TAC ta(TACType::ASSIGN, leftVal, rightVal, "","");
+                TAC ta("ASSIGN", leftVal, rightVal, "");
                 ctx.current_block->tacInstructions.push_back(ta);
                 return ctx.current_block;
 
@@ -369,10 +369,9 @@ private:
             BasicBlock* mergeBlock = create_block(ctx.cfg);
 
             // 3. Emit conditional jump (true: thenBlock, false: elseBlock)
-            TAC condJump(TACType::COND_JUMP, 
-                        "",              // No destination
-                        tempting,        // Condition (src1)
+            TAC condJump("COND_JUMP", 
                         elseBlock->label, // False target (src2)
+                        tempting,        // Condition (src1)
                         thenBlock->label // True target (label field)
             );
             ctx.current_block->tacInstructions.push_back(condJump);
@@ -388,7 +387,7 @@ private:
             ctx.current_block = thenBlock;
 
             BasicBlock* thenEnd = visit_stmt(thenStmtNode, ctx);
-            TAC thenGoto(TACType::JUMP, "", "", "", mergeBlock->label );
+            TAC thenGoto("JUMP",  mergeBlock->label, "", "" );
             thenEnd->tacInstructions.push_back(thenGoto);
             thenEnd->successors.push_back(mergeBlock);
 
@@ -398,7 +397,7 @@ private:
             ctx.current_block = elseBlock;
             
             BasicBlock* elseEnd = visit_stmt(elseStmtNode, ctx);
-            TAC elseGoto(TACType::JUMP, "", "", "", mergeBlock->label);
+            TAC elseGoto("JUMP", mergeBlock->label ,"", "");
             elseEnd->tacInstructions.push_back(elseGoto);
             elseEnd->successors.push_back(mergeBlock);
             
@@ -419,14 +418,14 @@ private:
             BasicBlock* whileExit = create_block(ctx.cfg, "whileExit_" + std::to_string(block_counter));
         
             // 2. Jump to the condition block from the current block
-            TAC jumpToCond(TACType::JUMP, "", "", "", whileCondition->label);
+            TAC jumpToCond("JUMP", whileCondition->label, "", "");
             ctx.current_block->tacInstructions.push_back(jumpToCond);
             ctx.current_block->successors.push_back(whileCondition);
         
             // 3. Evaluate the condition
             ctx.current_block = whileCondition;
             std::string conditionTemp = visit_expr(conditionNode, ctx); // Evaluate condition
-            TAC condJump(TACType::COND_JUMP, "", conditionTemp, whileExit->label, whileBody->label);
+            TAC condJump("COND_JUMP",  conditionTemp, whileExit->label, whileBody->label);
             whileCondition->tacInstructions.push_back(condJump);
             whileCondition->successors.push_back(whileBody);
             whileCondition->successors.push_back(whileExit);
@@ -436,7 +435,7 @@ private:
             BasicBlock* bodyEnd = visit_stmt(bodyNode, ctx);
         
             // 5. Add a jump back to the condition
-            TAC loopBack(TACType::JUMP, "", "", "", whileCondition->label);
+            TAC loopBack("JUMP",  whileCondition->label, "","");
             bodyEnd->tacInstructions.push_back(loopBack);
             bodyEnd->successors.push_back(whileCondition);
         
@@ -474,7 +473,7 @@ private:
 
         }
         else if (node->type == "classDeclarations"){ // used just for the EXIT tac instruction
-            TAC ta (TACType::EXIT,"","","","");
+            TAC ta ("EXIT","","","");
             ctx.current_block->tacInstructions.push_back(ta);
             for (auto child : node->children){
                 traverse_generic(child, ctx);
