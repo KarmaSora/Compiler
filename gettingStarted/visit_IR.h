@@ -141,6 +141,15 @@ private:
             return temp;
         }
 
+        else if (node->type == "AddExpression"){
+            Node* leftVal = node->children.front();
+            Node* rightVal = *std::next(node->children.begin());
+
+            std::string temp = this->new_temp();
+            TAC ta(TACType::BIN_OP, temp, leftVal->value, rightVal->value, "", "+");
+            ctx.current_block->tacInstructions.push_back(ta);
+            return temp;
+        }
         if (node->type == "LESS_THAN"){
             std::string temp = this->new_temp();
 
@@ -256,8 +265,9 @@ private:
         }
         else if (node->type == "statements"){
             for (auto child : node->children){
-                return visit_stmt(child, ctx);
+                 visit_stmt(child, ctx);
             }
+
         }
         else if(node->type == "statement"){
             std::cout << "uuuuuuuuuuUUU";
@@ -285,7 +295,7 @@ private:
 
             // TAC t(TACType::ASSIGN, left->value, temp, "", "");
             // ctx.current_block->tacInstructions.push_back(t);
-            if(right->type == "MultExpression"){
+            if(right->type == "MultExpression" || right->type == "AddExpression"|| right->type == "SubExpression" ) {
 
                 std::string src = visit_expr(right, ctx);
                 TAC ta(TACType::ASSIGN, left->value, src, "","");  // foo2 
@@ -325,9 +335,18 @@ private:
                 //ctx.current_block = newBlock; // Switch to the new block
                 return ctx.current_block;
             }
+
+            
+
             else {
-                TAC ta(TACType::ASSIGN, left->value, right->value, "","");
+                string leftVal = visit_expr(left,ctx);
+                string rightVal = visit_expr(right,ctx);
+
+                TAC ta(TACType::ASSIGN, leftVal, rightVal, "","");
                 ctx.current_block->tacInstructions.push_back(ta);
+                return ctx.current_block;
+
+
             }
         }
         else if (node->type == "IF LP expression RP statement ELSE statement"){
@@ -387,6 +406,47 @@ private:
             ctx.current_block = mergeBlock;
             return mergeBlock;
         }
+
+
+        else if (node->type == "WHILE LP expression RP statement") {
+            // Extract condition and body nodes
+            Node* conditionNode = node->children.front(); 
+            Node* bodyNode = *std::next(node->children.begin());
+        
+            // 1. Create blocks
+            BasicBlock* whileCondition = create_block(ctx.cfg, "whileCondition_" + std::to_string(block_counter));
+            BasicBlock* whileBody = create_block(ctx.cfg, "whileBody_" + std::to_string(block_counter));
+            BasicBlock* whileExit = create_block(ctx.cfg, "whileExit_" + std::to_string(block_counter));
+        
+            // 2. Jump to the condition block from the current block
+            TAC jumpToCond(TACType::JUMP, "", "", "", whileCondition->label);
+            ctx.current_block->tacInstructions.push_back(jumpToCond);
+            ctx.current_block->successors.push_back(whileCondition);
+        
+            // 3. Evaluate the condition
+            ctx.current_block = whileCondition;
+            std::string conditionTemp = visit_expr(conditionNode, ctx); // Evaluate condition
+            TAC condJump(TACType::COND_JUMP, "", conditionTemp, whileExit->label, whileBody->label);
+            whileCondition->tacInstructions.push_back(condJump);
+            whileCondition->successors.push_back(whileBody);
+            whileCondition->successors.push_back(whileExit);
+        
+            // 4. Process while body
+            ctx.current_block = whileBody;
+            BasicBlock* bodyEnd = visit_stmt(bodyNode, ctx);
+        
+            // 5. Add a jump back to the condition
+            TAC loopBack(TACType::JUMP, "", "", "", whileCondition->label);
+            bodyEnd->tacInstructions.push_back(loopBack);
+            bodyEnd->successors.push_back(whileCondition);
+        
+            // 6. Continue execution in the exit block
+            ctx.current_block = whileExit;
+            return whileExit;
+        }
+        
+
+
 
         return ctx.current_block;
 
