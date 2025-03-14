@@ -370,9 +370,9 @@ private:
 
             // 3. Emit conditional jump (true: thenBlock, false: elseBlock)
             TAC condJump("COND_JUMP", 
-                        elseBlock->label, // False target (src2)
-                        tempting,        // Condition (src1)
-                        thenBlock->label // True target (label field)
+                tempting,        // Condition (src1)
+                elseBlock->label, // False target (src2)
+                thenBlock->label // True target (label field)
             );
             ctx.current_block->tacInstructions.push_back(condJump);
 
@@ -413,9 +413,9 @@ private:
             Node* bodyNode = *std::next(node->children.begin());
         
             // 1. Create blocks
-            BasicBlock* whileCondition = create_block(ctx.cfg, "whileCondition_" + std::to_string(block_counter));
-            BasicBlock* whileBody = create_block(ctx.cfg, "whileBody_" + std::to_string(block_counter));
-            BasicBlock* whileExit = create_block(ctx.cfg, "whileExit_" + std::to_string(block_counter));
+            BasicBlock* whileCondition = create_block(ctx.cfg, "whileCondition_" + std::to_string(block_counter++));
+            BasicBlock* whileBody = create_block(ctx.cfg, "whileBody_" + std::to_string(block_counter++));
+            BasicBlock* whileExit = create_block(ctx.cfg, "whileExit_" + std::to_string(block_counter++));
         
             // 2. Jump to the condition block from the current block
             TAC jumpToCond("JUMP", whileCondition->label, "", "");
@@ -425,7 +425,7 @@ private:
             // 3. Evaluate the condition
             ctx.current_block = whileCondition;
             std::string conditionTemp = visit_expr(conditionNode, ctx); // Evaluate condition
-            TAC condJump("COND_JUMP",  conditionTemp, whileExit->label, whileBody->label);
+            TAC condJump("COND_JUMP", conditionTemp, whileBody->label, whileExit->label);
             whileCondition->tacInstructions.push_back(condJump);
             whileCondition->successors.push_back(whileBody);
             whileCondition->successors.push_back(whileExit);
@@ -435,7 +435,7 @@ private:
             BasicBlock* bodyEnd = visit_stmt(bodyNode, ctx);
         
             // 5. Add a jump back to the condition
-            TAC loopBack("JUMP",  whileCondition->label, "","");
+            TAC loopBack("JUMP", whileCondition->label, "","");
             bodyEnd->tacInstructions.push_back(loopBack);
             bodyEnd->successors.push_back(whileCondition);
         
@@ -443,7 +443,7 @@ private:
             ctx.current_block = whileExit;
             return whileExit;
         }
-        
+                
 
 
 

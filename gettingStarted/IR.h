@@ -175,7 +175,7 @@ public:
                 }
                 else if (tac.op == "COND_JUMP" ) {
 
-                    label += "if " + tac.src1 + " goto " + tac.dest + " else goto " + tac.src2 + "\\n";
+                    label += "if " + tac.dest + " goto " + tac.src1 + " else goto " + tac.src2 + "\\n";
                     }
                 else if (tac.op == "JUMP" ) {
                         label += "goto " + tac.dest + "\\n";
