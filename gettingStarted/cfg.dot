@@ -1,13 +1,5 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := NEW Sum\n @Param: 10000\n__t1 := CALL __t0.calcSum: 1\nPRINT __t1\nEXIT\n"];
-Sum_calcSum -> block_1 [xlabel="true"];
-Sum_calcSum -> block_2 [xlabel="false"];
-Sum_calcSum [label="Sum_calcSum\n__t2 := num < 2\nif __t2 goto block_2 else goto block_1\n"];
-block_1 -> block_3;
-block_1 [label="block_1\nsum := 1\ngoto block_3\n"];
-block_2 -> block_3;
-block_2 [label="block_2\n__t5 := num - 1\n__t6 := num - 1\n @Param: __t6\n__t4 := CALL THIS.calcSum: 1\n__t3 := num + __t4\nsum := __t3\ngoto block_3\n"];
-block_3 [label="block_3\nRETURN sum\n"];
+Main [label="Main\n__t3 := 4 * 2\n__t2 := __t3 + 10\n__t4 := 2 * 6\n__t1 := __t2 - __t4\n__t7 := 4 - 1\n__t6 := __t7 * 2\n__t5 := __t6 * 2\n__t0 := __t1 + __t5\nPRINT __t0\nPRINT \n"];
 }
