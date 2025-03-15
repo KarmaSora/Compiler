@@ -69,7 +69,11 @@ public:
 
                 }
                 else if(op == "CALL"){
-                    printf("%s := CALL %s(%s)\n", dest.c_str(), src1.c_str(), src2.c_str());
+                    printf("%s := CALL %s: %s\n", dest.c_str(), src1.c_str(), src2.c_str() );
+
+                }                
+                else if(op == "Args"){
+                    printf(" @param: %s \n", src1.c_str());
 
                 }
                 else if(op == "RETURN"){
@@ -181,8 +185,11 @@ public:
                         label += "goto " + tac.dest + "\\n";
                     }
                 else if (tac.op == "CALL" ) {
-                        label += tac.dest + " := CALL " + tac.src1 + "(" + tac.src2 + ")\\n";
+                        label += tac.dest + " := CALL " + tac.src1+ ": " +tac.src2+  "\\n";
                     }
+                else if (tac.op == "Args" ) {
+                    label +=  " @Param: " + tac.src1 + "\\n";
+                }
                 else if (tac.op == "RETURN" ) {
                         label += "RETURN " + tac.src1 + "\\n";
                     }

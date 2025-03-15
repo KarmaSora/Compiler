@@ -85,7 +85,25 @@ private:
             Node* argNode = *std::next(node->children.begin(),2); //aka FOO
             std::string argruments = visit_expr(argNode,ctx);  //can be argument_list or emptyArgumet
             
-            TAC ta("CALL", temp, firstExpThis +"."+ getFuncName->value, argruments);  
+            int argCount = argNode->children.size();
+            std::cout << "argNodeVal  : " + argNode->value << endl;
+            std::cout << "argNodeType  : " + argNode->type << endl;
+
+
+
+            for(auto child : argNode->children){
+                std::string argrument = visit_expr(child,ctx);  //can be argument_list or emptyArgumet
+
+                std::cout << "arguments are : " + argrument << endl;
+                TAC ta("Args", "", argrument,"");  
+
+                ctx.current_block->tacInstructions.push_back(ta);
+
+            }
+
+
+
+            TAC ta("CALL", temp, firstExpThis +"."+ getFuncName->value, std::to_string(argCount));  
             ctx.current_block->tacInstructions.push_back(ta);
 
 
@@ -322,9 +340,19 @@ private:
                 string isThis = "";
                 if (firstChild->type == "THIS") isThis = "this";
                 else isThis = firstChild->value;
-                string arg = visit_expr(thirdChild, ctx);
                 
-                TAC ta("CALL", left->value, isThis +"."+ secChild->value, "");  // foo2 
+                int argCount = thirdChild->children.size();
+                
+                for(auto child : thirdChild->children){
+                    string arg = visit_expr(child, ctx);
+                    TAC ta("Args", "", arg,"");  
+
+                    ctx.current_block->tacInstructions.push_back(ta);
+
+                }
+
+
+                TAC ta("CALL", left->value, isThis +"."+ secChild->value, to_string(argCount));  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
                 // TAC ta2(TACType::JUMP, "", "", "", secChild->value, "");
