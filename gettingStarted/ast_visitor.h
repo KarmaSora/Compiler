@@ -28,7 +28,7 @@ class DuplicateIdentifiers {
 in this case its: "DuplicateIdentifiers.func"
  */
 
- //python3 testScript.py -semantic -valid -lexical -syntax
+ //python3 testScript.py -lexical -semantic -syntax -valid -interpreter
 
 class ASTVisitor {
 private:
