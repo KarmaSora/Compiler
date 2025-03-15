@@ -1,17 +1,5 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := NEW A\n__t1 := CALL __t0.a2: 0\nPRINT __t1\nEXIT\n"];
-A_a1 -> block_1 [xlabel="true"];
-A_a1 -> block_2 [xlabel="false"];
-A_a1 [label="A_a1\n__t2 := num < 1\nif __t2 goto block_2 else goto block_1\n"];
-block_1 -> block_3;
-block_1 [label="block_1\nnum_aux := 1\ngoto block_3\n"];
-block_2 -> block_3;
-block_2 [label="block_2\n__t3 := num * \nnum_aux := __t3\ngoto block_3\n"];
-block_3 [label="block_3\nRETURN \n"];
-A_a2 [label="A_a2\nRETURN 0\n"];
-A_a3 [label="A_a3\n__t4 := NEW A\na := __t4\nRETURN a\n"];
-A_a4 [label="A_a4\na := \ni := \na := \n @Param: False\n @Param: i\n @Param: ia\n @Param: \ni := CALL this.a5: 4\nRETURN \n"];
-A_a5 [label="A_a5\nRETURN 1\n"];
+Main [label="Main\n__t0 := 4 * 2\n__t1 := __t0 + 10\n__t2 := 2 * 6\n__t3 := __t1 - __t2\n__t6 := 4 - 1\n__t5 := __t6 * 2\n__t4 := __t5 * 2\n__t7 := __t3 + __t4\nPRINT __t7\n__t11 := !True\n__t10 := __t11 && False\n__t9 := True == __t10\n__t13 := 10 > 1\n__t14 := 1 < 10\n__t12 := __t13 && __t14\n__t8 := __t9 || __t12\nPRINT __t8\n"];
 }
