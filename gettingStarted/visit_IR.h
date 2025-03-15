@@ -154,7 +154,9 @@ private:
             Node* rightVal = *std::next(node->children.begin());
 
             std::string temp = this->new_temp();
-            TAC ta("SUB", temp, leftVal->value, rightVal->value);
+            std::string leVal = visit_expr(leftVal,ctx);
+            std::string reVal = visit_expr(rightVal,ctx);
+            TAC ta("SUB", temp, leVal, reVal);
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
@@ -164,7 +166,9 @@ private:
             Node* rightVal = *std::next(node->children.begin());
 
             std::string temp = this->new_temp();
-            TAC ta("ADD", temp, leftVal->value, rightVal->value);
+            std::string leVal = visit_expr(leftVal,ctx);
+            std::string reVal = visit_expr(rightVal,ctx);
+            TAC ta("ADD", temp, leVal, reVal);
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
