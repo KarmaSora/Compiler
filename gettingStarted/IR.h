@@ -52,12 +52,20 @@ public:
                     printf("%s := %s * %s\n", dest.c_str(), src1.c_str(), 
                      src2.c_str()); // FIX THIS IN FINAL ANSWER
                 }
+                else if (op =="OR"){
+                    printf("%s := %s || %s\n", dest.c_str(), src1.c_str(), 
+                     src2.c_str()); // FIX THIS IN FINAL ANSWER
+                }
+                else if (op =="EQUAL"){
+                    printf("%s := %s == %s\n", dest.c_str(), src1.c_str(), 
+                     src2.c_str()); // FIX THIS IN FINAL ANSWER
+                }
                 else if (op =="SUB"){
                     printf("%s := %s - %s\n", dest.c_str(), src1.c_str(), 
                      src2.c_str()); // FIX THIS IN FINAL ANSWER
                 }
                 else if (op =="AND"){
-                    printf("%s := %s - %s\n", dest.c_str(), src1.c_str(), 
+                    printf("%s := %s && %s\n", dest.c_str(), src1.c_str(), 
                      src2.c_str()); // FIX THIS IN FINAL ANSWER
                 }
 
@@ -167,6 +175,12 @@ public:
                 }
                 else if (tac.op == "MULT" ) {
                     label += tac.dest + " := " + tac.src1 + " * " + tac.src2 + "\\n";
+                }
+                else if (tac.op == "OR" ) {
+                    label += tac.dest + " := " + tac.src1 + " || " + tac.src2 + "\\n";
+                }
+                else if (tac.op == "EQUAL" ) {
+                    label += tac.dest + " := " + tac.src1 + " == " + tac.src2 + "\\n";
                 }
                 else if (tac.op == "LESS_THAN" ) {
                     label += tac.dest + " := " + tac.src1 + " < " + tac.src2 + "\\n";
