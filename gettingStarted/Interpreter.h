@@ -30,6 +30,9 @@ enum InstructionType {
     CLASS,
     NEW,
     LABEL,  // label i Mark the instruction with i as a label
+    IEQUAL, // iequal Pop value v1 and v2. Push 1 if v2 == v1, else 0
+    IGT,    // Integer Greater Than
+    
     STOP    // stop Execution completed
     
 };

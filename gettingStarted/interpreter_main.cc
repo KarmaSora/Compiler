@@ -78,6 +78,14 @@ Program loadProgramFromFile(const std::string& filename) {
                 instrId = STOP;
                 noArgInstr = true;
             }
+            else if (op == "equal") {
+                instrId = IEQUAL;
+                noArgInstr = true;
+            }
+            else if (op == "igt") {
+                instrId = IGT; // Assuming IGT is already defined in your InstructionType enum
+                noArgInstr = true;
+            }
 
             if (noArgInstr) {
                 // Add instruction with dummy argument (0)

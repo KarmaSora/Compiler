@@ -113,13 +113,13 @@ void Interpreter::execute() {
         }
 
         Instruction* currentInstr = current_activation->getNextInstruction();
-        std::cout << "Executing instruction: ID=" << currentInstr->id 
-                  << ", Argument=" << currentInstr->argument << "\n";
+        //std::cout << "Executing instruction: ID=" << currentInstr->id 
+        //          << ", Argument=" << currentInstr->argument << "\n";
 
         switch (currentInstr->id) {
             case ICONST:
                 data_stack.push(currentInstr->argument);
-                std::cout << "Pushed constant: " << currentInstr->argument << "\n";
+                //std::cout << "Pushed constant: " << currentInstr->argument << "\n";
                 break;
 
             case ISTORE: {
@@ -138,7 +138,7 @@ void Interpreter::execute() {
                     throw std::runtime_error("Variable " + varName + " not initialized.");
                 }
                 data_stack.push(current_activation->local_variables[varName]);
-                std::cout << "Loaded " << varName << ": " << current_activation->local_variables[varName] << "\n";
+                //std::cout << "Loaded " << varName << ": " << current_activation->local_variables[varName] << "\n";
                 break;
             }
 
@@ -147,7 +147,7 @@ void Interpreter::execute() {
                 int v1 = data_stack.top(); data_stack.pop();
                 int v2 = data_stack.top(); data_stack.pop();
                 data_stack.push(v2 + v1);
-                std::cout << "Added " << v2 << " + " << v1 << " = " << (v2 + v1) << "\n";
+                //std::cout << "Added " << v2 << " + " << v1 << " = " << (v2 + v1) << "\n";
                 break;
             }
 
@@ -156,7 +156,7 @@ void Interpreter::execute() {
                 int v1 = data_stack.top(); data_stack.pop();
                 int v2 = data_stack.top(); data_stack.pop();
                 data_stack.push(v2 - v1);
-                std::cout << "Subtracted " << v2 << " - " << v1 << " = " << (v2 - v1) << "\n";
+                //std::cout << "Subtracted " << v2 << " - " << v1 << " = " << (v2 - v1) << "\n";
                 break;
             }
 
@@ -165,7 +165,7 @@ void Interpreter::execute() {
                 int v1 = data_stack.top(); data_stack.pop();
                 int v2 = data_stack.top(); data_stack.pop();
                 data_stack.push(v2 * v1);
-                std::cout << "Multiplied " << v2 << " * " << v1 << " = " << (v2 * v1) << "\n";
+                //std::cout << "Multiplied " << v2 << " * " << v1 << " = " << (v2 * v1) << "\n";
                 break;
             }
 
@@ -188,6 +188,14 @@ void Interpreter::execute() {
                 break;
             }
 
+            case IGT: {
+                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in ILT");
+                int v1 = data_stack.top(); data_stack.pop();
+                int v2 = data_stack.top(); data_stack.pop();
+                data_stack.push((v2 > v1) ? 1 : 0);
+                std::cout << "Compared " << v2 << " > " << v1 << " ? " << (v2 > v1) << "\n";
+                break;
+            }
             case IAND: {
                 if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IAND");
                 int v1 = data_stack.top(); data_stack.pop();
@@ -269,7 +277,7 @@ void Interpreter::execute() {
 
             case PRINT: {
                 if (data_stack.empty()) throw std::runtime_error("Stack underflow in PRINT");
-                std::cout << "Output: " << data_stack.top() << "\n";
+                std::cout << "Output: " << data_stack.top() << "\n\n";
                 data_stack.pop();
                 break;
             }
@@ -278,6 +286,14 @@ void Interpreter::execute() {
                 std::cout << "Execution stopped.\n";
                 delete current_activation;
                 return;
+            }
+            case IEQUAL: {
+                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IEQUAL");
+                int v1 = data_stack.top(); data_stack.pop();
+                int v2 = data_stack.top(); data_stack.pop();
+                data_stack.push((v1 == v2) ? 1 : 0); // Push 1 if equal, 0 otherwise
+                std::cout << "Equality check: " << v1 << " == " << v2 << " ? " << (v1 == v2) << "\n";
+                break;
             }
 
             default:

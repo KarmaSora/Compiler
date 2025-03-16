@@ -577,15 +577,17 @@ private:
     }
 };
 
-void loadOrConst(ByteCode& b, std::string sauce){
-    if (sauce == "TRUE" || sauce == "FALSE" || sauce == "THIS" || sauce == "NEW"){
-        b.addInstruction("iconst", sauce);
-    }
-    else if(std::all_of(sauce.begin(), sauce.end(), ::isdigit)){
-        b.addInstruction("iconst", sauce);
-    }
-    else {
-        b.addInstruction("iload", sauce);
+void loadOrConst(ByteCode& b, std::string sauce) {
+    if (sauce == "TRUE") {
+        b.addInstruction("iconst", "1");  // TRUE → 1
+    } else if (sauce == "FALSE") {
+        b.addInstruction("iconst", "0"); // FALSE → 0
+    } else if (sauce == "THIS" || sauce == "NEW") {
+        b.addInstruction("iconst", sauce); // Handle THIS/NEW as before
+    } else if (std::all_of(sauce.begin(), sauce.end(), ::isdigit)) {
+        b.addInstruction("iconst", sauce); // Numeric constant
+    } else {
+        b.addInstruction("iload", sauce); // Variable load
     }
 }
 void generateByteCode(CFG* cfg, ByteCode& byteCode) {
