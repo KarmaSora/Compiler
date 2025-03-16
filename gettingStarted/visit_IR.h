@@ -577,11 +577,24 @@ private:
     }
 };
 
+void loadOrConst(ByteCode& b, std::string sauce){
+    if (sauce == "TRUE" || sauce == "FALSE" || sauce == "THIS" || sauce == "NEW"){
+        b.addInstruction("iconst", sauce);
+    }
+    else if(std::all_of(sauce.begin(), sauce.end(), ::isdigit)){
+        b.addInstruction("iconst", sauce);
+    }
+    else {
+        b.addInstruction("iload", sauce);
+    }
+}
 void generateByteCode(CFG* cfg, ByteCode& byteCode) {
 
 
     std::unordered_set<BasicBlock*> visitedBlocks;
     std::vector<BasicBlock*> stack = {cfg->entry_block};
+
+
 
     while (!stack.empty()) {
         BasicBlock* block = stack.back();
@@ -592,30 +605,30 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
 
         for (const auto& tac : block->tacInstructions) {
             if (tac.op == "ASSIGN") {
-                byteCode.addInstruction("iload", tac.src1);
+                loadOrConst(byteCode, tac.src1);
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "ADD") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("iadd");
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "SUB") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("isub");
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "MULT") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("imul");
                 byteCode.addInstruction("istore", tac.dest);
             } 
             
             else if (tac.op == "PRINT") {
-                byteCode.addInstruction("iload", tac.src1);
+                loadOrConst(byteCode, tac.src1);
                 byteCode.addInstruction("print");
             } else if (tac.op == "RETURN") {
-                byteCode.addInstruction("iload", tac.src1);
+                loadOrConst(byteCode, tac.src1);
                 byteCode.addInstruction("ireturn");
             } else if (tac.op == "COND_JUMP") {
                 byteCode.addInstruction("iload", tac.dest);
@@ -625,8 +638,8 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("goto", tac.dest);
             }
             else if (tac.op == "CALL") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("invokevirtual", tac.dest); // invoke
             }
             else if (tac.op == "NEW") {
@@ -637,37 +650,37 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("iload", tac.src1);
             }
             else if (tac.op == "EQUAL") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("equal");
                 byteCode.addInstruction("istore", tac.dest);
             }
             else if (tac.op == "OR") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("ior");
                 byteCode.addInstruction("istore", tac.dest);
             }
             else if (tac.op == "AND") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("iand");
                 byteCode.addInstruction("istore", tac.dest);
             }
             else if (tac.op == "LESS_THAN") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("ilt");
                 byteCode.addInstruction("istore", tac.dest);
             }
             else if (tac.op == "MORE_THAN") {
-                byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("iload", tac.src2);
+                loadOrConst(byteCode, tac.src1);
+                loadOrConst(byteCode, tac.src2);
                 byteCode.addInstruction("igt");
                 byteCode.addInstruction("istore", tac.dest);
             }
             else if (tac.op == "NOT") {
-                byteCode.addInstruction("iload", tac.src1);
+                loadOrConst(byteCode, tac.src1);
                 byteCode.addInstruction("inot");
                 byteCode.addInstruction("istore", tac.dest);
             }

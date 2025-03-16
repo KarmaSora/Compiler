@@ -14,7 +14,7 @@ Program loadProgramFromFile(const std::string& filename) {
     std::unordered_map<std::string, Method> methods;
     std::vector<Instruction> instructions;
     std::vector<std::string> variables;
-    std::unordered_map<std::string, int> varIndexMap; // Map variable names to indices
+    std::unordered_map<std::string, int> varIndexMap;
     std::string line;
     std::string currentMethod = "main";
 
@@ -25,14 +25,13 @@ Program loadProgramFromFile(const std::string& filename) {
         iss >> op;
         if (op == "method") {
             if (!instructions.empty()) {
-                // Ensure stop instruction is present before closing the method
-                if (instructions.empty() || instructions.back().id != STOP) {
+                if (instructions.back().id != STOP) {
                     instructions.emplace_back(STOP, 0);
                 }
                 methods[currentMethod] = Method(instructions, variables);
                 instructions.clear();
                 variables.clear();
-                varIndexMap.clear(); // Reset variable mapping per method
+                varIndexMap.clear();
             }
             iss >> currentMethod;
         } else if (op == "var") {
@@ -42,70 +41,110 @@ Program loadProgramFromFile(const std::string& filename) {
                 variables.push_back(arg);
             }
         } else {
-            if (iss >> arg) {
-                int instrId = -1;
-                int argValue = 0;
-                bool isConstant = false;
+            // Check if the instruction is one without an argument
+            bool noArgInstr = false;
+            int instrId = -1;
+            if (op == "iadd") {
+                instrId = IADD;
+                noArgInstr = true;
+            } else if (op == "isub") {
+                instrId = ISUB;
+                noArgInstr = true;
+            } else if (op == "imul") {
+                instrId = IMUL;
+                noArgInstr = true;
+            } else if (op == "idiv") {
+                instrId = IDIV;
+                noArgInstr = true;
+            } else if (op == "ilt") {
+                instrId = ILT;
+                noArgInstr = true;
+            } else if (op == "iand") {
+                instrId = IAND;
+                noArgInstr = true;
+            } else if (op == "ior") {
+                instrId = IOR;
+                noArgInstr = true;
+            } else if (op == "inot") {
+                instrId = INOT;
+                noArgInstr = true;
+            } else if (op == "print") {
+                instrId = PRINT;
+                noArgInstr = true;
+            } else if (op == "ireturn") {
+                instrId = IRETURN;
+                noArgInstr = true;
+            } else if (op == "stop") {
+                instrId = STOP;
+                noArgInstr = true;
+            }
 
-                // Check if the argument is a number (constant)
-                if (isdigit(arg[0]) || arg[0] == '-') {
-                    argValue = std::stoi(arg);
-                    isConstant = true;
-                } else {
-                    // Variable handling
-                    auto it = varIndexMap.find(arg);
-                    if (it != varIndexMap.end()) {
-                        argValue = it->second; // Get existing index
+            if (noArgInstr) {
+                // Add instruction with dummy argument (0)
+                instructions.emplace_back(instrId, 0);
+            } else {
+                // Handle instructions with arguments
+                if (iss >> arg) {
+                    bool isConstant = false;
+                    int argValue = 0;
+
+                    if (isdigit(arg[0]) || arg[0] == '-') {
+                        argValue = std::stoi(arg);
+                        isConstant = true;
                     } else {
-                        // New variable found, assign it a new index
-                        argValue = variables.size();
-                        variables.push_back(arg);
-                        varIndexMap[arg] = argValue;
+                        auto it = varIndexMap.find(arg);
+                        if (it != varIndexMap.end()) {
+                            argValue = it->second;
+                        } else {
+                            argValue = variables.size();
+                            variables.push_back(arg);
+                            varIndexMap[arg] = argValue;
+                        }
                     }
-                }
 
-                // Match operation
-                if (op == "iload" && isConstant) instrId = ICONST; // Fix: use ICONST for constants
-                else if (op == "iload") instrId = ILOAD;
-                else if (op == "iconst") instrId = ICONST;
-                else if (op == "istore") instrId = ISTORE;
-                else if (op == "iadd") instrId = IADD;
-                else if (op == "isub") instrId = ISUB;
-                else if (op == "imul") instrId = IMUL;
-                else if (op == "idiv") instrId = IDIV;
-                else if (op == "ilt") instrId = ILT;
-                else if (op == "iand") instrId = IAND;
-                else if (op == "ior") instrId = IOR;
-                else if (op == "inot") instrId = INOT;
-                else if (op == "goto") instrId = GOTO;
-                else if (op == "iffalse_goto") instrId = IFFALSEGOTO;
-                else if (op == "invokevirtual") instrId = INVOKEVIRTUAL;
-                else if (op == "ireturn") instrId = IRETURN;
-                else if (op == "print") instrId = PRINT;
-                else if (op == "stop") instrId = STOP;
-                else if (op == "class") instrId = CLASS;
-                else if (op == "new") instrId = NEW;
-                else if (op == "label") instrId = LABEL;
+                    // Determine instruction ID for ops with arguments
+                    if (op == "iload" && isConstant) {
+                        instrId = ICONST;
+                    } else if (op == "iload") {
+                        instrId = ILOAD;
+                    } else if (op == "iconst") {
+                        instrId = ICONST;
+                    } else if (op == "istore") {
+                        instrId = ISTORE;
+                    } else if (op == "goto") {
+                        instrId = GOTO;
+                    } else if (op == "iffalse_goto") {
+                        instrId = IFFALSEGOTO;
+                    } else if (op == "invokevirtual") {
+                        instrId = INVOKEVIRTUAL;
+                    } else if (op == "new") {
+                        instrId = NEW;
+                    } else if (op == "class") {
+                        instrId = CLASS;
+                    } else if (op == "label") {
+                        instrId = LABEL;
+                    }
 
-                if (instrId != -1) {
-                    instructions.emplace_back(instrId, argValue);
+                    if (instrId != -1) {
+                        instructions.emplace_back(instrId, argValue);
+                    }
+                } else {
+                    throw std::runtime_error("Missing argument for instruction: " + op);
                 }
             }
         }
     }
 
-    // Ensure the last instruction in main is STOP
-    if (instructions.empty() || instructions.back().id != STOP) {
-        instructions.emplace_back(STOP, 0);
-    }
-
+    // Handle remaining instructions after loop
     if (!instructions.empty()) {
+        if (instructions.back().id != STOP) {
+            instructions.emplace_back(STOP, 0);
+        }
         methods[currentMethod] = Method(instructions, variables);
     }
 
     return Program(methods);
 }
-
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <bytecode file>" << std::endl;

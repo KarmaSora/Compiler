@@ -1,5 +1,5 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := 4 * 2\nPRINT __t0\nEXIT\n"];
+Main [label="Main\n__t0 := 4 * 2\n__t1 := __t0 + 10\n__t2 := 2 * 6\n__t3 := __t1 - __t2\n__t6 := 4 - 1\n__t5 := __t6 * 2\n__t4 := __t5 * 2\n__t7 := __t3 + __t4\nPRINT __t7\nEXIT\n"];
 }

@@ -1,6 +1,34 @@
-iload 4
-iload 2
+iconst 4
+iconst 2
 imul
 istore __t0
 iload __t0
+iconst 10
+iadd
+istore __t1
+iconst 2
+iconst 6
+imul
+istore __t2
+iload __t1
+iload __t2
+isub
+istore __t3
+iconst 4
+iconst 1
+isub
+istore __t6
+iload __t6
+iconst 2
+imul
+istore __t5
+iload __t5
+iconst 2
+imul
+istore __t4
+iload __t3
+iload __t4
+iadd
+istore __t7
+iload __t7
 print
