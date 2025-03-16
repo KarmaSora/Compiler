@@ -29,7 +29,7 @@ tree2:
 	dot -Tpdf cfg.dot -otree2.pdf
 
 # Run the compiler and generate byte-code
-s:
+karma:
 	make compiler
 	./compiler test.txt
 	dot -Tpdf tree.dot -otree.pdf

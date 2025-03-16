@@ -523,9 +523,15 @@ private:
 
 
         }
-        else if (node->type == "classDeclarations"){ // used just for the EXIT tac instruction
+        else if(node->type == "MAIN CLASS"){
+            for (auto child : node->children){
+                traverse_generic(child, ctx);
+            }
             TAC ta ("EXIT","","","");
             ctx.current_block->tacInstructions.push_back(ta);
+        }
+        else if (node->type == "classDeclarations"){ // used just for the EXIT tac instruction
+
             for (auto child : node->children){
                 traverse_generic(child, ctx);
             }
@@ -584,6 +590,7 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
 
         for (const auto& tac : block->tacInstructions) {
             if (tac.op == "ASSIGN") {
+                byteCode.addInstruction("iload", tac.src1);
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "ADD") {
                 byteCode.addInstruction("iload", tac.src1);
@@ -600,7 +607,9 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("iload", tac.src2);
                 byteCode.addInstruction("imul");
                 byteCode.addInstruction("istore", tac.dest);
-            } else if (tac.op == "PRINT") {
+            } 
+            
+            else if (tac.op == "PRINT") {
                 byteCode.addInstruction("iload", tac.src1);
                 byteCode.addInstruction("print");
             } else if (tac.op == "RETURN") {
@@ -616,7 +625,7 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
             else if (tac.op == "CALL") {
                 byteCode.addInstruction("iload", tac.src1);
                 byteCode.addInstruction("iload", tac.src2);
-                byteCode.addInstruction("invoke", tac.dest);
+                byteCode.addInstruction("invokevirtual", tac.dest); // invoke
             }
             else if (tac.op == "NEW") {
                 byteCode.addInstruction("new", tac.src1);
