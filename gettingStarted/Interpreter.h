@@ -1,28 +1,86 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stack>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
+#include <iostream>
+#include <stack>
+
+enum InstructionType {
+    ILOAD, // iload n Push integer value stored in local variable n.
+    ICONST, // iconst v Push integer value v.
+    ISTORE, // istore n Pop value v and store it in local variable n
+    IADD, // iadd Pop value v1 and v2. Push v2 + v1
+    ISUB, // isub Pop value v1 and v2. Push v2 - v1
+    IMUL, // imul Pop value v1 and v2. Push v2 * v1
+    IDIV, // idiv Pop value v1 and v2. Push v2 / v1
+    ILT, // ilt Pop value v1 and v2. Push 1 if v2 < v1, else 0
+    IAND, // iand Pop value v1 and v2. Push 0 if v2 * v1 == 0, else push 1.
+    IOR, // ior Pop value v1 and v2. Push 0 if v2 + v1 == 0, else push 1
+    INOT, // inot Pop value v. Push 1 if v == 0, else push 0.
+    GOTO, // goto i Jump to instruction labeled i unconditionally
+    IFFALSEGOTO, // iffalse goto i Pop value v from the data stack. If v == 0 jump to instruction labeled i,
+                 //else continue with the following instruction
+
+    INVOKEVIRTUAL,  // invokevirtual m Push current activation to the activation stack and
+                    // switch to the method with qualified name m.
+    IRETURN, // ireturn Pop the activation from the activation stack and continue 
+    PRINT,  // print Pop the value from the data stack and print it
+    STOP    // stop Execution completed
+    
+};
+
+class Instruction {
+public:
+    int id;
+    int argument;
+
+    Instruction();
+    Instruction(int id, int argument);
+    void printInstruction();
+};
+
+class Method {
+public:
+    std::vector<Instruction> instructions;
+    std::vector<std::string> variables;
+
+    Method();
+    Method(std::vector<Instruction> instructions, std::vector<std::string> variables);
+    void printMethod();
+};
+
+class Program {
+public:
+    std::unordered_map<std::string, Method> methods;
+
+    Program();
+    Program(std::unordered_map<std::string, Method> methods);
+    void printProgram();
+    Method getMainMethod();
+};
+
+class Activation {
+public:
+    int pc;
+    std::unordered_map<std::string, int> local_variables;
+    Method main;
+
+    Activation();
+    Activation(int pc, Method method);
+    getNextInstruction();
+    storeValue(std::string var, int value);
+};
 
 class Interpreter {
-private:
-    std::stack<int> dataStack; // Data stack for intermediate values
-    std::unordered_map<std::string, int> variables; // Variable storage
-
-    // Helper function to parse an instruction
-    std::vector<std::string> parseInstruction(const std::string& line);
-
-    // Execute a single instruction
-    void executeInstruction(const std::vector<std::string>& instruction);
-
 public:
-    // Interpret the byte-code file
-    void interpret(const std::string& filename);
+    Program program;
+    Method main;
+
+    Interpreter();
+    Interpreter(Program program);
+    void execute();
 };
 
 #endif
