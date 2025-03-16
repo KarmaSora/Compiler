@@ -578,6 +578,8 @@ private:
 };
 
 void generateByteCode(CFG* cfg, ByteCode& byteCode) {
+
+
     std::unordered_set<BasicBlock*> visitedBlocks;
     std::vector<BasicBlock*> stack = {cfg->entry_block};
 
@@ -614,10 +616,10 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("print");
             } else if (tac.op == "RETURN") {
                 byteCode.addInstruction("iload", tac.src1);
-                byteCode.addInstruction("return");
+                byteCode.addInstruction("ireturn");
             } else if (tac.op == "COND_JUMP") {
                 byteCode.addInstruction("iload", tac.dest);
-                byteCode.addInstruction("iffalse", tac.src2);
+                byteCode.addInstruction("iffalse_goto", tac.src2);
                 byteCode.addInstruction("goto", tac.src1);
             } else if (tac.op == "JUMP") {
                 byteCode.addInstruction("goto", tac.dest);
@@ -685,3 +687,6 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
         }
     }
 }
+
+
+

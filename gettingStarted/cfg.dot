@@ -1,0 +1,5 @@
+digraph CFG {
+graph [splines=ortho];
+node [shape=box];
+Main [label="Main\n__t0 := 4 * 2\nPRINT __t0\nEXIT\n"];
+}

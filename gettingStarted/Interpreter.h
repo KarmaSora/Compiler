@@ -27,6 +27,9 @@ enum InstructionType {
                     // switch to the method with qualified name m.
     IRETURN, // ireturn Pop the activation from the activation stack and continue 
     PRINT,  // print Pop the value from the data stack and print it
+    CLASS,
+    NEW,
+    LABEL,  // label i Mark the instruction with i as a label
     STOP    // stop Execution completed
     
 };
@@ -65,18 +68,22 @@ class Activation {
 public:
     int pc;
     std::unordered_map<std::string, int> local_variables;
-    Method main;
+    Method method;
 
     Activation();
-    Activation(int pc, Method method);
-    getNextInstruction();
-    storeValue(std::string var, int value);
+    Activation(int p, Method m);
+    Instruction *  getNextInstruction();
+    void storeValue(std::string& var, int value);
 };
 
 class Interpreter {
 public:
     Program program;
     Method main;
+    
+std::unordered_map<std::string, int> labelMap; // Store labels with their instruction index
+std::unordered_map<std::string, int> objectHeap; // Simulate object creation
+
 
     Interpreter();
     Interpreter(Program program);

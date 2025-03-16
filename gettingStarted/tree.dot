@@ -1,0 +1,29 @@
+digraph {
+n0 [label="goal:"];
+n1 [label="MAIN CLASS:"];
+n2 [label="identifier:E"];
+n1 -> n2
+n3 [label="MAIN METHOD:"];
+n4 [label="identifier:a"];
+n3 -> n4
+n5 [label="statements:"];
+n6 [label="statement:"];
+n7 [label="LC statement RC:"];
+n8 [label="statements:"];
+n9 [label="statement:"];
+n10 [label="SIMPLE PRINT LOL:"];
+n11 [label="MultExpression:"];
+n12 [label="INT:4"];
+n11 -> n12
+n13 [label="INT:2"];
+n11 -> n13
+n10 -> n11
+n9 -> n10
+n8 -> n9
+n7 -> n8
+n6 -> n7
+n5 -> n6
+n3 -> n5
+n1 -> n3
+n0 -> n1
+}
