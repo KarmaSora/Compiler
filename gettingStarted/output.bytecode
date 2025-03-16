@@ -32,14 +32,14 @@ iadd
 istore __t7
 iload __t7
 print
-iload True
+iconst 1
 inot
 istore __t11
 iload __t11
-iload False
+iconst 0
 iand
 istore __t10
-iload True
+iconst 1
 iload __t10
 equal
 istore __t9

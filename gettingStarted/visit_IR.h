@@ -578,9 +578,9 @@ private:
 };
 
 void loadOrConst(ByteCode& b, std::string sauce) {
-    if (sauce == "TRUE") {
+    if (sauce == "True") {
         b.addInstruction("iconst", "1");  // TRUE → 1
-    } else if (sauce == "FALSE") {
+    } else if (sauce == "False") {
         b.addInstruction("iconst", "0"); // FALSE → 0
     } else if (sauce == "THIS" || sauce == "NEW") {
         b.addInstruction("iconst", sauce); // Handle THIS/NEW as before
