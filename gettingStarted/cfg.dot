@@ -1,22 +1,5 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := NEW Bar\n__t1 := CALL __t0: Bar_foo\nPRINT __t1\nEXIT\n"];
-Bar_foo [label="Bar_foo\nMETHOD Bar_foo IN \naux := 1\naux2 := True\n @Param: aux\naux := CALL this.foo2: 1\n @Param: 2\n @Param: 5\n @Param: aux2\naux := CALL this.foo3: 3\nRETURN aux\n"];
-Bar_foo2 -> block_1 [xlabel="true"];
-Bar_foo2 -> block_2 [xlabel="false"];
-Bar_foo2 [label="Bar_foo2\nMETHOD Bar_foo2 IN \n__t2 := p1 < 2\nif __t2 goto block_2 else goto block_1\n"];
-block_1 -> block_3;
-block_1 [label="block_1\nPRINT 10\ngoto block_3\n"];
-block_2 -> block_3;
-block_2 [label="block_2\nPRINT 0\ngoto block_3\n"];
-block_3 [label="block_3\nRETURN 1\n"];
-Bar_foo3 -> block_4 [xlabel="true"];
-Bar_foo3 -> block_5 [xlabel="false"];
-Bar_foo3 [label="Bar_foo3\nMETHOD Bar_foo3 IN \nif p3 goto block_5 else goto block_4\n"];
-block_4 -> block_6;
-block_4 [label="block_4\nPRINT 1\ngoto block_6\n"];
-block_5 -> block_6;
-block_5 [label="block_5\nPRINT 0\ngoto block_6\n"];
-block_6 [label="block_6\nPRINT p1\n__t3 := p2 - p1\nPRINT __t3\nRETURN 4\n"];
+Main [label="Main\n__t0 := 4 * 2\n__t1 := __t0 + 10\n__t2 := 2 * 6\n__t3 := __t1 - __t2\n__t6 := 4 - 1\n__t5 := __t6 * 2\n__t4 := __t5 * 2\n__t7 := __t3 + __t4\nPRINT __t7\n__t11 := !True\n__t10 := __t11 && False\n__t9 := True == __t10\n__t13 := 10 > 1\n__t14 := 1 < 10\n__t12 := __t13 && __t14\n__t8 := __t9 || __t12\nPRINT __t8\nEXIT\n"];
 }

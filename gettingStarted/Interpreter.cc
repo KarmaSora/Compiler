@@ -188,14 +188,6 @@ void Interpreter::execute() {
                 break;
             }
 
-            case IGT: {
-                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in ILT");
-                int v1 = data_stack.top(); data_stack.pop();
-                int v2 = data_stack.top(); data_stack.pop();
-                data_stack.push((v2 > v1) ? 1 : 0);
-                std::cout << "Compared " << v2 << " > " << v1 << " ? " << (v2 > v1) << "\n";
-                break;
-            }
             case IAND: {
                 if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IAND");
                 int v1 = data_stack.top(); data_stack.pop();
@@ -267,13 +259,7 @@ void Interpreter::execute() {
                 break;
             }
 
-            case NEW: {
-                int objId = objectHeap.size();
-                objectHeap[std::to_string(objId)] = 0; // Initialize object
-                data_stack.push(objId);
-                std::cout << "Created object ID: " << objId << "\n";
-                break;
-            }
+
 
             case PRINT: {
                 if (data_stack.empty()) throw std::runtime_error("Stack underflow in PRINT");
@@ -287,14 +273,7 @@ void Interpreter::execute() {
                 delete current_activation;
                 return;
             }
-            case IEQUAL: {
-                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IEQUAL");
-                int v1 = data_stack.top(); data_stack.pop();
-                int v2 = data_stack.top(); data_stack.pop();
-                data_stack.push((v1 == v2) ? 1 : 0); // Push 1 if equal, 0 otherwise
-                std::cout << "Equality check: " << v1 << " == " << v2 << " ? " << (v1 == v2) << "\n";
-                break;
-            }
+
 
             default:
                 throw std::runtime_error("Unsupported instruction");

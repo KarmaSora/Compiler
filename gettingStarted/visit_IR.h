@@ -627,20 +627,24 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 else if (tac.op == "PRINT") {
                     loadOrConst(byteCode, tac.src1);
                     byteCode.addInstruction("print");
-                } else if (tac.op == "RETURN") {
+                } 
+                else if (tac.op == "RETURN") {
                     loadOrConst(byteCode, tac.src1);
                     byteCode.addInstruction("ireturn");
-                } else if (tac.op == "COND_JUMP") {
+                } 
+                
+                else if (tac.op == "COND_JUMP") {
                     byteCode.addInstruction("iload", tac.dest);
                     byteCode.addInstruction("iffalse_goto", tac.src2);
                     byteCode.addInstruction("goto", tac.src1);
-                } else if (tac.op == "JUMP") {
+                } 
+                else if (tac.op == "JUMP") {
                     byteCode.addInstruction("goto", tac.dest);
                 }
+
                 else if (tac.op == "CALL") {
                     // Load the receiver (object) onto the stack
                     loadOrConst(byteCode, tac.src1);  // e.g., THIS or object temp
-                    
                     // Invoke the method using its qualified name
                     byteCode.addInstruction("invokevirtual", tac.src2);  // ClassName/methodName
                     

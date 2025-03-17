@@ -78,14 +78,7 @@ Program loadProgramFromFile(const std::string& filename) {
                 instrId = STOP;
                 noArgInstr = true;
             }
-            else if (op == "equal") {
-                instrId = IEQUAL;
-                noArgInstr = true;
-            }
-            else if (op == "igt") {
-                instrId = IGT; // Assuming IGT is already defined in your InstructionType enum
-                noArgInstr = true;
-            }
+
 
             if (noArgInstr) {
                 // Add instruction with dummy argument (0)
@@ -125,13 +118,7 @@ Program loadProgramFromFile(const std::string& filename) {
                         instrId = IFFALSEGOTO;
                     } else if (op == "invokevirtual") {
                         instrId = INVOKEVIRTUAL;
-                    } else if (op == "new") {
-                        instrId = NEW;
-                    } else if (op == "class") {
-                        instrId = CLASS;
-                    } else if (op == "label") {
-                        instrId = LABEL;
-                    }
+                    } 
 
                     if (instrId != -1) {
                         instructions.emplace_back(instrId, argValue);
