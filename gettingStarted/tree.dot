@@ -72,7 +72,7 @@ n38 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
 n39 [label="identifier:aux"];
 n38 -> n39
 n40 [label="exp DOT ident LP exp COMMA exp RP:"];
-n41 [label="identifier:Bar"];
+n41 [label="THIS:"];
 n40 -> n41
 n42 [label="identifier:foo2"];
 n40 -> n42
@@ -88,7 +88,7 @@ n46 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
 n47 [label="identifier:aux"];
 n46 -> n47
 n48 [label="exp DOT ident LP exp COMMA exp RP:"];
-n49 [label="identifier:Bar"];
+n49 [label="THIS:"];
 n48 -> n49
 n50 [label="identifier:foo3"];
 n48 -> n50

@@ -27,13 +27,14 @@ enum InstructionType {
                     // switch to the method with qualified name m.
     IRETURN, // ireturn Pop the activation from the activation stack and continue 
     PRINT,  // print Pop the value from the data stack and print it
+    STOP,    // stop Execution completed
+    
     CLASS,
     NEW,
     LABEL,  // label i Mark the instruction with i as a label
     IEQUAL, // iequal Pop value v1 and v2. Push 1 if v2 == v1, else 0
-    IGT,    // Integer Greater Than
+    IGT    // Integer Greater Than
     
-    STOP    // stop Execution completed
     
 };
 
