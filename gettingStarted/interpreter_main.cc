@@ -79,6 +79,27 @@ Program loadProgramFromFile(const std::string& filename) {
                 noArgInstr = true;
             }
 
+            else if(op == "equal"){
+                instrId = EQUAL;
+                noArgInstr = true;
+            }
+            else if(op == "invokevirtual"){
+                instrId = INVOKEVIRTUAL;
+                noArgInstr = true;
+            }
+            else if(op == "goto"){
+                instrId = GOTO;
+                noArgInstr = true;
+            }
+            else if(op == "iffalse_goto"){
+                instrId = IFFALSEGOTO;
+                noArgInstr = true;
+            }
+            else if( op == "igt"){
+                instrId = IGT;
+                noArgInstr = true;
+            }
+
 
             if (noArgInstr) {
                 // Add instruction with dummy argument (0)

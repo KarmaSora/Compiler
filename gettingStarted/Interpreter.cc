@@ -197,6 +197,14 @@ void Interpreter::execute() {
                 break;
             }
 
+            case EQUAL: {
+                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IAND");
+                int v1 = data_stack.top(); data_stack.pop();
+                int v2 = data_stack.top(); data_stack.pop();
+                data_stack.push((v1 ==v2 ) ? 1 : 0);
+                std::cout << "Compared: " << v2 << " == " << v1 << " ? " << (v1 == v2) << "\n";
+                break;
+            }
             case IOR: {
                 if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IOR");
                 int v1 = data_stack.top(); data_stack.pop();
@@ -274,9 +282,20 @@ void Interpreter::execute() {
                 return;
             }
 
+            case IGT: {
+                if (data_stack.size() < 2) throw std::runtime_error("Stack underflow in IGT");
+                int v1 = data_stack.top(); data_stack.pop();
+                int v2 = data_stack.top(); data_stack.pop();
+                data_stack.push((v2 > v1) ? 1 : 0);
+                std::cout << "Compared " << v2 << " > " << v1 << " ? " << (v2 > v1) << "\n";
+                break;
+            }
+
+            
+
 
             default:
-                throw std::runtime_error("Unsupported instruction");
+                throw std::runtime_error("Unsupported instruction" );
         }
     }
 }

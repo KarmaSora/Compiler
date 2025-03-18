@@ -53,5 +53,6 @@
     "sstream": "cpp",
     "cstring": "cpp"
   },
-  "C_Cpp.errorSquiggles": "disabled"
+  "C_Cpp.errorSquiggles": "disabled",
+  "github.copilot.chat.codesearch.enabled": true
 }
