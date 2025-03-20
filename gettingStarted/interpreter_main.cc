@@ -23,6 +23,8 @@ Program loadProgramFromFile(const std::string& filename) {
         std::string op, arg;
         
         iss >> op;
+        std::cout << "[DEBUG] Parsing opcode: " << op << std::endl;
+
         if (op == "method") {
             if (!instructions.empty()) {
                 if (instructions.back().id != STOP) {
@@ -34,89 +36,45 @@ Program loadProgramFromFile(const std::string& filename) {
                 varIndexMap.clear();
             }
             iss >> currentMethod;
-        } else if (op == "var") {
+        } 
+        else if (op == "var") {
             iss >> arg;
             if (varIndexMap.find(arg) == varIndexMap.end()) {
                 varIndexMap[arg] = variables.size();
                 variables.push_back(arg);
             }
-        } else {
-            // Check if the instruction is one without an argument
-            bool noArgInstr = false;
-            int instrId = -1;
-            if (op == "iadd") {
-                instrId = IADD;
-                noArgInstr = true;
-            } else if (op == "isub") {
-                instrId = ISUB;
-                noArgInstr = true;
-            } else if (op == "imul") {
-                instrId = IMUL;
-                noArgInstr = true;
-            } else if (op == "idiv") {
-                instrId = IDIV;
-                noArgInstr = true;
-            } else if (op == "ilt") {
-                instrId = ILT;
-                noArgInstr = true;
-            } else if (op == "iand") {
-                instrId = IAND;
-                noArgInstr = true;
-            } else if (op == "ior") {
-                instrId = IOR;
-                noArgInstr = true;
-            } else if (op == "inot") {
-                instrId = INOT;
-                noArgInstr = true;
-            } else if (op == "print") {
-                instrId = PRINT;
-                noArgInstr = true;
-            } else if (op == "ireturn") {
-                instrId = IRETURN;
-                noArgInstr = true;
-            } else if (op == "stop") {
-                instrId = STOP;
-                noArgInstr = true;
-            }
+        } 
+        else {
+            // Map opcodes to instruction IDs
+            static const std::unordered_map<std::string, int> opcodes = {
+                {"iadd", IADD}, {"isub", ISUB}, {"imul", IMUL}, {"idiv", IDIV},
+                {"ilt", ILT}, {"igt", IGT}, {"iand", IAND}, {"ior", IOR},
+                {"inot", INOT}, {"print", PRINT}, {"ireturn", IRETURN},
+                {"stop", STOP}, {"equal", EQUAL}, {"invokevirtual", INVOKEVIRTUAL},
+                {"goto", GOTO}, {"iffalse_goto", IFFALSEGOTO}, {"iload", ILOAD},
+                {"iconst", ICONST}, {"istore", ISTORE}, {"new", NEW} // Added "new"
+            };
 
-            else if(op == "equal"){
-                instrId = EQUAL;
-                noArgInstr = true;
-            }
-            else if(op == "invokevirtual"){
-                instrId = INVOKEVIRTUAL;
-                noArgInstr = true;
-            }
-            else if(op == "goto"){
-                instrId = GOTO;
-                noArgInstr = true;
-            }
-            else if(op == "iffalse_goto"){
-                instrId = IFFALSEGOTO;
-                noArgInstr = true;
-            }
-            else if( op == "igt"){
-                instrId = IGT;
-                noArgInstr = true;
-            }
+            auto it = opcodes.find(op);
+            if (it != opcodes.end()) {
+                int instrId = it->second;
+                std::cout << "[DEBUG] Mapped opcode '" << op << "' to ID: " << instrId << std::endl;
 
+                if (instrId == ILOAD || instrId == ICONST || instrId == ISTORE ||
+                    instrId == GOTO || instrId == IFFALSEGOTO || instrId == INVOKEVIRTUAL ||
+                    instrId == NEW) { // "new" instruction requires an argument
+                    
+                    if (!(iss >> arg)) {
+                        throw std::runtime_error("Missing argument for instruction: " + op);
+                    }
 
-            if (noArgInstr) {
-                // Add instruction with dummy argument (0)
-                instructions.emplace_back(instrId, 0);
-            } else {
-                // Handle instructions with arguments
-                if (iss >> arg) {
-                    bool isConstant = false;
-                    int argValue = 0;
-
+                    int argValue;
                     if (isdigit(arg[0]) || arg[0] == '-') {
-                        argValue = std::stoi(arg);
-                        isConstant = true;
+                        argValue = std::stoi(arg); // Handle numeric constants
                     } else {
-                        auto it = varIndexMap.find(arg);
-                        if (it != varIndexMap.end()) {
-                            argValue = it->second;
+                        auto varIt = varIndexMap.find(arg);
+                        if (varIt != varIndexMap.end()) {
+                            argValue = varIt->second; // Use existing variable index
                         } else {
                             argValue = variables.size();
                             variables.push_back(arg);
@@ -124,34 +82,29 @@ Program loadProgramFromFile(const std::string& filename) {
                         }
                     }
 
-                    // Determine instruction ID for ops with arguments
-                    if (op == "iload" && isConstant) {
-                        instrId = ICONST;
-                    } else if (op == "iload") {
-                        instrId = ILOAD;
-                    } else if (op == "iconst") {
-                        instrId = ICONST;
-                    } else if (op == "istore") {
-                        instrId = ISTORE;
-                    } else if (op == "goto") {
-                        instrId = GOTO;
-                    } else if (op == "iffalse_goto") {
-                        instrId = IFFALSEGOTO;
-                    } else if (op == "invokevirtual") {
-                        instrId = INVOKEVIRTUAL;
-                    } 
-
-                    if (instrId != -1) {
-                        instructions.emplace_back(instrId, argValue);
-                    }
-                } else {
-                    throw std::runtime_error("Missing argument for instruction: " + op);
+                    std::cout << "[DEBUG] Adding instruction: " << op << " (ID=" << instrId 
+                              << ", Arg=" << argValue << ")" << std::endl;
+                    instructions.emplace_back(instrId, argValue);
+                } 
+                else {
+                    std::cout << "[DEBUG] Adding instruction: " << op << " (ID=" << instrId << ")" << std::endl;
+                    instructions.emplace_back(instrId, 0);
                 }
+                
+                std::cout << "[DEBUG] Available methods in program: ";
+                for (const auto& method : methods) {
+                    std::cout << method.first << " ";
+                }
+                std::cout << std::endl;
+
+
+            } 
+            else {
+                throw std::runtime_error("Unknown opcode encountered: " + op);
             }
         }
     }
 
-    // Handle remaining instructions after loop
     if (!instructions.empty()) {
         if (instructions.back().id != STOP) {
             instructions.emplace_back(STOP, 0);
@@ -161,6 +114,7 @@ Program loadProgramFromFile(const std::string& filename) {
 
     return Program(methods);
 }
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <bytecode file>" << std::endl;

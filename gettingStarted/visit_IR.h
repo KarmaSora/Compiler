@@ -157,7 +157,7 @@ private:
             ctx.current_block->tacInstructions.push_back(ta);
             return temp;
         }
-        if (node->type == "LESS_THAN"){
+        else if (node->type == "LESS_THAN"){
             std::string temp = this->new_temp();
 
             Node* f1 = node->children.front();
@@ -258,10 +258,15 @@ private:
 
             return temp;
         }
+        else if(node->type == "THIS"){
+            return "this";
+        }
 
         
+        std::cout << "KKKKKKKKKKKKKKKKKKKKAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRAAAAAAAAAAAAAAAAAAAMMMMMMMMMMM: " << node->type << std::endl;
+        std::cout << "Expression not handled: " << node->type << std::endl;
 
-        return "";
+        
 
     }
 
@@ -576,11 +581,16 @@ private:
 };
 
 void loadOrConst(ByteCode& b, std::string sauce) {
+    if (sauce.empty()) {
+        std::cerr << "Error: Empty constant detected!" << std::endl;
+        return;
+    }
+    else
     if (sauce == "True") {
         b.addInstruction("iconst", "1");  // TRUE → 1
     } else if (sauce == "False") {
         b.addInstruction("iconst", "0"); // FALSE → 0
-    } else if (sauce == "THIS" || sauce == "NEW") {
+    } else if (sauce == "THIS" ||sauce == "this" || sauce == "NEW") {
         b.addInstruction("iconst", sauce); // Handle THIS/NEW as before
     } else if (std::all_of(sauce.begin(), sauce.end(), ::isdigit)) {
         b.addInstruction("iconst", sauce); // Numeric constant

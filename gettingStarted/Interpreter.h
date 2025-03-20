@@ -30,7 +30,10 @@ enum InstructionType {
     STOP,    // stop Execution completed
     
     EQUAL,    // checks ==
-    IGT // igt Pop value v1 and v2. Push 1 if v2 > v1, else 0
+    IGT, // igt Pop value v1 and v2. Push 1 if v2 > v1, else 0
+    
+    NEW // new Create a new object of the class specified by the argument
+
     
   
     

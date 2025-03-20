@@ -106,6 +106,8 @@ void Interpreter::execute() {
 
     std::cout << "Execution started...\n";
 
+
+
     while (true) {
         if (current_activation->pc >= current_activation->method.instructions.size()) {
             std::cerr << "Interpreter error: No more instructions to execute.\n";
@@ -116,6 +118,9 @@ void Interpreter::execute() {
         //std::cout << "Executing instruction: ID=" << currentInstr->id 
         //          << ", Argument=" << currentInstr->argument << "\n";
 
+
+        std::cout << "Executing instruction: ID=" << currentInstr->id
+        << ", Argument=" << currentInstr->argument << std::endl;
         switch (currentInstr->id) {
             case ICONST:
                 data_stack.push(currentInstr->argument);
@@ -290,12 +295,38 @@ void Interpreter::execute() {
                 std::cout << "Compared " << v2 << " > " << v1 << " ? " << (v2 > v1) << "\n";
                 break;
             }
+            case NEW: {
+                std::cout << "Executing NEW instruction for class: " << currentInstr->argument << std::endl;
+                
+                // Validate class index (Argument should map to a class name in methods)
+                if (currentInstr->argument >= main.variables.size()) {
+                    throw std::runtime_error("Invalid class reference in NEW instruction.");
+                }
+            
+                std::string className = main.variables[currentInstr->argument];  // Get the class name
+                auto methodIt = program.methods.find(className);  // Check if class exists
+            
+                if (methodIt == program.methods.end()) {
+                    throw std::runtime_error("Class " + className + " not found in method table.");
+                }
+            
+                // Create a new Activation frame for the object (Heap allocation simulation)
+                Activation* newActivation = new Activation(0, methodIt->second);
+                std::cout << "Created new instance of " << className << std::endl;
+            
+                // Store a reference (Just store an integer reference for now)
+                int newRef = activations_stack.size() + 1;  // Unique reference ID
+                data_stack.push(newRef);
+            
+                break;
+            }
+            
 
             
 
 
             default:
-                throw std::runtime_error("Unsupported instruction" );
+                throw std::runtime_error("Unsupported instruction" + std::to_string(currentInstr->id)); 
         }
     }
 }
