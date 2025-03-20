@@ -1,63 +1,144 @@
-iconst 4
-iconst 2
-imul
+new Sum
 istore __t0
+iload 10000
 iload __t0
-iconst 10
-iadd
+invokevirtual Sum_calcSum
 istore __t1
-iconst 2
-iconst 6
-imul
-istore __t2
 iload __t1
+print
+method Sum_calcSum
+iload num
+iconst 2
+ilt
+istore __t2
 iload __t2
-isub
-istore __t3
-iconst 4
+iffalse_goto block_1
+goto block_2
+iconst 1
+istore sum
+goto block_3
+iload num
 iconst 1
 isub
-istore __t6
-iload __t6
-iconst 2
-imul
+istore __t4
+iload __t4
+iconst this
+invokevirtual Sum_calcSum
+istore __t3
+iload num
+iload __t3
+iadd
 istore __t5
 iload __t5
+istore sum
+goto block_3
+iload sum
+ireturn
+new Sum
+istore __t0
+iload 10000
+iload __t0
+invokevirtual Sum_calcSum
+istore __t1
+iload __t1
+print
+method Sum_calcSum
+iload num
 iconst 2
-imul
-istore __t4
-iload __t3
-iload __t4
-iadd
-istore __t7
-iload __t7
-print
-iconst 1
-inot
-istore __t11
-iload __t11
-iconst 0
-iand
-istore __t10
-iconst 1
-iload __t10
-equal
-istore __t9
-iconst 10
-iconst 1
-igt
-istore __t13
-iconst 1
-iconst 10
 ilt
-istore __t14
-iload __t13
-iload __t14
-iand
-istore __t12
-iload __t9
-iload __t12
-ior
-istore __t8
-iload __t8
+istore __t2
+iload __t2
+iffalse_goto block_1
+goto block_2
+iconst 1
+istore sum
+goto block_3
+iload num
+iconst 1
+isub
+istore __t4
+iload __t4
+iconst this
+invokevirtual Sum_calcSum
+istore __t3
+iload num
+iload __t3
+iadd
+istore __t5
+iload __t5
+istore sum
+goto block_3
+iload sum
+ireturn
+new Sum
+istore __t0
+iload 10000
+iload __t0
+invokevirtual Sum_calcSum
+istore __t1
+iload __t1
 print
+method Sum_calcSum
+iload num
+iconst 2
+ilt
+istore __t2
+iload __t2
+iffalse_goto block_1
+goto block_2
+iconst 1
+istore sum
+goto block_3
+iload num
+iconst 1
+isub
+istore __t4
+iload __t4
+iconst this
+invokevirtual Sum_calcSum
+istore __t3
+iload num
+iload __t3
+iadd
+istore __t5
+iload __t5
+istore sum
+goto block_3
+iload sum
+ireturn
+new Sum
+istore __t0
+iload 10000
+iload __t0
+invokevirtual Sum_calcSum
+istore __t1
+iload __t1
+print
+method Sum_calcSum
+iload num
+iconst 2
+ilt
+istore __t2
+iload __t2
+iffalse_goto block_1
+goto block_2
+iconst 1
+istore sum
+goto block_3
+iload num
+iconst 1
+isub
+istore __t4
+iload __t4
+iconst this
+invokevirtual Sum_calcSum
+istore __t3
+iload num
+iload __t3
+iadd
+istore __t5
+iload __t5
+istore sum
+goto block_3
+iload sum
+ireturn
