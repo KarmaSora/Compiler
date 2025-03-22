@@ -78,10 +78,12 @@ private:
             }
         
             Node* methodNameNode = *std::next(node->children.begin());
-            std::string methodName = className + "_" + methodNameNode->value;
+            //std::string methodName = className + "_" + methodNameNode->value;
         
             // Process arguments
             Node* argNode = *std::next(node->children.begin(), 2);
+            TAC taClass("Args", "", className, "");        //class as param
+            ctx.current_block->tacInstructions.push_back(taClass);
             for (auto child : argNode->children) {
                 std::string arg = visit_expr(child, ctx);
                 TAC ta("Args", "", arg, "");
@@ -89,7 +91,7 @@ private:
             }
         
             // Emit CALL TAC: receiver, methodName, result_temp
-            TAC ta("CALL", temp, receiver, methodName);
+            TAC ta("CALL", temp, methodNameNode->value, std::to_string( argNode->children.size()+1));
             ctx.current_block->tacInstructions.push_back(ta);
         
             return temp;
@@ -259,7 +261,7 @@ private:
             return temp;
         }
         else if(node->type == "THIS"){
-            return "this";
+            return curr_class_name;
         }
 
         
@@ -360,11 +362,23 @@ private:
                 // }
 
                 string isThis = "";
-                if (firstChild->type == "THIS") isThis = "this";
+                if (firstChild->type == "THIS") isThis = curr_class_name;
                 else isThis = firstChild->value;
                 
                 int argCount = thirdChild->children.size();
-                
+
+                std::string nameOfClass = "";//here!!!
+                Node* nodeWithClassName = right->children.front();
+                if(nodeWithClassName->type == "NEW identifier LP RP"){
+                    nameOfClass = nodeWithClassName->children.front()->value;
+                }
+                else {
+                    nameOfClass = nodeWithClassName->value;
+                }
+
+                TAC taClass("Args", "", nameOfClass,"");  
+
+                ctx.current_block->tacInstructions.push_back(taClass);
                 for(auto child : thirdChild->children){
                     string arg = visit_expr(child, ctx);
                     TAC ta("Args", "", arg,"");  
@@ -374,7 +388,7 @@ private:
                 }
 
 
-                TAC ta("CALL", left->value, isThis +"."+ secChild->value, to_string(argCount));  // foo2 
+                TAC ta("CALL", left->value,secChild->value, to_string(argCount +1));  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
                 // TAC ta2(TACType::JUMP, "", "", "", secChild->value, "");
@@ -548,7 +562,7 @@ private:
 
 
                // Add METHOD TAC to mark the method's start
-            TAC methodTac("METHOD", resThis, "", "");
+            TAC methodTac("METHOD", curr_class_name, node->value, "");
             res->tacInstructions.push_back(methodTac);
             ctx.current_block = res;
             
@@ -654,12 +668,12 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
 
                 else if (tac.op == "CALL") {
                     // Load the receiver (object) onto the stack
-                    loadOrConst(byteCode, tac.src1);  // e.g., THIS or object temp
+                    loadOrConst(byteCode, tac.src1);                // e.g., className 
                     // Invoke the method using its qualified name
-                    byteCode.addInstruction("invokevirtual", tac.src2);  // ClassName/methodName
+                    byteCode.addInstruction("invokevirtual", tac.src2);  // methodName
                     
                     // Store the return value if the method isn't void
-                    byteCode.addInstruction("istore", tac.dest);
+                    byteCode.addInstruction("istore", tac.dest);        //store result of call
                 }
                 else if (tac.op == "NEW") {
                     byteCode.addInstruction("new", tac.src1);
@@ -703,18 +717,11 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                     byteCode.addInstruction("inot");
                     byteCode.addInstruction("istore", tac.dest);
                 }
-                else if (tac.op == "CLASS") {
-                    byteCode.addInstruction("class", tac.dest);
-                }
                 else if (tac.op == "METHOD") {
-                    byteCode.addInstruction("method", tac.dest, tac.src1);
+                    byteCode.addInstruction("method", tac.dest, tac.src1); // methoDec, function name and class name
                 }
-                else if (tac.op == "LABEL") {
-                    byteCode.addInstruction("label", tac.dest);
-                }
-                else if (tac.op == "METHOD") {
-                    byteCode.addInstruction("method", tac.dest); // Emit "method Bar_foo"
-                }
+
+
             }
             
             for (auto successor : block->successors) {

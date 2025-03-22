@@ -1,13 +1,13 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := NEW Sum\n @Param: 10000\n__t1 := CALL __t0: Sum_calcSum\nPRINT __t1\nEXIT\n"];
+Main [label="Main\n__t0 := NEW Sum\n @Param: Sum\n @Param: 10000\n__t1 := CALL calcSum: 2\nPRINT __t1\nEXIT\n"];
 Sum_calcSum -> block_1 [xlabel="true"];
 Sum_calcSum -> block_2 [xlabel="false"];
-Sum_calcSum [label="Sum_calcSum\nMETHOD Sum_calcSum IN \n__t2 := num < 2\nif __t2 goto block_2 else goto block_1\n"];
+Sum_calcSum [label="Sum_calcSum\nMETHOD Sum IN calcSum\n__t2 := num < 2\nif __t2 goto block_2 else goto block_1\n"];
 block_1 -> block_3;
 block_1 [label="block_1\nsum := 1\ngoto block_3\n"];
 block_2 -> block_3;
-block_2 [label="block_2\n__t4 := num - 1\n @Param: __t4\n__t3 := CALL this: Sum_calcSum\n__t5 := num + __t3\nsum := __t5\ngoto block_3\n"];
+block_2 [label="block_2\n @Param: Sum\n__t4 := num - 1\n @Param: __t4\n__t3 := CALL calcSum: 2\n__t5 := num + __t3\nsum := __t5\ngoto block_3\n"];
 block_3 [label="block_3\nRETURN sum\n"];
 }

@@ -1,12 +1,13 @@
 new Sum
 istore __t0
+iload Sum
 iload 10000
-iload __t0
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t1
 iload __t1
 print
-method Sum_calcSum
+method Sum calcSum
 iload num
 iconst 2
 ilt
@@ -17,13 +18,14 @@ goto block_2
 iconst 1
 istore sum
 goto block_3
+iload Sum
 iload num
 iconst 1
 isub
 istore __t4
 iload __t4
-iconst this
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t3
 iload num
 iload __t3
@@ -36,13 +38,14 @@ iload sum
 ireturn
 new Sum
 istore __t0
+iload Sum
 iload 10000
-iload __t0
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t1
 iload __t1
 print
-method Sum_calcSum
+method Sum calcSum
 iload num
 iconst 2
 ilt
@@ -53,13 +56,14 @@ goto block_2
 iconst 1
 istore sum
 goto block_3
+iload Sum
 iload num
 iconst 1
 isub
 istore __t4
 iload __t4
-iconst this
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t3
 iload num
 iload __t3
@@ -72,13 +76,14 @@ iload sum
 ireturn
 new Sum
 istore __t0
+iload Sum
 iload 10000
-iload __t0
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t1
 iload __t1
 print
-method Sum_calcSum
+method Sum calcSum
 iload num
 iconst 2
 ilt
@@ -89,13 +94,14 @@ goto block_2
 iconst 1
 istore sum
 goto block_3
+iload Sum
 iload num
 iconst 1
 isub
 istore __t4
 iload __t4
-iconst this
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t3
 iload num
 iload __t3
@@ -108,13 +114,14 @@ iload sum
 ireturn
 new Sum
 istore __t0
+iload Sum
 iload 10000
-iload __t0
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t1
 iload __t1
 print
-method Sum_calcSum
+method Sum calcSum
 iload num
 iconst 2
 ilt
@@ -125,13 +132,14 @@ goto block_2
 iconst 1
 istore sum
 goto block_3
+iload Sum
 iload num
 iconst 1
 isub
 istore __t4
 iload __t4
-iconst this
-invokevirtual Sum_calcSum
+iload calcSum
+invokevirtual 2
 istore __t3
 iload num
 iload __t3

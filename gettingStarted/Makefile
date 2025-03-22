@@ -38,3 +38,7 @@ karma:
 # Run the interpreter
 run-interpreter: interpreter
 	./interpreter output.bytecode
+
+a: 
+	make karma
+	make run-interpreter
