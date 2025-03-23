@@ -139,11 +139,8 @@ void Interpreter::execute() {
 
             case ILOAD: {
                 std::string varName = current_activation->method.variables[currentInstr->argument];
-                if (current_activation->local_variables.find(varName) == current_activation->local_variables.end()) {
-                    throw std::runtime_error("Variable " + varName + " not initialized.");
-                }
                 data_stack.push(current_activation->local_variables[varName]);
-                //std::cout << "Loaded " << varName << ": " << current_activation->local_variables[varName] << "\n";
+                std::cout << "Loaded " << varName << ": " << current_activation->local_variables[varName] << "\n";
                 break;
             }
 
@@ -249,6 +246,7 @@ void Interpreter::execute() {
 
             case INVOKEVIRTUAL: {
                 std::string methodName = current_activation->method.variables[currentInstr->argument];
+                std::cout <<"\n\n methhhhNAMEEE:  " << methodName <<" \n\n" <<std::endl;
                 auto methodIt = program.methods.find(methodName);
                 if (methodIt == program.methods.end()) throw std::runtime_error("Method not found");
                 activations_stack.push(current_activation);
