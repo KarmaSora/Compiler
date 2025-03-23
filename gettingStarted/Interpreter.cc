@@ -155,11 +155,31 @@ Interpreter::Interpreter(Program program)
                     std::string methodName = instr->operand;
                     auto it = program.methods.find(methodName);
                     if (it == program.methods.end()) throw std::runtime_error("Method not found: " + methodName);
+                
+                    Method method = it->second;
+                    Activation* newActivation = new Activation(0, method);
+                
+                    int argCount = instr->intValue;
+                    if (argCount > method.variables.size()) {
+                        throw std::runtime_error("Not enough variables in method to hold arguments.");
+                    }
+                
+                    // Pop arguments and assign to first N declared variables
+                    for (int i = argCount - 1; i >= 0; --i) {
+                        if (data.empty()) throw std::runtime_error("Stack underflow during argument passing");
+                        int val = data.top(); data.pop();
+                        const std::string& varName = method.variables[i];
+                        newActivation->local_variables[varName] = val;
+                    }
+                
                     activations.push(current);
-                    current = new Activation(0, it->second);
+                    current = newActivation;
                     didJump = true;
                     break;
                 }
+                
+                
+                
     
                 case IRETURN: {
                     if (activations.empty()) {
