@@ -601,6 +601,9 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
             } else if (tac.op == "METHOD") {
                 byteCode.addInstruction("method", tac.dest, tac.src1);
             }
+            else if (tac.op == "EXIT") {
+                byteCode.addInstruction("stop", tac.dest, tac.src1);
+            }
         }
     }
 }
