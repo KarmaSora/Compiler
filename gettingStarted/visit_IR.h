@@ -86,6 +86,7 @@ private:
             ctx.current_block->tacInstructions.push_back(taClass);
             for (auto child : argNode->children) {
                 std::string arg = visit_expr(child, ctx);
+
                 TAC ta("Args", "", arg, "");
                 ctx.current_block->tacInstructions.push_back(ta);
             }
@@ -328,16 +329,15 @@ private:
                 Node* thirdChild = *std::next(right->children.begin(), 2);
                 
 
-                string isThis = "";
-                if (firstChild->type == "THIS") isThis = curr_class_name;
-                else isThis = firstChild->value;
-                
                 int argCount = thirdChild->children.size();
 
                 std::string nameOfClass = "";//here!!!
                 Node* nodeWithClassName = right->children.front();
                 if(nodeWithClassName->type == "NEW identifier LP RP"){
                     nameOfClass = nodeWithClassName->children.front()->value;
+                }
+                else if(nodeWithClassName->type == "THIS"){
+                    nameOfClass = curr_class_name;
                 }
                 else {
                     nameOfClass = nodeWithClassName->value;
