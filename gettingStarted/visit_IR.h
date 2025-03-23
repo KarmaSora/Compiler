@@ -322,45 +322,6 @@ private:
 
             } 
             
-            if (right->type == "exp DOT ident LP exp COMMA exp RP"){
-                // handle single do not make temp variables.
-                Node* firstChild = right->children.front();
-                Node* secChild = *std::next(right->children.begin());
-                Node* thirdChild = *std::next(right->children.begin(), 2);
-                
-
-                int argCount = thirdChild->children.size();
-
-                std::string nameOfClass = "";//here!!!
-                Node* nodeWithClassName = right->children.front();
-                if(nodeWithClassName->type == "NEW identifier LP RP"){
-                    nameOfClass = nodeWithClassName->children.front()->value;
-                }
-                else if(nodeWithClassName->type == "THIS"){
-                    nameOfClass = curr_class_name;
-                }
-                else {
-                    nameOfClass = nodeWithClassName->value;
-                }
-
-                TAC taClass("Args", "", nameOfClass,"");  
-
-                ctx.current_block->tacInstructions.push_back(taClass);
-                for(auto child : thirdChild->children){
-                    string arg = visit_expr(child, ctx);
-                    TAC ta("Args", "", arg,"");  
-
-                    ctx.current_block->tacInstructions.push_back(ta);
-
-                }
-
-
-                TAC ta("CALL", left->value,secChild->value, to_string(argCount +1));  // foo2 
-                ctx.current_block->tacInstructions.push_back(ta);
-
- 
-                return ctx.current_block;
-            }
 
             
 
