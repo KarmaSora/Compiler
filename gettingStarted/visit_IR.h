@@ -273,34 +273,15 @@ private:
     }
 
     BasicBlock* visit_stmt(Node* node, BlockContext& ctx) {
-        //if(!node) return ctx.current_block;
         if(!node) return nullptr;
         else if(node->type == "SIMPLE PRINT LOL"){    
             std::string t = visit_expr(node->children.front(),ctx);
             TAC ta ("PRINT","",t,"");
             ctx.current_block->tacInstructions.push_back(ta);  
-            // if(node->children.front()->type =="exp DOT ident LP exp COMMA exp RP"){
-            //     BasicBlock* newBlock = create_block(ctx.cfg);
-            //     ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
-            //     ctx.current_block = newBlock; // Switch to the new block
-            //     return ctx.current_block;
-            // }
+
             return ctx.current_block;
         }
 
-        // //karmaHere
-        // else if(node->type == "LC statement RC"){
-        //     return visit_stmt(node->children.front(),ctx);
-        // }
-
-        // else if(node->type == "statements"){
-        //     BasicBlock* lastBlock = ctx.current_block;
-        //     for (Node* stmt : node->children) {
-        //         lastBlock = visit_stmt(stmt, ctx); // Process each statement
-        //     }
-        //     return lastBlock; // Return the last processed block
-
-        // }
         else if (node->type == "LC statement RC"){
             std::cout << "KKKKKKKKKKKKKKKK";
             if (node->children.size() == 1) return visit_stmt(node->children.front(),ctx);
@@ -324,19 +305,13 @@ private:
             TAC ta("RETURN", "", first_CHILD->value, "");  
             ctx.current_block->tacInstructions.push_back(ta);
 
-            // BasicBlock* newBlock = create_block(ctx.cfg);
-            // //ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
-            // ctx.current_block = newBlock; // Switch to the new block
+       
             return ctx.current_block;
         }
         else if(node->type =="SOMETHING ASSIGNED = TO SOMETHING"){
             Node* left = node->children.front();
             Node* right = *std::next(node->children.begin());
 
-            //string temp = visit_expr(right, ctx);
-
-            // TAC t(TACType::ASSIGN, left->value, temp, "", "");
-            // ctx.current_block->tacInstructions.push_back(t);
             if(right->type == "MultExpression" || right->type == "AddExpression"|| right->type == "SubExpression" ) {
 
                 std::string src = visit_expr(right, ctx);
@@ -352,14 +327,6 @@ private:
                 Node* secChild = *std::next(right->children.begin());
                 Node* thirdChild = *std::next(right->children.begin(), 2);
                 
-                //std::string arg = visit_expr(thirdChild, ctx);
-                // string arguments = "";
-                // if (thirdChild->type == "argument_list"){
-                //     if (thirdChild->children.size() == 1) 
-                //     for (auto i : thirdChild->children){
-                //         arguments += i->value + ",";
-                //     }
-                // }
 
                 string isThis = "";
                 if (firstChild->type == "THIS") isThis = curr_class_name;
@@ -391,12 +358,7 @@ private:
                 TAC ta("CALL", left->value,secChild->value, to_string(argCount +1));  // foo2 
                 ctx.current_block->tacInstructions.push_back(ta);
 
-                // TAC ta2(TACType::JUMP, "", "", "", secChild->value, "");
-                // ctx.current_block->tacInstructions.push_back(ta2);
-
-                //BasicBlock* newBlock = create_block(ctx.cfg);
-                //ctx.current_block->successors.push_back(newBlock); // Ensure correct flow
-                //ctx.current_block = newBlock; // Switch to the new block
+ 
                 return ctx.current_block;
             }
 
@@ -422,7 +384,6 @@ private:
 
 
             // 1. Evaluate condition to a temporary variable
-            //std::string condTemp = visit_expr(conditionNode, ctx);
             string tempting = visit_expr(conditionNode,ctx);
 
             
@@ -435,8 +396,8 @@ private:
             // 3. Emit conditional jump (true: thenBlock, false: elseBlock)
             TAC condJump("COND_JUMP", 
                 tempting,        // Condition (src1)
-                elseBlock->label, // False target (src2)
-                thenBlock->label // True target (label field)
+                thenBlock->label, // True target (label field)
+                elseBlock->label // False target (src2)
             );
             ctx.current_block->tacInstructions.push_back(condJump);
 
@@ -519,23 +480,12 @@ private:
     void traverse_generic(Node* node, BlockContext& ctx) {
         if (!node) return;
 
-        // if(node->type =="SIMPLE PRINT LOL"){
-        //     BasicBlock *res = visit_stmt(node,ctx);
 
-        // }
-        // else if(node->type =="SOMETHING ASSIGNED = TO SOMETHING"){
-            
-        //     BasicBlock *res = visit_stmt(node,ctx);
-        // }
         if (node->type == "statement"){
             Node* stmt = node->children.front();
             BasicBlock* res = visit_stmt(stmt, ctx);
         }
-        else if (node->type == "var declaration"){
-            //handle it if the right child is subexpression or addexpression MAKE TEMP VALUES
 
-
-        }
         else if(node->type == "MAIN CLASS"){
             for (auto child : node->children){
                 traverse_generic(child, ctx);

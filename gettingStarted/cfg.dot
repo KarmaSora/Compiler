@@ -4,7 +4,7 @@ node [shape=box];
 Main [label="Main\n__t0 := NEW Sum\n @Param: Sum\n @Param: 10000\n__t1 := CALL calcSum: 2\nPRINT __t1\nEXIT\n"];
 Sum_calcSum -> block_1 [xlabel="true"];
 Sum_calcSum -> block_2 [xlabel="false"];
-Sum_calcSum [label="Sum_calcSum\nMETHOD Sum IN calcSum\n__t2 := num < 2\nif __t2 goto block_2 else goto block_1\n"];
+Sum_calcSum [label="Sum_calcSum\n__t2 := num < 2\nif __t2 goto block_2 else goto block_1\n"];
 block_1 -> block_3;
 block_1 [label="block_1\nsum := 1\ngoto block_3\n"];
 block_2 -> block_3;

@@ -57,7 +57,7 @@ public:
                      src2.c_str()); // FIX THIS IN FINAL ANSWER
                 }
                 else if (op =="AND"){
-                    printf("%s := %s - %s\n", dest.c_str(), src1.c_str(), 
+                    printf("%s := %s && %s\n", dest.c_str(), src1.c_str(), 
                      src2.c_str()); // FIX THIS IN FINAL ANSWER
                 }
 
@@ -112,7 +112,7 @@ public:
                 }
                 else {
 
-                    printf("Unknown TAC type == ", op.c_str() ," \n");
+                    printf("Unknown TAC type == %s \n", op.c_str() );
                 }
         }
         
@@ -215,10 +215,7 @@ public:
                 
                     label += "CLASS " + tac.dest + "\\n";
                 }
-                else if (tac.op == "METHOD" ) {
 
-                    label += "METHOD " + tac.dest + " IN " + tac.src1 + "\\n";
-                }
                 else if (tac.op == "LABEL" ) {
 
                     label += "LABEL " + tac.dest + "\\n";
