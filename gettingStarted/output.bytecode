@@ -1,11 +1,13 @@
+label Main
+method Main Main
 new Bar
 istore __t0
 iload Bar
-iload foo
-invokevirtual 1
+invokevirtual foo
 istore __t1
 iload __t1
 print
+label Bar_foo
 method Bar foo
 iconst 1
 istore aux
@@ -13,8 +15,7 @@ iconst 1
 istore aux2
 iload Bar
 iload aux
-iload foo2
-invokevirtual 2
+invokevirtual foo2
 istore __t2
 iload __t2
 istore aux
@@ -22,13 +23,13 @@ iload Bar
 iload 2
 iload 5
 iload aux2
-iload foo3
-invokevirtual 4
+invokevirtual foo3
 istore __t3
 iload __t3
 istore aux
 iload aux
 ireturn
+label Bar_foo2
 method Bar foo2
 iload p1
 iconst 2
@@ -37,24 +38,31 @@ istore __t4
 iload __t4
 iffalse_goto block_2
 goto block_1
+label block_1
 iconst 10
 print
 goto block_3
+label block_2
 iconst 0
 print
 goto block_3
+label block_3
 iconst 1
 ireturn
+label Bar_foo3
 method Bar foo3
 iload p3
 iffalse_goto block_5
 goto block_4
+label block_4
 iconst 1
 print
 goto block_6
+label block_5
 iconst 0
 print
 goto block_6
+label block_6
 iload p1
 print
 iload p2

@@ -1,4 +1,5 @@
 Main:
+    METHOD Main IN Main
     __t0 := NEW Bar
      @param: Bar
     __t1 := CALL foo: 1

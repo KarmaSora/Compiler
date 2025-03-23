@@ -4,8 +4,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
 #include <stack>
+#include <iostream>
 
 enum InstructionType {
     ILOAD, // iload n Push integer value stored in local variable n.
@@ -42,12 +42,13 @@ enum InstructionType {
 
 class Instruction {
 public:
-    int id;
-    int argument;
+    InstructionType type;
+    std::string operand; // variable name, label, or method name
+    int intValue;        // numeric value, e.g., for iconst or jump targets
 
     Instruction();
-    Instruction(int id, int argument);
-    void printInstruction();
+    Instruction(InstructionType t, const std::string& op, int val = 0);
+    void printInstruction() const;
 };
 
 class Method {
@@ -57,7 +58,7 @@ public:
 
     Method();
     Method(std::vector<Instruction> instructions, std::vector<std::string> variables);
-    void printMethod();
+    void printMethod() const ;
 };
 
 class Program {
@@ -66,7 +67,7 @@ public:
 
     Program();
     Program(std::unordered_map<std::string, Method> methods);
-    void printProgram();
+    void printProgram() const;
     Method getMainMethod();
 };
 
@@ -78,22 +79,24 @@ public:
 
     Activation();
     Activation(int p, Method m);
-    Instruction *  getNextInstruction();
-    void storeValue(std::string& var, int value);
+    Instruction* getNextInstruction();
+    void storeValue(const std::string& var, int value);
 };
 
 class Interpreter {
 public:
     Program program;
     Method main;
-    
-std::unordered_map<std::string, int> labelMap; // Store labels with their instruction index
-std::unordered_map<std::string, int> objectHeap; // Simulate object creation
 
+    std::unordered_map<std::string, int> labelMap;           // Label to instruction index
+    std::unordered_map<std::string, int> objectHeap;         // Simulated object heap
 
     Interpreter();
     Interpreter(Program program);
     void execute();
 };
 
-#endif
+// Load a bytecode program from a file into memory
+Program loadProgramFromFile(const std::string& filename);
+
+#endif // INTERPRETER_H

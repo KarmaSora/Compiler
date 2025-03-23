@@ -43,16 +43,22 @@ private:
     }
 public:
 
-    CFG* generate_IR(Node* root) {
-        CFG* cfg = new CFG(); // Create a CFG on the heap
-        BasicBlock* entry_block = create_block(cfg); // Pass CFG to create_block
-        cfg->entry_block = entry_block;
-        cfg->entry_block->label = "Main";
-        BlockContext ctx{entry_block, cfg};
-        traverse_generic(root, ctx);
+CFG* generate_IR(Node* root) {
+    CFG* cfg = new CFG(); // Create a CFG on the heap
+    BasicBlock* entry_block = create_block(cfg); // Create entry block
+    cfg->entry_block = entry_block;
+    cfg->entry_block->label = "Main";
 
-        return cfg; // Return the fully built CFG
-    }
+    // 🔥 Add a METHOD instruction for the main block
+    TAC mainMethodTac("METHOD", "Main", "Main", "");
+    cfg->entry_block->tacInstructions.push_back(mainMethodTac);
+
+    BlockContext ctx{entry_block, cfg};
+    traverse_generic(root, ctx);
+
+    return cfg;
+}
+
 
 private:
 
@@ -518,6 +524,7 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
     for (BasicBlock* block : cfg->blocks) {
         if (visitedBlocks.count(block)) continue;
         visitedBlocks.insert(block);
+        byteCode.addInstruction("label", block->label);
 
         for (const auto& tac : block->tacInstructions) {
             if (tac.op == "ASSIGN") {
@@ -550,11 +557,14 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("goto", tac.src1);
             } else if (tac.op == "JUMP") {
                 byteCode.addInstruction("goto", tac.dest);
+
             } else if (tac.op == "CALL") {
-                loadOrConst(byteCode, tac.src1);
-                byteCode.addInstruction("invokevirtual", tac.src2);
+                //loadOrConst(byteCode, tac.src1);
+                byteCode.addInstruction("invokevirtual", tac.src1);
                 byteCode.addInstruction("istore", tac.dest);
-            } else if (tac.op == "NEW") {
+            } 
+            
+            else if (tac.op == "NEW") {
                 byteCode.addInstruction("new", tac.src1);
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "Args") {
