@@ -312,29 +312,16 @@ private:
         else if(node->type =="SOMETHING ASSIGNED = TO SOMETHING"){
             Node* left = node->children.front();
             Node* right = *std::next(node->children.begin());
+        
+            string leftVal = visit_expr(left,ctx);
+            string rightVal = visit_expr(right,ctx);
 
-            if(right->type == "MultExpression" || right->type == "AddExpression"|| right->type == "SubExpression" ) {
+            TAC ta("ASSIGN", leftVal, rightVal, "");
+            ctx.current_block->tacInstructions.push_back(ta);
+            return ctx.current_block;
 
-                std::string src = visit_expr(right, ctx);
-                TAC ta("ASSIGN", left->value, src, "");  // foo2 
-                ctx.current_block->tacInstructions.push_back(ta);
-                return ctx.current_block;
-
-            } 
-            
 
             
-
-            else {
-                string leftVal = visit_expr(left,ctx);
-                string rightVal = visit_expr(right,ctx);
-
-                TAC ta("ASSIGN", leftVal, rightVal, "");
-                ctx.current_block->tacInstructions.push_back(ta);
-                return ctx.current_block;
-
-
-            }
         }
         else if (node->type == "IF LP expression RP statement ELSE statement"){
 

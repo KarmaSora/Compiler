@@ -1,63 +1,469 @@
-iconst 4
-iconst 2
-imul
+new Bar
 istore __t0
-iload __t0
-iconst 10
-iadd
+iload Bar
+iload foo
+invokevirtual 1
 istore __t1
-iconst 2
-iconst 6
-imul
-istore __t2
 iload __t1
-iload __t2
-isub
-istore __t3
-iconst 4
+print
+method Bar foo
 iconst 1
-isub
-istore __t6
-iload __t6
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
 iconst 2
-imul
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
 istore __t5
 iload __t5
-iconst 2
-imul
-istore __t4
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
 iload __t3
-iload __t4
-iadd
-istore __t7
-iload __t7
-print
-iconst 1
-inot
-istore __t11
-iload __t11
-iconst 0
-iand
-istore __t10
-iconst 1
-iload __t10
-equal
-istore __t9
-iconst 10
-iconst 1
-igt
-istore __t13
-iconst 1
-iconst 10
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
 ilt
-istore __t14
-iload __t13
-iload __t14
-iand
-istore __t12
-iload __t9
-iload __t12
-ior
-istore __t8
-iload __t8
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
 print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
+new Bar
+istore __t0
+iload Bar
+iload foo
+invokevirtual 1
+istore __t1
+iload __t1
+print
+method Bar foo
+iconst 1
+istore aux
+iconst 1
+istore aux2
+iload Bar
+iload aux
+iload foo2
+invokevirtual 2
+istore __t2
+iload __t2
+istore aux
+iload Bar
+iload 2
+iload 5
+iload aux2
+iload foo3
+invokevirtual 4
+istore __t3
+iload __t3
+istore aux
+iload aux
+ireturn
+method Bar foo2
+iload p1
+iconst 2
+ilt
+istore __t4
+iload __t4
+iffalse_goto block_2
+goto block_1
+iconst 10
+print
+goto block_3
+iconst 0
+print
+goto block_3
+iconst 1
+ireturn
+method Bar foo3
+iload p3
+iffalse_goto block_5
+goto block_4
+iconst 1
+print
+goto block_6
+iconst 0
+print
+goto block_6
+iload p1
+print
+iload p2
+iload p1
+isub
+istore __t5
+iload __t5
+print
+iconst 4
+ireturn
