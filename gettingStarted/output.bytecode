@@ -21,8 +21,8 @@ istore __t2
 iload __t2
 istore aux
 iload Bar
-iload 2
-iload 5
+iconst 2
+iconst 5
 iload aux2
 invokevirtual foo3
 istore __t3

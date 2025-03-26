@@ -552,7 +552,8 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 loadOrConst(byteCode, tac.src1);
                 byteCode.addInstruction("ireturn");
             } else if (tac.op == "COND_JUMP") {
-                byteCode.addInstruction("iload", tac.dest);
+                loadOrConst(byteCode, tac.dest);
+
                 byteCode.addInstruction("iffalse_goto", tac.src2);
                 byteCode.addInstruction("goto", tac.src1);
             } else if (tac.op == "JUMP") {
@@ -568,7 +569,8 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
                 byteCode.addInstruction("new", tac.src1);
                 byteCode.addInstruction("istore", tac.dest);
             } else if (tac.op == "Args") {
-                byteCode.addInstruction("iload", tac.src1);
+                loadOrConst(byteCode, tac.src1);
+
             } else if (tac.op == "EQUAL") {
                 loadOrConst(byteCode, tac.src1);
                 loadOrConst(byteCode, tac.src2);
