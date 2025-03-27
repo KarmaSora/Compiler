@@ -27,6 +27,8 @@ InstructionType mapToEnum(const std::string& op) {
     if (op == "stop") return STOP;
     if (op == "new") return NEW;
     if (op == "label") return STOP;
+    if (op == "param") return PARAM;
+
     throw std::runtime_error("Unknown opcode: " + op);
 }
 
@@ -87,6 +89,13 @@ ParsedProgram parseBytecodeFile(const std::string& filename) {
             labelMap[op1] = currentPc;
             continue;
         }
+        if (op == "param") {
+            iss >> op1; // op1 is parameter name
+            if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end())
+                currentVars.push_back(op1);
+            continue;
+        }
+        
 
         // 4) Otherwise, read the next two tokens (op1, op2) for instructions
         iss >> op1 >> op2;

@@ -460,21 +460,35 @@ private:
             }
         }
         else if (node->type == "methodDec"){
-            
-            string resThis = curr_class_name + "_" + node->value; // also that is has a class name
-            BasicBlock *res = create_block(ctx.cfg, resThis); //provided  method name AS BLOCK NAME
-
-
-               // Add METHOD TAC to mark the method's start
-            TAC methodTac("METHOD", curr_class_name, node->value, "");
+            string methodName = node->value;
+            string resThis = curr_class_name + "_" + methodName;
+            BasicBlock *res = create_block(ctx.cfg, resThis);
+        
+            // METHOD TAC
+            TAC methodTac("METHOD", curr_class_name, methodName, "");
             res->tacInstructions.push_back(methodTac);
-            ctx.current_block = res;
-            
+        
+            // 🔥 Find and emit PARAM TACs (in order)
             for (auto child : node->children){
-                traverse_generic(child, ctx);
+                if (child->type == "parameters") {
+                    for (auto param : child->children) {
+                        if(param->type == "parameter"){
+                        Node* parNOIDA = *std::next(param->children.begin(),1);
+                        TAC paramTac("PARAM", parNOIDA->value, "", "");
+                        res->tacInstructions.push_back(paramTac);
+                        }
+                    }
+                }
             }
-            
+            ctx.current_block = res;
+        
+            // Traverse all children except parameterList
+            for (auto child : node->children){
+                if (child->type != "parameterList")
+                    traverse_generic(child, ctx);
+            }
         }
+        
 
         else if (node->type == "methodBody"){
             for (auto child : node->children){
@@ -607,6 +621,10 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
             else if (tac.op == "EXIT") {
                 byteCode.addInstruction("stop", tac.dest, tac.src1);
             }
+            else if (tac.op == "PARAM") {
+                byteCode.addInstruction("param", tac.dest);
+            }
+            
         }
     }
 }

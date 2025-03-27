@@ -165,14 +165,16 @@ Interpreter::Interpreter(Program program)
                     }
                 
                     // Pop arguments and assign to first N declared variables
-                    for (int i = 0; i < argCount; i++) {
+                    for (int i = argCount - 1; i >= 0; i--) {
                         if (data.empty()) throw std::runtime_error("Stack underflow during argument passing");
                         int val = data.top(); data.pop();
                         const std::string& varName = method.variables[i];
                         std::cout << "KarmaParamVal: " << varName << " = " << val << std::endl;
-                        newActivation->local_variables[varName] = val;
+                        // newActivation->local_variables[varName] = val;
+                        newActivation->local_variables[ method.variables[i] ] = val;
                     }
                 
+
                     activations.push(current);
                     current = newActivation;
                     didJump = true;

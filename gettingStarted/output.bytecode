@@ -29,6 +29,7 @@ iload aux
 ireturn
 label Bar_foo2
 method Bar foo2
+param p1
 iload p1
 iconst 2
 ilt
@@ -49,6 +50,9 @@ iconst 1
 ireturn
 label Bar_foo3
 method Bar foo3
+param p1
+param p2
+param p3
 iload p3
 iffalse_goto block_5
 goto block_4
