@@ -74,9 +74,9 @@ Interpreter::Interpreter(Program program)
     
             InstructionType type = instr->type;
     
-            // Debug
+            // Debug Karma
             //std::cout << "Executing [" << current->pc << "]: " << type << " (" << instr->operand << ", " << instr->intValue << ")\n";
-    
+            
             bool didJump = false;
     
             switch (type) {
