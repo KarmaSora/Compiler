@@ -97,6 +97,18 @@ ParsedProgram parseBytecodeFile(const std::string& filename) {
             int val = std::stoi(op1);
             currentInstructions.emplace_back(type, "", val);
         }
+        else if (type == GOTO || type == IFFALSEGOTO) {
+            // 'op1' is a label, not a variable
+            currentInstructions.emplace_back(type, op1);
+            // DO NOT add `op1` to currentVars here!
+        }
+        else if (type == ILOAD || type == ISTORE || type == NEW) {
+            // 'op1' is a real variable reference or name, so store it
+            currentInstructions.emplace_back(type, op1);
+            if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end()) {
+                currentVars.push_back(op1);
+            }
+        }
         else if (type == INVOKEVIRTUAL) {
             // e.g. "invokevirtual foo3 4"
             // op1 = "foo3", op2 = "4"
@@ -106,15 +118,6 @@ ParsedProgram parseBytecodeFile(const std::string& filename) {
             }
             currentInstructions.emplace_back(type, op1, argCount);
             // Optionally track method name as a "variable"
-            if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end()) {
-                currentVars.push_back(op1);
-            }
-        }
-        else if (type == ILOAD || type == ISTORE ||
-                 type == GOTO || type == IFFALSEGOTO || type == NEW) {
-            // e.g. "iload x" or "goto block_3"
-            currentInstructions.emplace_back(type, op1);
-            // Track the variable name
             if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end()) {
                 currentVars.push_back(op1);
             }
