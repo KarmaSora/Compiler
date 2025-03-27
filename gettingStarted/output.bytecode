@@ -2,7 +2,7 @@ label Main
 method Main Main
 new Bar
 istore __t0
-iload Bar
+iload __t0
 invokevirtual foo
 istore __t1
 iload __t1

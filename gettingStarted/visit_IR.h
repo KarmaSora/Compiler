@@ -88,7 +88,7 @@ private:
         
             // Process arguments
             Node* argNode = *std::next(node->children.begin(), 2);
-            TAC taClass("Args", "", className, "");        //class as param
+            TAC taClass("Args", "", receiver, "");        //class as param
             ctx.current_block->tacInstructions.push_back(taClass);
             for (auto child : argNode->children) {
                 std::string arg = visit_expr(child, ctx);
@@ -504,9 +504,9 @@ void loadOrConst(ByteCode& b, std::string sauce) {
         return;
     }
     else
-    if (sauce == "True") {
+    if (sauce == "True" || sauce == "TRUE" ) {
         b.addInstruction("iconst", "1");  // TRUE → 1
-    } else if (sauce == "False") {
+    } else if (sauce == "False" || sauce == "FALSE") {
         b.addInstruction("iconst", "0"); // FALSE → 0
     } else if (sauce == "THIS" ||sauce == "this" || sauce == "NEW") {
         b.addInstruction("iconst", sauce); // Handle THIS/NEW as before
