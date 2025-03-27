@@ -1,8 +1,8 @@
 digraph CFG {
 graph [splines=ortho];
 node [shape=box];
-Main [label="Main\n__t0 := NEW Bar\n @Param: __t0\n__t1 := CALL foo: 1\nPRINT __t1\nEXIT\n"];
-Bar_foo [label="Bar_foo\naux := 100\naux2 := True\n @Param: Bar\n @Param: aux\n__t2 := CALL foo2: 2\naux := __t2\n @Param: Bar\n @Param: 2\n @Param: 5\n @Param: aux2\n__t3 := CALL foo3: 4\naux := __t3\nRETURN aux\n"];
+Main [label="Main\n__t0 := NEW Bar\n__t1 := CALL foo: 0\nPRINT __t1\nEXIT\n"];
+Bar_foo [label="Bar_foo\naux := 1\naux2 := True\n @Param: aux\n__t2 := CALL foo2: 1\naux := __t2\n @Param: 2\n @Param: 5\n @Param: aux2\n__t3 := CALL foo3: 3\naux := __t3\nRETURN aux\n"];
 Bar_foo2 -> block_1 [xlabel="true"];
 Bar_foo2 -> block_2 [xlabel="false"];
 Bar_foo2 [label="Bar_foo2\n__t4 := p1 < 2\nif __t4 goto block_1 else goto block_2\n"];

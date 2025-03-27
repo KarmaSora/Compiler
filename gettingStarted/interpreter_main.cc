@@ -58,50 +58,76 @@ ParsedProgram parseBytecodeFile(const std::string& filename) {
         std::string op, op1, op2;
         iss >> op;
 
+        // 1) Detect the start of a new method
         if (op == "method") {
+            // If we were in the middle of another method, store it first
             if (!currentMethodName.empty()) {
                 methods[currentMethodName] = Method(currentInstructions, currentVars);
                 currentInstructions.clear();
                 currentVars.clear();
                 currentPc = 0;
             }
+            // Read "className methodName" after 'method'
             std::string className, methodName;
             iss >> className >> methodName;
             currentMethodName = methodName;
             continue;
         }
 
-        if (op.back() == ':') {
+        // 2) If this line ends with a colon, it's a label
+        if (!op.empty() && op.back() == ':') {
             std::string label = op.substr(0, op.length() - 1);
             labelMap[label] = currentPc;
             continue;
         }
 
+        // 3) If this line starts with "label", then the next token is the label name
         if (op == "label") {
             iss >> op1;
             labelMap[op1] = currentPc;
             continue;
         }
 
+        // 4) Otherwise, read the next two tokens (op1, op2) for instructions
         iss >> op1 >> op2;
         InstructionType type = mapToEnum(op);
 
         if (type == ICONST) {
+            // e.g. "iconst 5"
             int val = std::stoi(op1);
             currentInstructions.emplace_back(type, "", val);
-        } else if (type == ILOAD || type == ISTORE || type == INVOKEVIRTUAL ||
-                   type == GOTO || type == IFFALSEGOTO || type == NEW) {
-            currentInstructions.emplace_back(type, op1);
+        }
+        else if (type == INVOKEVIRTUAL) {
+            // e.g. "invokevirtual foo3 4"
+            // op1 = "foo3", op2 = "4"
+            int argCount = 0;
+            if (!op2.empty()) {
+                argCount = std::stoi(op2);
+            }
+            currentInstructions.emplace_back(type, op1, argCount);
+            // Optionally track method name as a "variable"
             if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end()) {
                 currentVars.push_back(op1);
             }
-        } else {
+        }
+        else if (type == ILOAD || type == ISTORE ||
+                 type == GOTO || type == IFFALSEGOTO || type == NEW) {
+            // e.g. "iload x" or "goto block_3"
+            currentInstructions.emplace_back(type, op1);
+            // Track the variable name
+            if (std::find(currentVars.begin(), currentVars.end(), op1) == currentVars.end()) {
+                currentVars.push_back(op1);
+            }
+        }
+        else {
+            // For one-operand or no-operand instructions (e.g. "iadd", "print", "stop")
             currentInstructions.emplace_back(type, "");
         }
 
         currentPc++;
     }
 
+    // 5) If we finished reading but still have a 'currentMethodName', store its instructions
     if (!currentMethodName.empty()) {
         methods[currentMethodName] = Method(currentInstructions, currentVars);
     }

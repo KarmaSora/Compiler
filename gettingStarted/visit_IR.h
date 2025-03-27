@@ -88,8 +88,8 @@ private:
         
             // Process arguments
             Node* argNode = *std::next(node->children.begin(), 2);
-            TAC taClass("Args", "", receiver, "");        //class as param
-            ctx.current_block->tacInstructions.push_back(taClass);
+            // TAC taClass("Args", "", receiver, "");        //class as param
+            // ctx.current_block->tacInstructions.push_back(taClass);
             for (auto child : argNode->children) {
                 std::string arg = visit_expr(child, ctx);
 
@@ -98,7 +98,7 @@ private:
             }
         
             // Emit CALL TAC: receiver, methodName, result_temp
-            TAC ta("CALL", temp, methodNameNode->value, std::to_string( argNode->children.size()+1));
+            TAC ta("CALL", temp, methodNameNode->value, std::to_string( argNode->children.size()));
             ctx.current_block->tacInstructions.push_back(ta);
         
             return temp;

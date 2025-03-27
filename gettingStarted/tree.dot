@@ -55,7 +55,7 @@ n29 [label="statement:"];
 n30 [label="SOMETHING ASSIGNED = TO SOMETHING:"];
 n31 [label="identifier:aux"];
 n30 -> n31
-n32 [label="INT:100"];
+n32 [label="INT:1"];
 n30 -> n32
 n29 -> n30
 n22 -> n29

@@ -2,29 +2,26 @@ label Main
 method Main Main
 new Bar
 istore __t0
-iload __t0
-invokevirtual foo 1
+invokevirtual foo 0
 istore __t1
 iload __t1
 print
 stop
 label Bar_foo
 method Bar foo
-iconst 100
+iconst 1
 istore aux
 iconst 1
 istore aux2
-iload Bar
 iload aux
-invokevirtual foo2 2
+invokevirtual foo2 1
 istore __t2
 iload __t2
 istore aux
-iload Bar
 iconst 2
 iconst 5
 iload aux2
-invokevirtual foo3 4
+invokevirtual foo3 3
 istore __t3
 iload __t3
 istore aux

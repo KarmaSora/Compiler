@@ -1,24 +1,21 @@
 Main:
     METHOD Main IN Main
     __t0 := NEW Bar
-     @param: __t0
-    __t1 := CALL foo: 1
+    __t1 := CALL foo: 0
     PRINT __t1
     EXIT
 
 Bar_foo:
     METHOD Bar IN foo
-    aux := 100
+    aux := 1
     aux2 := True
-     @param: Bar
      @param: aux
-    __t2 := CALL foo2: 2
+    __t2 := CALL foo2: 1
     aux := __t2
-     @param: Bar
      @param: 2
      @param: 5
      @param: aux2
-    __t3 := CALL foo3: 4
+    __t3 := CALL foo3: 3
     aux := __t3
     RETURN aux
 
