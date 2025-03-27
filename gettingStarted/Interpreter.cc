@@ -75,7 +75,7 @@ Interpreter::Interpreter(Program program)
             InstructionType type = instr->type;
     
             // Debug
-            std::cout << "Executing [" << current->pc << "]: " << type << " (" << instr->operand << ", " << instr->intValue << ")\n";
+            //std::cout << "Executing [" << current->pc << "]: " << type << " (" << instr->operand << ", " << instr->intValue << ")\n";
     
             bool didJump = false;
     

@@ -1,59 +1,29 @@
 Main:
     METHOD Main IN Main
-    __t0 := NEW Bar
-    __t1 := CALL foo: 0
+    __t0 := NEW Sum
+     @param: 10000
+    __t1 := CALL calcSum: 1
     PRINT __t1
     EXIT
 
-Bar_foo:
-    METHOD Bar IN foo
-    aux := 1
-    aux2 := True
-     @param: aux
-    __t2 := CALL foo2: 1
-    aux := __t2
-     @param: 2
-     @param: 5
-     @param: aux2
-    __t3 := CALL foo3: 3
-    aux := __t3
-    RETURN aux
-
-Bar_foo2:
-    METHOD Bar IN foo2
+Sum_calcSum:
+    METHOD Sum IN calcSum
     Unknown TAC: PARAM
-    __t4 := p1 < 2
-    if __t4 goto block_1 else goto block_2
+    __t2 := num < 2
+    if __t2 goto block_1 else goto block_2
 
 block_1:
-    PRINT 10
+    sum := 1
     goto block_3
 
 block_2:
-    PRINT 0
+    __t4 := num - 1
+     @param: __t4
+    __t3 := CALL calcSum: 1
+    __t5 := num + __t3
+    sum := __t5
     goto block_3
 
 block_3:
-    RETURN 1
-
-Bar_foo3:
-    METHOD Bar IN foo3
-    Unknown TAC: PARAM
-    Unknown TAC: PARAM
-    Unknown TAC: PARAM
-    if p3 goto block_4 else goto block_5
-
-block_4:
-    PRINT 1
-    goto block_6
-
-block_5:
-    PRINT 0
-    goto block_6
-
-block_6:
-    PRINT p1
-    __t5 := p2 - p1
-    PRINT __t5
-    RETURN 4
+    RETURN sum
 
