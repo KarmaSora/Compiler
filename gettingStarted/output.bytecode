@@ -3,20 +3,20 @@ method Main Main
 new Bar
 istore __t0
 iload __t0
-invokevirtual foo
+invokevirtual foo 1
 istore __t1
 iload __t1
 print
 stop
 label Bar_foo
 method Bar foo
-iconst 1
+iconst 100
 istore aux
 iconst 1
 istore aux2
 iload Bar
 iload aux
-invokevirtual foo2
+invokevirtual foo2 2
 istore __t2
 iload __t2
 istore aux
@@ -24,7 +24,7 @@ iload Bar
 iconst 2
 iconst 5
 iload aux2
-invokevirtual foo3
+invokevirtual foo3 4
 istore __t3
 iload __t3
 istore aux

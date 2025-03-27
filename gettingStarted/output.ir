@@ -8,7 +8,7 @@ Main:
 
 Bar_foo:
     METHOD Bar IN foo
-    aux := 1
+    aux := 100
     aux2 := True
      @param: Bar
      @param: aux

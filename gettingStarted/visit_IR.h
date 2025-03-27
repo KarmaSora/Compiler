@@ -561,7 +561,8 @@ void generateByteCode(CFG* cfg, ByteCode& byteCode) {
 
             } else if (tac.op == "CALL") {
                 //loadOrConst(byteCode, tac.src1);
-                byteCode.addInstruction("invokevirtual", tac.src1);
+                //byteCode.addInstruction("invokevirtual", tac.src1);
+                byteCode.addInstruction("invokevirtual", tac.src1, tac.src2);
                 byteCode.addInstruction("istore", tac.dest);
             } 
             
