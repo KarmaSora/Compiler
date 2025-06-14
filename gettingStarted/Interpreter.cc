@@ -192,7 +192,7 @@ Interpreter::Interpreter(Program program)
                     }
                     Activation* prev = current;
                     current = activations.top(); activations.pop();
-                    current->pc++; // 🔥 advance past the CALL after returning
+                    current->pc++; // advance past the CALL after returning
                     delete prev;
                     didJump = true;
                     break;

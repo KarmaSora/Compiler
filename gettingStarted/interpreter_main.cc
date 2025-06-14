@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include "INTERPRETER.h"
+#include "Interpreter.h"
 #include "BYTECODE.h"
 
 InstructionType mapToEnum(const std::string& op) {

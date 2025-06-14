@@ -49,7 +49,7 @@ CFG* generate_IR(Node* root) {
     cfg->entry_block = entry_block;
     cfg->entry_block->label = "Main";
 
-    // 🔥 Add a METHOD instruction for the main block
+    //   Add a METHOD instruction for the main block
     TAC mainMethodTac("METHOD", "Main", "Main", "");
     cfg->entry_block->tacInstructions.push_back(mainMethodTac);
 
@@ -468,7 +468,7 @@ private:
             TAC methodTac("METHOD", curr_class_name, methodName, "");
             res->tacInstructions.push_back(methodTac);
         
-            // 🔥 Find and emit PARAM TACs (in order)
+            //   Find and emit PARAM TACs (in order)
             for (auto child : node->children){
                 if (child->type == "parameters") {
                     for (auto param : child->children) {

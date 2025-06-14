@@ -37,17 +37,11 @@ private:
     string curr_class_name; // Track current class name
 
     Node* curr_class_for_returns = nullptr;
-    //Node* curr_method_for_returns = nullptr;
     bool flag = false; //used for when its okay for example i1 = ia1[1] + ia2[2]; or b1 = i1 < i2;
     Symbol* a1 = nullptr;
 
     vector<string> method_scope_name;
     unordered_set<string> declared_vars; // Track local declarations
-    // IR:
-public:
-    // variables for the IR generation
-    // BasicBlock* current_block;
-    // std::unordered_map<std::string, BasicBlock*> method_entry_blocks;
 
 public:
     ASTVisitor(SymbolTable &st) : symtab(st) {}
@@ -678,11 +672,7 @@ public:
                     
                     Node* check_this = obj_node->children.front(); // THIS
                     Node* ident_name_to_find = *std::next(obj_node->children.begin()); // identifier:extract 
-                    // Node* argument_list_or_argument = *std::next(obj_node->children.begin(), 2);
-                    // cout << argument_list_or_argument->type<<endl;
-                    // if (check_this->type == "exp DOT ident LP exp COMMA exp RP" ){
 
-                    // }
 
                     if (check_this->type == "THIS"){
                         Symbol* method_sym = symtab.lookup(ident_name_to_find->value);
@@ -710,8 +700,6 @@ public:
                                 }
                             }
                             
-                            // Now param_types contains ["int"] for a1()
-                            // Use these to validate arguments
                         }
                     }
                 }
@@ -948,8 +936,7 @@ public:
             Node* func_that_has_the_parameters = *std::next(node->children.begin()); // identifier:a5
             Node* check_argument_list = *std::next(node->children.begin(), 2); // argument_list
             Node* check_this2 = node->children.front(); // THIS
-            //Symbol* getA5 = getSymbolForFunction_For_parameters(func_that_has_the_parameters->value);
-            //Symbol* getA5 = getSymbolForMethod_For_parameters(curr_class_name, func_that_has_the_parameters->value, "a5");
+
             vector<string> get_curr_params_types; // a = this.a5(b, a, ia, new InvalidNestedMethodCalls()); current parameters types.
             vector<string> getA5_params_types; // a5 parameters types.
             int counter = 1;
@@ -1071,7 +1058,7 @@ public:
                 
             }
             
-            
+
             // if (counter != getA5_params_types.size()){
             //     cout << "counter " << counter << " getA5_params_types.size() " << getA5_params_types.size() << " "<<node->lineno << endl;
             //     string error_msg = "semantic (invalid number of parameters)";
